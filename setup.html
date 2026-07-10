@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vocabulary Game – Teacher Setup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="inputArea">
+    <h2>Teacher Setup</h2>
+
+    <p>Enter vocabulary as:</p>
+    <p><strong>WORD,DEFINITION</strong> (one per line)</p>
+
+    <!-- LIST NAME -->
+    <input
+      id="listName"
+      placeholder="List name (e.g. aplat3_1)"
+      style="width:100%; padding:10px; margin-bottom:10px;"
+    >
+
+    <!-- VOCAB INPUT -->
+    <textarea
+      id="vocabInput"
+      rows="12"
+      placeholder="amicus,friend&#10;bellum,war"
+    ></textarea>
+
+    <!-- BUTTONS -->
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button onclick="exportJSON()">Export JSON</button>
+    </div>
+
+    <!-- STATUS -->
+    <p id="status" style="margin-top:10px; font-weight:bold;"></p>
+  </div>
+
+  <script>
+    function exportJSON() {
+      const name = document.getElementById("listName").value.trim();
+      const text = document.getElementById("vocabInput").value.trim();
+      const status = document.getElementById("status");
+
+      if (!name || !text) {
+        alert("Please enter both a list name and vocabulary.");
+        return;
+      }
+
+      const lines = text.split("\n");
+      const data = [];
+
+      for (let line of lines) {
+        const parts = line.split(",");
+        if (parts.length >= 2) {
+          data.push({
+            word: parts[0].trim(),
+            definition: parts[1].trim()
+          });
+        }
+      }
+
+      if (data.length < 5) {
+        alert("Please enter at least 5 vocabulary items.");
+        return;
+      }
+
+      const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        { type: "application/json" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = name + ".json";
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      status.textContent =
+        "✅ JSON file downloaded. Upload it to /vocab/ in GitHub.";
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BubbleWord</title>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<!-- =========================================
+     TEACHER PANEL
+========================================= -->
+
+<div id="teacher-panel">
+
+    <h2>BubbleWord</h2>
+
+    <p>Load a vocabulary list from the online repository.</p>
+
+    <input
+        type="text"
+        id="vocab-url"
+        placeholder="Paste JSON vocabulary URL here"
+    >
+
+    <p style="font-size:13px;color:#666;margin-top:10px;">
+        Example:
+        <br><br>
+        https://alexjeffersonmarsh.github.io/bubble-vocab-lists/sat-unit-1.json
+    </p>
+
+    <button id="start-game-btn">
+        Start Game
+    </button>
+
+</div>
+
+<!-- =========================================
+     GAME AREA
+========================================= -->
+
+<div id="game-container">
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- LEFT HUD -->
+    <div id="hud-left">
+        <div class="hud-box">
+            Score: <span id="score">0</span>
+        </div>
+        <div class="hud-box">
+            Level: <span id="level">1</span>
+        </div>
+    </div>
+
+    <!-- RIGHT HUD -->
+    <div id="hud-right">
+        <div class="hud-box">
+            Time: <span id="timer">60</span>
+        </div>
+        <div class="hud-box">
+            Shots Left: <span id="attempts">20</span>
+        </div>
+        <div class="hud-box">
+            <button id="mute-btn">🔊</button>
+        </div>
+    </div>
+
+    <!-- TARGET WORD -->
+    <div id="target-word-bar">
+        <div id="target-label">
+            Find the definition for:
+        </div>
+        <div id="target-word">
+            PRESS START
+        </div>
+    </div>
+
+</div>
+
+<!-- =========================================
+     JSON LOADER (LEGACY SUPPORT)
+========================================= -->
+
+<script>
+
+window.preloadedVocab = null;
+
+// Load via ?vocab=URL
+async function loadVocabularyFromURL() {
+
+    const params = new URLSearchParams(window.location.search);
+
+    // ✅ VERY IMPORTANT: skip JSON loader if Firebase ID exists
+    if (params.get("id")) {
+        return;
+    }
+
+    const vocabURL = params.get("vocab");
+
+    if (!vocabURL) return;
+
+    try {
+
+        const response = await fetch(vocabURL);
+        const data = await response.json();
+
+        window.preloadedVocab = data;
+
+        document.getElementById("teacher-panel").style.display = "none";
+
+        if (window.startLoadedGame) {
+            window.startLoadedGame();
+        }
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Could not load vocabulary list.");
+
+    }
+}
+
+// Manual input
+async function loadVocabularyManually() {
+
+    const url = document.getElementById("vocab-url").value.trim();
+
+    if (!url) {
+        alert("Please enter a vocabulary URL.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        window.preloadedVocab = data;
+
+        if (window.startLoadedGame) {
+            window.startLoadedGame();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Could not load vocabulary list.");
+
+    }
+}
+
+document
+    .getElementById("start-game-btn")
+    .addEventListener("click", loadVocabularyManually);
+
+// Auto-load JSON if present
+loadVocabularyFromURL();
+
+</script>
+
+<!-- =========================================
+     FIREBASE LOADER (MAIN SYSTEM)
+========================================= -->
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ✅ Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+  authDomain: "bubbleword-30367.firebaseapp.com",
+  projectId: "bubbleword-30367",
+  storageBucket: "bubbleword-30367.firebasestorage.app",
+  messagingSenderId: "1058393039019",
+  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ✅ FIXED loader
+async function loadSet(setId) {
+
+    const ref = doc(db, "vocabSets", setId);
+    const snapshot = await getDoc(ref);
+
+    if (!snapshot.exists()) {
+        throw new Error("Set not found");
+    }
+
+    const data = snapshot.data();
+
+    let terms = data.terms;
+
+    // ✅ Handle string storage (from REST API)
+    if (typeof terms === "string") {
+        try {
+            terms = JSON.parse(terms);
+        } catch (e) {
+            console.error("Parse failed:", e);
+            terms = [];
+        }
+    }
+
+    return terms;
+}
+
+// ✅ Read URL param
+const params = new URLSearchParams(window.location.search);
+const setId = params.get("id") || params.get("set");
+
+if (setId) {
+
+    loadSet(setId)
+        .then(vocab => {
+
+            window.preloadedVocab = vocab.map(v => ({
+                word: v.word,
+                definition: v.meaning
+            }));
+
+            console.log("Loaded Firebase vocab:", vocab);
+
+            document.getElementById("teacher-panel").style.display = "none";
+
+            if (window.startLoadedGame) {
+                window.startLoadedGame();
+            }
+
+        })
+        .catch(error => {
+
+            console.error(error);
+            alert("Could not load Firebase vocabulary set.");
+
+        });
+
+}
+
+</script>
+
+<!-- =========================================
+     GAME LOGIC
+========================================= -->
+
+<script src="script.js"></script>
+
+</body>
+</html>

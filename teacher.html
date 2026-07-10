@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>BubbleWord Teacher Setup</title>
+
+<!-- ✅ CORRECT CSS LINK -->
+<link rel="stylesheet" href="styles.css">
+
+<!-- ✅ QR LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    background: linear-gradient(to bottom, #9ad9ff, #e6f7ff);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ✅ WIDE PANEL (this fixes skinny issue) */
+#teacher-box {
+    width: 1000px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+h2 { margin-bottom: 10px; color: #1d3d57; }
+
+p {
+    color: #4d6477;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+textarea, input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #b8d7e8;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+textarea {
+    height: 180px;
+    resize: none;
+}
+
+/* ✅ BUTTONS */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #58d88f, #34bc6e);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+/* ✅ RESULT BOX */
+#result {
+    margin-top: 15px;
+    background: #f0f9ff;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* ✅ PREVIEW */
+#preview-box table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+#preview-box th, #preview-box td {
+    border: 1px solid #ccc;
+    padding: 6px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="teacher-box">
+
+<h2>BubbleWord Teacher CMS</h2>
+
+<p>Paste vocabulary in format: <b>word, meaning</b></p>
+
+<input id="set-name" placeholder="Set Title">
+<input id="content-area" placeholder="Content Area">
+
+<!-- ✅ DROPDOWN (RESTORED + WORKING) -->
+<h4>Select Game:</h4>
+<select id="game-select">
+    <option value="BubbleWord">BubbleWord</option>
+    <option value="GemWord">GemWord</option>
+</select>
+
+<textarea id="teacher-input">
+amicus, friend
+aqua, water
+arbor, tree
+bellum, war
+caelum, sky
+</textarea>
+
+<button onclick="previewVocab()">Preview</button>
+<button onclick="createVocabSet()">Save</button>
+
+<div id="preview-box"></div>
+
+<div id="result"></div>
+<canvas id="qrCanvas"></canvas>
+
+</div>
+
+<script>
+
+// ===== HELPERS =====
+function generateID() {
+    return Math.random().toString(36).substring(2, 10);
+}
+
+function parseCSV(text) {
+    return text.split("\n")
+        .map(l => l.trim())
+        .filter(l => l.includes(","))
+        .map(line => {
+            const parts = line.split(",");
+            return {
+                word: parts[0].trim(),
+                meaning: parts.slice(1).join(",").trim()
+            };
+        });
+}
+
+// ===== PREVIEW =====
+function previewVocab() {
+    const text = document.getElementById("teacher-input").value;
+    const terms = parseCSV(text);
+
+    let html = "<h4>Preview</h4><table>";
+    html += "<tr><th>Word</th><th>Meaning</th></tr>";
+
+    terms.forEach(t => {
+        html += `<tr><td>${t.word}</td><td>${t.meaning}</td></tr>`;
+    });
+
+    html += "</table>";
+
+    document.getElementById("preview-box").innerHTML = html;
+}
+
+// ===== SAVE =====
+async function createVocabSet() {
+
+    const title = document.getElementById("set-name").value.trim();
+    const contentArea = document.getElementById("content-area").value.trim();
+    const text = document.getElementById("teacher-input").value;
+
+    if (!title) {
+        alert("Enter a title.");
+        return;
+    }
+
+    const terms = parseCSV(text);
+
+    if (terms.length < 5) {
+        alert("Add at least 5 vocab items.");
+        return;
+    }
+
+    const id = generateID();
+
+    try {
+
+        await fetch(
+            "https://firestore.googleapis.com/v1/projects/bubbleword-30367/databases/(default)/documents/vocabSets?documentId=" + id,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fields: {
+                        title: { stringValue: title },
+                        contentArea: { stringValue: contentArea },
+                        createdAt: { integerValue: Date.now().toString() },
+                        terms: { stringValue: JSON.stringify(terms) }
+                    }
+                })
+            }
+        );
+
+        // ✅ GAME SELECTION WORKING
+        const game = document.getElementById("game-select").value;
+
+        let link = "";
+
+        if (game === "BubbleWord") {
+            link = "https://alexjeffersonmarsh.github.io/BubbleWord/index.html?id=" + id;
+        }
+
+        if (game === "GemWord") {
+            link = "https://alexjeffersonmarsh.github.io/Latin-Vocab-Game/game.html?id=" + id;
+        }
+
+        document.getElementById("result").innerHTML = `
+            ✅ Saved!<br><br>
+            <input id="shareLink" value="${link}" readonly>
+            <button onclick="copyLink()">Copy Link</button>
+            <strong></a>
+        `;
+
+        QRCode.toCanvas(document.getElementById("qrCanvas"), link);
+
+    } catch (err) {
+        console.error(err);
+        alert("Save failed.");
+    }
+}
+
+// ===== COPY =====
+function copyLink() {
+    const input = document.getElementById("shareLink");
+    input.select();
+    document.execCommand("copy");
+    alert("Copied!");
+}
+
+</script>
+
+</body>
+</html>

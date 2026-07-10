@@ -1,0 +1,298 @@
+/* =========================================
+   GLOBAL RESET
+========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================================
+   BODY
+========================================= */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(to bottom, #9ad9ff, #e6f7ff);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    color: #2b3a42;
+}
+
+/* =========================================
+   TEACHER PANEL
+========================================= */
+#teacher-panel {
+    width: 300px;
+    max-width: 400px; /* ✅ prevents oversizing */
+    background: rgba(255,255,255,0.95);
+    border-right: 4px solid #cde7f5;
+    padding: 15px;
+    overflow-y: auto;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.08);
+}
+
+#teacher-panel h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #1d3d57;
+}
+
+#bulk-vocab-input {
+    width: 100%;
+    height: 300px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #b8d7e8;
+    font-size: 14px;
+}
+
+/* =========================================
+   INPUTS
+========================================= */
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #b8d7e8;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+button {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(to bottom, #58d88f, #34bc6e);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+/* ✅ Secondary button (Preview) */
+button.secondary {
+    background: linear-gradient(to bottom, #d0e8f7, #a8d4ef);
+    color: #1d3d57;
+}
+
+/* Start button */
+#start-game-btn:hover {
+    background: linear-gradient(to bottom, #69e59d, #2cab63);
+}
+
+/* =========================================
+   PREVIEW TABLE
+========================================= */
+#preview-box {
+    margin-top: 15px;
+}
+
+#preview-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#preview-box th {
+    background: #e8f4fb;
+    color: #1d3d57;
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ccc;
+}
+
+#preview-box td {
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #ffffff;
+}
+
+#preview-box tr:nth-child(even) td {
+    background: #f7fbff;
+}
+
+/* =========================================
+   RESULT AREA (LINK + COPY)
+========================================= */
+#result {
+    margin-top: 15px;
+}
+
+#result input {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+#result button {
+    margin-top: 8px;
+    background: linear-gradient(to bottom, #4aa3df, #2b7bbf);
+}
+
+/* =========================================
+   QR CODE
+========================================= */
+#qrCanvas {
+    margin-top: 15px;
+    display: block;
+}
+
+/* =========================================
+   GAME CONTAINER
+========================================= */
+#game-container {
+    flex: 1;
+    position: relative;
+}
+
+/* =========================================
+   CANVAS (PLAY AREA)
+========================================= */
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: linear-gradient(to bottom, #7fd6ff, #e9faff);
+}
+
+/* =========================================
+   LEFT HUD (Score + Level)
+========================================= */
+#hud-left {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    pointer-events: none;
+}
+
+/* =========================================
+   RIGHT HUD (Time + Shots)
+========================================= */
+#hud-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    align-items: flex-end;
+
+    pointer-events: none;
+}
+
+/* =========================================
+   HUD BOXES
+========================================= */
+.hud-box {
+    background: rgba(255,255,255,0.95);
+    padding: 16px 22px;
+    border-radius: 14px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1d3d57;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    min-width: 140px;
+    text-align: center;
+}
+
+/* =========================================
+   MUTE BUTTON
+========================================= */
+#mute-btn {
+    font-size: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* =========================================
+   TARGET WORD BAR
+========================================= */
+#target-word-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background: rgba(255,255,255,0.97);
+    border-top: 4px solid #cde7f5;
+
+    padding: 16px 20px;
+    text-align: center;
+
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+
+    z-index: 5;
+}
+
+#target-label {
+    font-size: 16px;
+    color: #5a6d7c;
+    margin-bottom: 6px;
+}
+
+#target-word {
+    font-size: 42px;
+    font-weight: bold;
+    color: #123a52;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+#teacher-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+#teacher-panel::-webkit-scrollbar-thumb {
+    background: #9fd7f7;
+    border-radius: 20px;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    #teacher-panel {
+        width: 100%;
+        height: 40vh;
+        border-right: none;
+        border-bottom: 4px solid #cde7f5;
+    }
+
+    #game-container {
+        height: 60vh;
+    }
+
+    .hud-box {
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+
+    #target-word {
+        font-size: 30px;
+    }
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Select a Game</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+#play-box {
+    width: 500px;
+    text-align: center;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Buttons */
+.game-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.bubble {
+    background: linear-gradient(to bottom, #58d88f, #34bc6e);
+}
+
+.gem {
+    background: linear-gradient(to bottom, #8e44ad, #5e2c7a);
+}
+
+.flash {
+    background: linear-gradient(to bottom, #3498db, #1f6faf);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="play-box">
+
+<h2>Select a Game</h2>
+
+<p>Your vocabulary set is ready:</p>
+
+<button class="game-btn bubble" onclick="goToGame('bubble')">
+    ▶ BubbleWord
+</button>
+
+<button class="game-btn gem" onclick="goToGame('gem')">
+    ▶ GemWord
+</button>
+
+<button class="game-btn flash" onclick="goToGame('flash')">
+    ▶ Flashcards
+</button>
+
+</div>
+
+<script>
+
+function goToGame(gameType) {
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) {
+        alert("No vocab set found.");
+        return;
+    }
+
+    let url = "";
+
+    if (gameType === "bubble") {
+        url = `https://alexjeffersonmarsh.github.io/BubbleWord/index.html?id=${id}`;
+    }
+
+    if (gameType === "gem") {
+        url = `https://alexjeffersonmarsh.github.io/Latin-Vocab-Game/game.html?id=${id}`;
+    }
+
+    if (gameType === "flash") {
+        url = `https://alexjeffersonmarsh.github.io/BubbleWord/flashcards.html?id=${id}`;
+    }
+
+    window.location.href = url;
+}
+
+</script>
+
+</body>
+</html>
