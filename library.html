@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+2
+<html lang="en">
+3
+<head>
+4
+<meta charset="UTF-8">
+5
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+6
+ 
+7
+<title>Vocabulary Library</title>
+8
+ 
+9
+<style>
+10
+ 
+11
+body{
+12
+font-family: Arial, sans-serif;
+13
+background:#f4f4f4;
+14
+margin:0;
+15
+padding:0;
+16
+}
+17
+ 
+18
+.container{
+19
+max-width:900px;
+20
+margin:auto;
+21
+padding:20px;
+22
+}
+23
+ 
+24
+h1{
+25
+text-align:center;
+26
+}
+27
+ 
+28
+.controls{
+29
+display:flex;
+30
+gap:10px;
+31
+flex-wrap:wrap;
+32
+margin-bottom:20px;
+33
+}
+34
+ 
+35
+input, select{
+36
+padding:10px;
+37
+font-size:16px;
+38
+}
+39
+ 
+40
+#search{
+41
+flex:1;
+42
+}
+43
+ 
+44
+.listCard{
+45
+background:white;
+46
+border-radius:8px;
+47
+padding:15px;
+48
+margin-bottom:10px;
+49
+display:flex;
+50
+justify-content:space-between;
+51
+align-items:center;
+52
+box-shadow:0 2px 4px rgba(0,0,0,.1);
+53
+}
+54
+ 
+55
+.details{
+56
+flex:1;
+57
+}
+58
+ 
+59
+.title{
+60
+font-size:18px;
+61
+font-weight:bold;
+62
+}
+63
+ 
+64
+.language{
+65
+color:#666;
+66
+margin-top:4px;
+67
+}
+68
+ 
+69
+.playButton{
+70
+background:#0078d4;
+71
+color:white;
+72
+text-decoration:none;
+73
+padding:10px 14px;
+74
+border-radius:5px;
+75
+}
+76
+ 
+77
+.playButton:hover{
+78
+background:#005ea8;
+79
+}
+80
+ 
+81
+#count{
+82
+margin-bottom:15px;
+83
+font-weight:bold;
+84
+}
+85
+ 
+86
+</style>
+87
+ 
+88
+</head>
+89
+<body>
+90
+ 
+91
+<div class="container">
+92
+ 
+93
+<h1>Vocabulary Library</h1>
+94
+ 
+95
+<div class="controls">
+96
+ 
+97
+<input
+98
+id="search"
+99
+type="text"
+100
+placeholder="Search titles..."
+101
+>
+102
+ 
+103
+<select id="languageFilter">
+104
+<option value="all">All Languages</option>
+105
+</select>
+106
+ 
+107
+</div>
+108
+ 
+109
+<div id="count"></div>
+110
+ 
+111
+<div id="libraryResults"></div>
+112
+ 
+113
+</div>
+114
+ 
+115
+<script>
+116
+ 
+117
+let allLists = [];
+118
+ 
+119
+async function loadLibrary() {
+120
+ 
+121
+try {
+122
+ 
+123
+const response = await fetch("vocab/library.json");
+124
+allLists = await response.json();
+125
+ 
+126
+populateLanguageFilter();
+127
+displayLists();
+128
+ 
+129
+} catch (error) {
+130
+ 
+131
+document.getElementById("libraryResults").innerHTML =
+132
+"<p>Could not load library.json</p>";
+133
+ 
+134
+console.error(error);
+135
+}
+136
+}
+137
+ 
+138
+function populateLanguageFilter() {
+139
+ 
+140
+const filter =
+141
+document.getElementById("languageFilter");
+142
+ 
+143
+const languages =
+144
+[...new Set(allLists.map(item => item.language))]
+145
+.sort();
+146
+ 
+147
+languages.forEach(language => {
+148
+ 
+149
+const option =
+150
+document.createElement("option");
+151
+ 
+152
+option.value = language;
+153
+option.textContent = language;
