@@ -2,90 +2,237 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Vocabulary Game – Teacher Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocabulary Game - Teacher Setup</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .inputArea {
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .buttonRow {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .buttonRow button {
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    .counter {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-  <div class="inputArea">
-    <h2>Teacher Setup</h2>
+<div class="inputArea">
 
-    <p>Enter vocabulary as:</p>
-    <p><strong>WORD,DEFINITION</strong> (one per line)</p>
+  <h2>Teacher Setup</h2>
 
-    <!-- LIST NAME -->
-    <input
-      id="listName"
-      placeholder="List name (e.g. aplat3_1)"
-      style="width:100%; padding:10px; margin-bottom:10px;"
-    >
+  <p>Enter vocabulary as:</p>
+  <p><strong>WORD,DEFINITION</strong> (one term per line)</p>
 
-    <!-- VOCAB INPUT -->
-    <textarea
-      id="vocabInput"
-      rows="12"
-      placeholder="amicus,friend&#10;bellum,war"
-    ></textarea>
+  <!-- LIST FILE NAME -->
+  <input
+    id="listName"
+    type="text"
+    placeholder="File name (example: aplat3_1)"
+  >
 
-    <!-- BUTTONS -->
-    <div style="display:flex; gap:10px; margin-top:10px;">
-      <button onclick="exportJSON()">Export JSON</button>
-    </div>
+  <!-- DISPLAY TITLE -->
+  <input
+    id="listTitle"
+    type="text"
+    placeholder="Vocabulary List Title"
+  >
 
-    <!-- STATUS -->
-    <p id="status" style="margin-top:10px; font-weight:bold;"></p>
+  <!-- LANGUAGE -->
+  <select id="language">
+    <option value="">Select Language</option>
+    <option>Latin</option>
+    <option>Spanish</option>
+    <option>French</option>
+    <option>German</option>
+    <option>Italian</option>
+    <option>Greek</option>
+    <option>Portuguese</option>
+    <option>Chinese</option>
+    <option>Japanese</option>
+    <option>Other</option>
+  </select>
+
+  <!-- VISIBILITY -->
+  <select id="visibility">
+    <option value="public">Public</option>
+    <option value="private">Private</option>
+  </select>
+
+  <!-- VOCABULARY -->
+  <textarea
+    id="vocabInput"
+    rows="12"
+    placeholder="amicus,friend&#10;bellum,war&#10;hostis,enemy"
+  ></textarea>
+
+  <div class="counter">
+    Vocabulary Entries: <span id="entryCount">0</span> / 50
   </div>
 
-  <script>
-    function exportJSON() {
-      const name = document.getElementById("listName").value.trim();
-      const text = document.getElementById("vocabInput").value.trim();
-      const status = document.getElementById("status");
+  <div class="buttonRow">
+    <button onclick="exportJSON()">Export JSON</button>
+  </div>
 
-      if (!name || !text) {
-        alert("Please enter both a list name and vocabulary.");
-        return;
-      }
+  <p id="status"></p>
 
-      const lines = text.split("\n");
-      const data = [];
+</div>
 
-      for (let line of lines) {
-        const parts = line.split(",");
-        if (parts.length >= 2) {
-          data.push({
-            word: parts[0].trim(),
-            definition: parts[1].trim()
-          });
-        }
-      }
+<script>
 
-      if (data.length < 5) {
-        alert("Please enter at least 5 vocabulary items.");
-        return;
-      }
+  const vocabInput = document.getElementById("vocabInput");
+  const entryCount = document.getElementById("entryCount");
 
-      const blob = new Blob(
-        [JSON.stringify(data, null, 2)],
-        { type: "application/json" }
-      );
+  function updateCount() {
+    const lines = vocabInput.value
+      .split("\n")
+      .filter(line => line.trim() !== "");
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+    entryCount.textContent = lines.length;
+  }
 
-      a.href = url;
-      a.download = name + ".json";
-      document.body.appendChild(a);
-      a.click();
+  vocabInput.addEventListener("input", updateCount);
 
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+  function exportJSON() {
 
-      status.textContent =
-        "✅ JSON file downloaded. Upload it to /vocab/ in GitHub.";
+    const fileName = document.getElementById("listName").value.trim();
+    const listTitle = document.getElementById("listTitle").value.trim();
+    const language = document.getElementById("language").value;
+    const visibility = document.getElementById("visibility").value;
+    const vocabText = vocabInput.value.trim();
+    const status = document.getElementById("status");
+
+    status.textContent = "";
+
+    if (!fileName) {
+      alert("Please enter a file name.");
+      return;
     }
-  </script>
+
+    if (!listTitle) {
+      alert("Please enter a list title.");
+      return;
+    }
+
+    if (!language) {
+      alert("Please select a language.");
+      return;
+    }
+
+    if (!vocabText) {
+      alert("Please enter vocabulary items.");
+      return;
+    }
+
+    const lines = vocabText
+      .split("\n")
+      .filter(line => line.trim() !== "");
+
+    if (lines.length < 5 || lines.length > 50) {
+      alert("Vocabulary lists must contain between 5 and 50 entries.");
+      return;
+    }
+
+    const items = [];
+
+    for (const line of lines) {
+
+      const commaIndex = line.indexOf(",");
+
+      if (commaIndex === -1) {
+        alert(
+          `Invalid entry:\n\n${line}\n\nEach line must contain WORD,DEFINITION`
+        );
+        return;
+      }
+
+      const word = line.substring(0, commaIndex).trim();
+      const definition = line.substring(commaIndex + 1).trim();
+
+      if (!word || !definition) {
+        alert(
+          `Invalid entry:\n\n${line}\n\nBoth word and definition are required.`
+        );
+        return;
+      }
+
+      items.push({
+        word,
+        definition
+      });
+    }
+
+    const exportData = {
+      title: listTitle,
+      language: language,
+      visibility: visibility,
+      created: new Date().toISOString(),
+      itemCount: items.length,
+      items: items
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(exportData, null, 2)],
+      {
+        type: "application/json"
+      }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `${fileName}.json`;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    status.textContent =
+      `✅ ${items.length} entries exported successfully. Upload ${fileName}.json to your /vocab/ folder in GitHub.`;
+  }
+
+  updateCount();
+
+</script>
 
 </body>
 </html>
