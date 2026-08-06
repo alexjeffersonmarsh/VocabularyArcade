@@ -1,615 +1,308 @@
 <!DOCTYPE html>
-2
 <html lang="en">
-3
 <head>
-4
 <meta charset="UTF-8">
-5
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-6
- 
-7
+
 <title>Vocabulary Game - Teacher Setup</title>
-8
- 
-9
+
 <style>
-10
- 
-11
+
 body{
-12
 font-family: Arial, sans-serif;
-13
 background:#f4f4f4;
-14
 margin:0;
-15
 padding:20px;
-16
 }
-17
- 
-18
+
 .inputArea{
-19
 max-width:800px;
-20
 margin:auto;
-21
 background:white;
-22
 padding:25px;
-23
 border-radius:10px;
-24
 box-shadow:0 2px 8px rgba(0,0,0,.1);
-25
 }
-26
- 
-27
+
 h2{
-28
 margin-top:0;
-29
 }
-30
- 
-31
+
 input,
-32
 select,
-33
 textarea{
-34
 width:100%;
-35
 padding:10px;
-36
 margin-bottom:10px;
-37
 box-sizing:border-box;
-38
 font-size:16px;
-39
 }
-40
- 
-41
+
 textarea{
-42
 resize:vertical;
-43
 }
-44
- 
-45
+
 button{
-46
 background:#0078d4;
-47
 color:white;
-48
 border:none;
-49
 padding:12px 18px;
-50
 cursor:pointer;
-51
 border-radius:5px;
-52
 font-size:16px;
-53
 }
-54
- 
-55
+
 button:hover{
-56
 background:#005ea8;
-57
 }
-58
- 
-59
+
 .counter{
-60
 margin-bottom:15px;
-61
 color:#666;
-62
 }
-63
- 
-64
+
 #status{
-65
 margin-top:15px;
-66
 font-weight:bold;
-67
 }
-68
- 
-69
+
 </style>
-70
 </head>
-71
- 
-72
+
 <body>
-73
- 
-74
+
 <div class="inputArea">
-75
- 
-76
+
 <h2>Teacher Setup</h2>
-77
- 
-78
+
 <p>Enter vocabulary as:</p>
-79
- 
-80
+
 <p>
-81
 <strong>WORD,DEFINITION</strong><br>
-82
 (one vocabulary item per line)
-83
 </p>
-84
- 
-85
+
 <input
-86
 id="listTitle"
-87
 type="text"
-88
 placeholder="Vocabulary List Title"
-89
 >
-90
- 
-91
+
 <select id="language">
-92
 <option value="">Select Language</option>
-93
 <option>Latin</option>
-94
 <option>Spanish</option>
-95
 <option>French</option>
-96
 <option>German</option>
-97
 <option>Italian</option>
-98
 <option>Greek</option>
-99
 <option>Portuguese</option>
-100
 <option>Chinese</option>
-101
 <option>Japanese</option>
-102
 <option>Other</option>
-103
 </select>
-104
- 
-105
+
 <select id="visibility">
-106
 <option value="public">Public</option>
-107
 <option value="private">Private</option>
-108
 </select>
-109
- 
-110
+
 <textarea
-111
 id="vocabInput"
-112
 rows="12"
-113
 placeholder="amicus,friend
-114
 bellum,war
-115
 hostis,enemy">
-116
 </textarea>
-117
- 
-118
+
 <div class="counter">
-119
 Vocabulary Entries:
-120
 <span id="entryCount">0</span> / 50
-121
 </div>
-122
- 
-123
+
 <button onclick="saveVocabularyList()">
-124
 Save To Library
-125
 </button>
-126
- 
-127
+
 <p id="status"></p>
-128
- 
-129
+
 </div>
-130
- 
-131
+
 <script type="module">
-132
- 
-133
+
 import { initializeApp }
-134
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-135
- 
-136
+
 import {
-137
 getFirestore,
-138
 collection,
-139
 addDoc,
-140
 serverTimestamp
-141
 }
-142
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-143
- 
-144
+
 const firebaseConfig = {
-145
 apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-146
 authDomain: "bubbleword-30367.firebaseapp.com",
-147
 projectId: "bubbleword-30367",
-148
 storageBucket: "bubbleword-30367.firebasestorage.app",
-149
 messagingSenderId: "1058393039019",
-150
 appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
-151
 };
-152
- 
-153
+
 const app = initializeApp(firebaseConfig);
-154
 const db = getFirestore(app);
-155
- 
-156
+
 const vocabInput =
-157
 document.getElementById("vocabInput");
-158
- 
-159
+
 const entryCount =
-160
 document.getElementById("entryCount");
-161
- 
-162
+
 function updateCount() {
-163
- 
-164
+
 const count =
-165
 vocabInput.value
-166
 .split("\n")
-167
 .filter(line => line.trim() !== "")
-168
 .length;
-169
- 
-170
+
 entryCount.textContent = count;
-171
 }
-172
- 
-173
+
 vocabInput.addEventListener("input", updateCount);
-174
- 
-175
+
 window.saveVocabularyList = async function() {
-176
- 
-177
+
 const title =
-178
 document
-179
 .getElementById("listTitle")
-180
 .value
-181
 .trim();
-182
- 
-183
+
 const language =
-184
 document
-185
 .getElementById("language")
-186
 .value;
-187
- 
-188
+
 const visibility =
-189
 document
-190
 .getElementById("visibility")
-191
 .value;
-192
- 
-193
+
 const text =
-194
 document
-195
 .getElementById("vocabInput")
-196
 .value
-197
 .trim();
-198
- 
-199
+
 const status =
-200
 document
-201
 .getElementById("status");
-202
- 
-203
+
 status.textContent = "";
-204
- 
-205
+
 if (!title) {
-206
 alert("Please enter a vocabulary list title.");
-207
 return;
-208
 }
-209
- 
-210
+
 if (!language) {
-211
 alert("Please select a language.");
-212
 return;
-213
 }
-214
- 
-215
+
 if (!text) {
-216
 alert("Please enter vocabulary items.");
-217
 return;
-218
 }
-219
- 
-220
+
 const lines =
-221
 text
-222
 .split("\n")
-223
 .filter(line => line.trim() !== "");
-224
- 
-225
+
 if (lines.length < 5 || lines.length > 50) {
-226
 alert(
-227
 "Vocabulary lists must contain between 5 and 50 entries."
-228
 );
-229
 return;
-230
 }
-231
- 
-232
+
 const items = [];
-233
- 
-234
+
 for (const line of lines) {
-235
- 
-236
+
 const commaIndex =
-237
 line.indexOf(",");
-238
- 
-239
+
 if (commaIndex === -1) {
-240
 alert(
-241
 `Invalid format:\n\n${line}\n\nUse WORD,DEFINITION`
-242
 );
-243
 return;
-244
 }
-245
- 
-246
+
 const word =
-247
 line.substring(0, commaIndex).trim();
-248
- 
-249
+
 const definition =
-250
 line.substring(commaIndex + 1).trim();
-251
- 
-252
+
 if (!word || !definition) {
-253
 alert(
-254
 `Invalid entry:\n\n${line}`
-255
 );
-256
 return;
-257
 }
-258
- 
-259
+
 items.push({
-260
 word,
-261
 definition
-262
 });
-263
 }
-264
- 
-265
+
 try {
-266
- 
-267
+
 status.textContent =
-268
 "Saving vocabulary list...";
-269
- 
-270
+
 const docRef =
-271
 await addDoc(
-272
 collection(db, "vocabSets"),
-273
 {
-274
 title,
-275
 language,
-276
 visibility,
-277
 itemCount: items.length,
-278
 createdAt: serverTimestamp(),
-279
 items
-280
 }
-281
 );
-282
- 
-283
+
 status.innerHTML =
-284
 `✅ Saved successfully!<br><br>
-285
 Document ID: ${docRef.id}`;
-286
- 
-287
+
 document
-288
 .getElementById("vocabInput")
-289
 .value = "";
-290
- 
-291
+
 updateCount();
-292
- 
-293
+
 } catch(error) {
-294
- 
-295
+
 console.error(error);
-296
- 
-297
+
 status.innerHTML =
-298
 `❌ Error saving list:<br>${error.message}`;
-299
 }
-300
- 
-301
+
 };
-302
- 
-303
+
 updateCount();
-304
- 
-305
+
 </script>
-306
- 
-307
+
 </body>
-308
 </html>
