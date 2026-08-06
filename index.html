@@ -22,13 +22,14 @@
 
     <h2>BubbleWord</h2>
 
-    <p>Load a vocabulary list from the online repository.</p>
+   <p>Select a vocabulary list from the library or load a legacy JSON file.</p>
 
-    <input
-        type="text"
-        id="vocab-url"
-        placeholder="Paste JSON vocabulary URL here"
-    >
+<input
+    type="text"
+    id="vocab-url"
+    placeholder="Optional: paste legacy JSON URL"
+>
+
 
     <p style="font-size:13px;color:#666;margin-top:10px;">
         Example:
@@ -182,7 +183,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ✅ Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
   authDomain: "bubbleword-30367.firebaseapp.com",
@@ -195,66 +195,150 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ✅ FIXED loader
+/*
+=================================================
+LOAD VOCAB SET FROM FIRESTORE
+Supports:
+
+NEW FORMAT
+{
+  title,
+  language,
+  items: [
+    {
+      word,
+      definition
+    }
+  ]
+}
+
+LEGACY FORMAT
+{
+  terms: [
+    {
+      word,
+      meaning
+    }
+  ]
+}
+=================================================
+*/
+
 async function loadSet(setId) {
 
     const ref = doc(db, "vocabSets", setId);
     const snapshot = await getDoc(ref);
 
     if (!snapshot.exists()) {
-        throw new Error("Set not found");
+        throw new Error("Vocabulary set not found.");
     }
 
     const data = snapshot.data();
 
+    // NEW FORMAT FROM setup.html
+    if (Array.isArray(data.items)) {
+        return data.items;
+    }
+
+    // LEGACY FORMAT
     let terms = data.terms;
 
-    // ✅ Handle string storage (from REST API)
     if (typeof terms === "string") {
+
         try {
+
             terms = JSON.parse(terms);
-        } catch (e) {
-            console.error("Parse failed:", e);
+
+        } catch (error) {
+
+            console.error(
+                "Could not parse terms JSON:",
+                error
+            );
+
             terms = [];
+
         }
     }
 
-    return terms;
+    return terms || [];
 }
 
-// ✅ Read URL param
-const params = new URLSearchParams(window.location.search);
-const setId = params.get("id") || params.get("set");
+/*
+=================================================
+READ FIREBASE DOCUMENT ID FROM URL
+
+Examples
+
+play.html?id=abc123
+
+index.html?id=abc123
+
+Legacy support:
+?set=abc123
+=================================================
+*/
+
+const params = new URLSearchParams(
+    window.location.search
+);
+
+const setId =
+    params.get("id") ||
+    params.get("set");
 
 if (setId) {
 
     loadSet(setId)
+
         .then(vocab => {
 
-            window.preloadedVocab = vocab.map(v => ({
-                word: v.word,
-                definition: v.meaning
+            /*
+            Normalize old and new formats
+            into one structure the game expects.
+            */
+
+            window.preloadedVocab = vocab.map(item => ({
+
+                word:
+                    item.word,
+
+                definition:
+                    item.definition ||
+                    item.meaning ||
+                    ""
+
             }));
 
-            console.log("Loaded Firebase vocab:", vocab);
+            console.log(
+                "Loaded Firebase vocabulary:",
+                window.preloadedVocab
+            );
 
-            document.getElementById("teacher-panel").style.display = "none";
+            document
+                .getElementById("teacher-panel")
+                .style.display = "none";
 
             if (window.startLoadedGame) {
                 window.startLoadedGame();
             }
 
         })
+
         .catch(error => {
 
             console.error(error);
-            alert("Could not load Firebase vocabulary set.");
+
+            alert(
+                "Could not load vocabulary set from Firebase."
+            );
 
         });
 
 }
 
 </script>
+
 
 <!-- =========================================
      GAME LOGIC
