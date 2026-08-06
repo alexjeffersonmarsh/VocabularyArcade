@@ -91,6 +91,41 @@ button:disabled{
     text-decoration:underline;
 }
 
+    /* =========================
+   DARK MODE
+========================= */
+
+body.dark-mode{
+    background:#121212;
+    color:#e0e0e0;
+}
+
+body.dark-mode .inputArea{
+    background:#1e1e1e;
+    color:#e0e0e0;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea{
+    background:#2c2c2c;
+    color:white;
+    border:1px solid #555;
+}
+
+body.dark-mode textarea::placeholder,
+body.dark-mode input::placeholder{
+    color:#bbbbbb;
+}
+
+body.dark-mode .counter{
+    color:#bbbbbb;
+}
+
+body.dark-mode a{
+    color:#66b3ff;
+}
+    
 </style>
 </head>
 
@@ -313,6 +348,90 @@ window.saveVocabularyList = async function() {
 
         document.getElementById("vocabInput").value = "";
 
+        /*
+2
+=========================
+3
+DARK MODE
+4
+=========================
+5
+*/
+6
+ 
+7
+const themeToggle =
+8
+document.getElementById("themeToggle");
+9
+ 
+10
+const savedTheme =
+11
+localStorage.getItem("theme");
+12
+ 
+13
+if (savedTheme === "dark") {
+14
+ 
+15
+document.body.classList.add("dark-mode");
+16
+ 
+17
+themeToggle.textContent =
+18
+"☀️ Light Mode";
+19
+}
+20
+ 
+21
+themeToggle.addEventListener("click", () => {
+22
+ 
+23
+document.body.classList.toggle("dark-mode");
+24
+ 
+25
+const darkMode =
+26
+document.body.classList.contains("dark-mode");
+27
+ 
+28
+if (darkMode) {
+29
+ 
+30
+localStorage.setItem("theme", "dark");
+31
+ 
+32
+themeToggle.textContent =
+33
+"☀️ Light Mode";
+34
+ 
+35
+} else {
+36
+ 
+37
+localStorage.setItem("theme", "light");
+38
+ 
+39
+themeToggle.textContent =
+40
+"🌙 Dark Mode";
+41
+}
+42
+});
+        
         updateCount();
 
     } catch(error) {
