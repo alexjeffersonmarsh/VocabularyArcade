@@ -1,305 +1,332 @@
 <!DOCTYPE html>
-2
 <html lang="en">
-3
 <head>
-4
 <meta charset="UTF-8">
-5
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-6
- 
-7
+
 <title>Vocabulary Library</title>
-8
- 
-9
+
 <style>
-10
- 
-11
+
 body{
-12
-font-family: Arial, sans-serif;
-13
-background:#f4f4f4;
-14
-margin:0;
-15
-padding:0;
-16
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:20px;
 }
-17
- 
-18
+
 .container{
-19
-max-width:900px;
-20
-margin:auto;
-21
-padding:20px;
-22
+    max-width:1000px;
+    margin:auto;
 }
-23
- 
-24
+
 h1{
-25
-text-align:center;
-26
+    text-align:center;
+    margin-bottom:25px;
 }
-27
- 
-28
+
 .controls{
-29
-display:flex;
-30
-gap:10px;
-31
-flex-wrap:wrap;
-32
-margin-bottom:20px;
-33
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:20px;
 }
-34
- 
-35
-input, select{
-36
-padding:10px;
-37
-font-size:16px;
-38
+
+input,
+select{
+    padding:10px;
+    font-size:16px;
 }
-39
- 
-40
+
 #search{
-41
-flex:1;
-42
+    flex:1;
+    min-width:250px;
 }
-43
- 
-44
-.listCard{
-45
-background:white;
-46
-border-radius:8px;
-47
-padding:15px;
-48
-margin-bottom:10px;
-49
-display:flex;
-50
-justify-content:space-between;
-51
-align-items:center;
-52
-box-shadow:0 2px 4px rgba(0,0,0,.1);
-53
+
+.stats{
+    margin-bottom:15px;
+    font-weight:bold;
 }
-54
- 
-55
-.details{
-56
-flex:1;
-57
+
+.card{
+    background:white;
+    border-radius:8px;
+    padding:15px;
+    margin-bottom:12px;
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
-58
- 
-59
+
+.cardInfo{
+    flex:1;
+}
+
 .title{
-60
-font-size:18px;
-61
-font-weight:bold;
-62
+    font-size:18px;
+    font-weight:bold;
 }
-63
- 
-64
+
 .language{
-65
-color:#666;
-66
-margin-top:4px;
-67
+    color:#0078d4;
+    margin-top:5px;
 }
-68
- 
-69
+
+.meta{
+    color:#666;
+    font-size:14px;
+    margin-top:5px;
+}
+
 .playButton{
-70
-background:#0078d4;
-71
-color:white;
-72
-text-decoration:none;
-73
-padding:10px 14px;
-74
-border-radius:5px;
-75
+    background:#0078d4;
+    color:white;
+    text-decoration:none;
+    padding:10px 15px;
+    border-radius:5px;
 }
-76
- 
-77
+
 .playButton:hover{
-78
-background:#005ea8;
-79
+    background:#005ea8;
 }
-80
- 
-81
-#count{
-82
-margin-bottom:15px;
-83
-font-weight:bold;
-84
+
+.loading{
+    text-align:center;
+    color:#666;
 }
-85
- 
-86
+
 </style>
-87
- 
-88
 </head>
-89
+
 <body>
-90
- 
-91
+
 <div class="container">
-92
- 
-93
-<h1>Vocabulary Library</h1>
-94
- 
-95
-<div class="controls">
-96
- 
-97
-<input
-98
-id="search"
-99
-type="text"
-100
-placeholder="Search titles..."
-101
->
-102
- 
-103
-<select id="languageFilter">
-104
-<option value="all">All Languages</option>
-105
-</select>
-106
- 
-107
+
+    <h1>Vocabulary Library</h1>
+
+    <div class="controls">
+
+        <input
+            id="search"
+            type="text"
+            placeholder="Search vocabulary lists..."
+        >
+
+        <select id="languageFilter">
+            <option value="all">All Languages</option>
+        </select>
+
+    </div>
+
+    <div class="stats" id="stats">
+        Loading...
+    </div>
+
+    <div id="results">
+        <div class="loading">
+            Loading vocabulary library...
+        </div>
+    </div>
+
 </div>
-108
- 
-109
-<div id="count"></div>
-110
- 
-111
-<div id="libraryResults"></div>
-112
- 
-113
-</div>
-114
- 
-115
-<script>
-116
- 
-117
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    query
+}
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+  authDomain: "bubbleword-30367.firebaseapp.com",
+  projectId: "bubbleword-30367",
+  storageBucket: "bubbleword-30367.firebasestorage.app",
+  messagingSenderId: "1058393039019",
+  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 let allLists = [];
-118
- 
-119
+
 async function loadLibrary() {
-120
- 
-121
-try {
-122
- 
-123
-const response = await fetch("vocab/library.json");
-124
-allLists = await response.json();
-125
- 
-126
-populateLanguageFilter();
-127
-displayLists();
-128
- 
-129
-} catch (error) {
-130
- 
-131
-document.getElementById("libraryResults").innerHTML =
-132
-"<p>Could not load library.json</p>";
-133
- 
-134
-console.error(error);
-135
+
+    try {
+
+        const q =
+            query(collection(db, "vocabSets"));
+
+        const snapshot =
+            await getDocs(q);
+
+        allLists = [];
+
+        snapshot.forEach(doc => {
+
+            const data = doc.data();
+
+            allLists.push({
+                id: doc.id,
+                ...data
+            });
+
+        });
+
+        allLists.sort((a,b) =>
+            (a.title || "")
+            .localeCompare(b.title || "")
+        );
+
+        populateLanguageFilter();
+        renderLists();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("results").innerHTML =
+            `<p>Error loading vocabulary library.</p>`;
+    }
 }
-136
+
+function populateLanguageFilter(){
+
+    const filter =
+        document.getElementById("languageFilter");
+
+    const languages =
+        [...new Set(
+            allLists.map(list => list.language)
+        )].sort();
+
+    languages.forEach(language => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = language;
+        option.textContent = language;
+
+        filter.appendChild(option);
+
+    });
+
 }
-137
- 
-138
-function populateLanguageFilter() {
-139
- 
-140
-const filter =
-141
-document.getElementById("languageFilter");
-142
- 
-143
-const languages =
-144
-[...new Set(allLists.map(item => item.language))]
-145
-.sort();
-146
- 
-147
-languages.forEach(language => {
-148
- 
-149
-const option =
-150
-document.createElement("option");
-151
- 
-152
-option.value = language;
-153
-option.textContent = language;
+
+function renderLists(){
+
+    const search =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase();
+
+    const selectedLanguage =
+        document
+        .getElementById("languageFilter")
+        .value;
+
+    const filtered =
+        allLists.filter(list => {
+
+            const titleMatch =
+                (list.title || "")
+                .toLowerCase()
+                .includes(search);
+
+            const languageMatch =
+                selectedLanguage === "all"
+                ||
+                list.language === selectedLanguage;
+
+            return (
+                titleMatch &&
+                languageMatch
+            );
+        });
+
+    document.getElementById("stats").textContent =
+        `${filtered.length} list(s) found`;
+
+    const container =
+        document.getElementById("results");
+
+    container.innerHTML = "";
+
+    if(filtered.length === 0){
+
+        container.innerHTML =
+            "<p>No vocabulary lists found.</p>";
+
+        return;
+    }
+
+    filtered.forEach(list => {
+
+        let createdDate = "";
+
+        if(list.createdAt?.seconds){
+
+            createdDate =
+                new Date(
+                    list.createdAt.seconds * 1000
+                ).toLocaleDateString();
+
+        }
+
+        const card =
+            document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+
+            <div class="cardInfo">
+
+                <div class="title">
+                    ${list.title || "Untitled List"}
+                </div>
+
+                <div class="language">
+                    ${list.language || "Unknown"}
+                </div>
+
+                <div class="meta">
+                    ${list.itemCount || 0} words
+                    ${createdDate ? " • Created " + createdDate : ""}
+                </div>
+
+            </div>
+
+            play.html?id=${list.id}
+                Play
+            </a>
+
+        `;
+
+        container.appendChild(card);
+
+    });
+
+}
+
+document
+.getElementById("search")
+.addEventListener("input", renderLists);
+
+document
+.getElementById("languageFilter")
+.addEventListener("change", renderLists);
+
+loadLibrary
