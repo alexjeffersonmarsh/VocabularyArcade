@@ -8,62 +8,87 @@
 
 <style>
 
+html,
 body{
-font-family: Arial, sans-serif;
-background:#f4f4f4;
-margin:0;
-padding:20px;
+    height:100%;
+    margin:0;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+    padding:20px;
+    overflow-y:auto;
+    box-sizing:border-box;
 }
 
 .inputArea{
-max-width:800px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.1);
+    max-width:800px;
+    margin:20px auto;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
 h2{
-margin-top:0;
+    margin-top:0;
 }
 
 input,
 select,
 textarea{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-box-sizing:border-box;
-font-size:16px;
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+    font-size:16px;
 }
 
 textarea{
-resize:vertical;
+    resize:vertical;
+    min-height:250px;
 }
 
 button{
-background:#0078d4;
-color:white;
-border:none;
-padding:12px 18px;
-cursor:pointer;
-border-radius:5px;
-font-size:16px;
+    background:#0078d4;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    cursor:pointer;
+    border-radius:5px;
+    font-size:16px;
 }
 
 button:hover{
-background:#005ea8;
+    background:#005ea8;
+}
+
+button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
 }
 
 .counter{
-margin-bottom:15px;
-color:#666;
+    margin-bottom:15px;
+    color:#666;
 }
 
 #status{
-margin-top:15px;
-font-weight:bold;
+    margin-top:15px;
+    font-weight:bold;
+    line-height:1.5;
+}
+
+.successLink{
+    display:inline-block;
+    margin-top:10px;
+    color:#0078d4;
+    text-decoration:none;
+}
+
+.successLink:hover{
+    text-decoration:underline;
 }
 
 </style>
@@ -120,7 +145,7 @@ Vocabulary Entries:
 <span id="entryCount">0</span> / 50
 </div>
 
-<button onclick="saveVocabularyList()">
+<button id="saveBtn" onclick="saveVocabularyList()">
 Save To Library
 </button>
 
@@ -134,169 +159,174 @@ import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
 import {
-getFirestore,
-collection,
-addDoc,
-serverTimestamp
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-authDomain: "bubbleword-30367.firebaseapp.com",
-projectId: "bubbleword-30367",
-storageBucket: "bubbleword-30367.firebasestorage.app",
-messagingSenderId: "1058393039019",
-appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+  authDomain: "bubbleword-30367.firebaseapp.com",
+  projectId: "bubbleword-30367",
+  storageBucket: "bubbleword-30367.firebasestorage.app",
+  messagingSenderId: "1058393039019",
+  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const vocabInput =
-document.getElementById("vocabInput");
+    document.getElementById("vocabInput");
 
 const entryCount =
-document.getElementById("entryCount");
+    document.getElementById("entryCount");
+
+const saveBtn =
+    document.getElementById("saveBtn");
 
 function updateCount() {
 
-const count =
-vocabInput.value
-.split("\n")
-.filter(line => line.trim() !== "")
-.length;
+    const count =
+        vocabInput.value
+            .split("\n")
+            .filter(line => line.trim() !== "")
+            .length;
 
-entryCount.textContent = count;
+    entryCount.textContent = count;
 }
 
 vocabInput.addEventListener("input", updateCount);
 
 window.saveVocabularyList = async function() {
 
-const title =
-document
-.getElementById("listTitle")
-.value
-.trim();
+    const title =
+        document.getElementById("listTitle")
+        .value
+        .trim();
 
-const language =
-document
-.getElementById("language")
-.value;
+    const language =
+        document.getElementById("language")
+        .value;
 
-const visibility =
-document
-.getElementById("visibility")
-.value;
+    const visibility =
+        document.getElementById("visibility")
+        .value;
 
-const text =
-document
-.getElementById("vocabInput")
-.value
-.trim();
+    const text =
+        document.getElementById("vocabInput")
+        .value
+        .trim();
 
-const status =
-document
-.getElementById("status");
+    const status =
+        document.getElementById("status");
 
-status.textContent = "";
+    status.innerHTML = "";
 
-if (!title) {
-alert("Please enter a vocabulary list title.");
-return;
-}
+    if (!title) {
+        alert("Please enter a vocabulary list title.");
+        return;
+    }
 
-if (!language) {
-alert("Please select a language.");
-return;
-}
+    if (!language) {
+        alert("Please select a language.");
+        return;
+    }
 
-if (!text) {
-alert("Please enter vocabulary items.");
-return;
-}
+    if (!text) {
+        alert("Please enter vocabulary items.");
+        return;
+    }
 
-const lines =
-text
-.split("\n")
-.filter(line => line.trim() !== "");
+    const lines =
+        text
+        .split("\n")
+        .filter(line => line.trim() !== "");
 
-if (lines.length < 5 || lines.length > 50) {
-alert(
-"Vocabulary lists must contain between 5 and 50 entries."
-);
-return;
-}
+    if (lines.length < 5 || lines.length > 50) {
+        alert("Vocabulary lists must contain between 5 and 50 entries.");
+        return;
+    }
 
-const items = [];
+    const items = [];
 
-for (const line of lines) {
+    for (const line of lines) {
 
-const commaIndex =
-line.indexOf(",");
+        const commaIndex = line.indexOf(",");
 
-if (commaIndex === -1) {
-alert(
-`Invalid format:\n\n${line}\n\nUse WORD,DEFINITION`
-);
-return;
-}
+        if (commaIndex === -1) {
+            alert(`Invalid format:\n\n${line}\n\nUse WORD,DEFINITION`);
+            return;
+        }
 
-const word =
-line.substring(0, commaIndex).trim();
+        const word =
+            line.substring(0, commaIndex).trim();
 
-const definition =
-line.substring(commaIndex + 1).trim();
+        const definition =
+            line.substring(commaIndex + 1).trim();
 
-if (!word || !definition) {
-alert(
-`Invalid entry:\n\n${line}`
-);
-return;
-}
+        if (!word || !definition) {
+            alert(`Invalid entry:\n\n${line}`);
+            return;
+        }
 
-items.push({
-word,
-definition
-});
-}
+        items.push({
+            word,
+            definition
+        });
+    }
 
-try {
+    try {
 
-status.textContent =
-"Saving vocabulary list...";
+        saveBtn.disabled = true;
+        status.textContent = "Saving vocabulary list...";
 
-const docRef =
-await addDoc(
-collection(db, "vocabSets"),
-{
-title,
-language,
-visibility,
-itemCount: items.length,
-createdAt: serverTimestamp(),
-items
-}
-);
+        const docRef =
+            await addDoc(
+                collection(db, "vocabSets"),
+                {
+                    title,
+                    language,
+                    visibility,
+                    itemCount: items.length,
+                    createdAt: serverTimestamp(),
+                    items
+                }
+            );
 
-status.innerHTML =
-`✅ Saved successfully!<br><br>
-Document ID: ${docRef.id}`;
+        status.innerHTML = `
+            ✅ Vocabulary list saved successfully.<br><br>
+            Document ID: <strong>${docRef.id}</strong><br><br>
 
-document
-.getElementById("vocabInput")
-.value = "";
+            library.html
+                View Vocabulary Library →
+            </a>
+        `;
 
-updateCount();
+        document.getElementById("listTitle").value = "";
 
-} catch(error) {
+        document.getElementById("language").selectedIndex = 0;
 
-console.error(error);
+        document.getElementById("visibility").value = "public";
 
-status.innerHTML =
-`❌ Error saving list:<br>${error.message}`;
-}
+        document.getElementById("vocabInput").value = "";
+
+        updateCount();
+
+    } catch(error) {
+
+        console.error(error);
+
+        status.innerHTML =
+            `❌ Error saving list:<br>${error.message}`;
+
+    } finally {
+
+        saveBtn.disabled = false;
+
+    }
 
 };
 
