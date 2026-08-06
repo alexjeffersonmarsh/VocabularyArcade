@@ -90,10 +90,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// =========================================
-// FIREBASE CONFIG
-// =========================================
-
 const firebaseConfig = {
 
   apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
@@ -111,12 +107,11 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
-// =========================================
-// LOAD VOCAB SET
-// =========================================
+/* =========================================
+   LOAD VOCABULARY SET
+========================================= */
 
 async function loadSet(setId) {
 
@@ -130,9 +125,19 @@ async function loadSet(setId) {
 
     }
 
-    let terms = snapshot.data().terms;
+    const data = snapshot.data();
 
-    // Handle stringified JSON
+    // NEW FORMAT
+
+    if (Array.isArray(data.items)) {
+
+        return data.items;
+
+    }
+
+    // LEGACY FORMAT
+
+    let terms = data.terms;
 
     if (typeof terms === "string") {
 
@@ -150,28 +155,29 @@ async function loadSet(setId) {
 
     }
 
-    return terms;
+    return terms || [];
 
 }
 
-// =========================================
-// LOAD GAME DATA
-// =========================================
+/* =========================================
+   START GAME
+========================================= */
 
 async function startGameWithSet(setId) {
 
     try {
 
-        const data = await loadSet(setId);
+        const vocab = await loadSet(setId);
 
-        // Convert Firebase format
-        // into game format
+        window.preloadedVocab = vocab.map(item => ({
 
-        window.preloadedVocab = data.map(v => ({
+            word:
+                item.word,
 
-            word: v.word,
-
-            definition: v.meaning
+            definition:
+                item.definition ||
+                item.meaning ||
+                ""
 
         }));
 
@@ -179,8 +185,6 @@ async function startGameWithSet(setId) {
             "GemWords vocab loaded:",
             window.preloadedVocab
         );
-
-        // Hide teacher panel
 
         const panel =
             document.getElementById("teacher-panel");
@@ -190,8 +194,6 @@ async function startGameWithSet(setId) {
             panel.style.display = "none";
 
         }
-
-        // Start game AFTER vocab loads
 
         if (window.startLoadedGame) {
 
@@ -209,17 +211,16 @@ async function startGameWithSet(setId) {
 
 }
 
-// =========================================
-// URL PARAM SUPPORT
-// =========================================
+/* =========================================
+   URL PARAM SUPPORT
+========================================= */
 
-const params = new URLSearchParams(window.location.search);
+const params =
+    new URLSearchParams(window.location.search);
 
 const setId =
     params.get("id") ||
     params.get("set");
-
-// Auto-load from URL
 
 if (setId) {
 
@@ -227,15 +228,16 @@ if (setId) {
 
 }
 
-// =========================================
-// MANUAL BUTTON LOADER
-// =========================================
+/* =========================================
+   MANUAL SET ID LOADER
+========================================= */
 
 document
     .getElementById("load-set-btn")
-    .addEventListener("click", async () => {
+    .addEventListener("click", () => {
 
-        const setId = document
+        const setId =
+            document
             .getElementById("set-id-input")
             .value
             .trim();
@@ -253,12 +255,3 @@ document
     });
 
 </script>
-
-<!-- =========================================
-     GAME SCRIPT
-========================================= -->
-
-<script src="script.js"></script>
-
-</body>
-</html>
