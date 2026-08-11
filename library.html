@@ -1,110 +1,359 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Vocabulary Library</title>
+<title>Vocabulary Arcade Library</title>
 
 <style>
 
-body{
+/* =========================================
+   GLOBAL
+========================================= */
+
+body {
+
     font-family: Arial, sans-serif;
-    background:#f5f5f5;
-    margin:0;
-    padding:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5f7fa 0%,
+            #e9edf2 100%
+        );
+
+    margin: 0;
+    padding: 30px;
+
+    color: #222;
 }
 
-.container{
-    max-width:1000px;
-    margin:auto;
+.container {
+
+    max-width: 1100px;
+
+    margin: auto;
 }
 
-h1{
-    text-align:center;
-    margin-bottom:25px;
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+
+    text-align: center;
+
+    margin-bottom: 30px;
 }
 
-.controls{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-bottom:20px;
+.header h1 {
+
+    margin: 0;
+
+    font-size: 36px;
+
+    color: #222;
+}
+
+.header p {
+
+    margin-top: 8px;
+
+    color: #666;
+
+    font-size: 17px;
+}
+
+
+/* =========================================
+   CONTROLS
+========================================= */
+
+.controls {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        240px
+        260px;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
 }
 
 input,
-select{
-    padding:10px;
-    font-size:16px;
+select {
+
+    padding: 13px;
+
+    font-size: 16px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    background: white;
+
+    box-sizing: border-box;
+
+    width: 100%;
 }
 
-#search{
-    flex:1;
-    min-width:250px;
+input:focus,
+select:focus {
+
+    outline: none;
+
+    border-color: #0078d4;
+
+    box-shadow:
+        0 0 0 2px rgba(0,120,212,.15);
 }
 
-.stats{
-    margin-bottom:15px;
-    font-weight:bold;
+
+/* =========================================
+   STATS
+========================================= */
+
+.stats {
+
+    margin-bottom: 15px;
+
+    font-weight: bold;
+
+    color: #555;
+
+    font-size: 15px;
 }
 
-.card{
-    background:white;
-    border-radius:8px;
-    padding:15px;
-    margin-bottom:12px;
-    box-shadow:0 2px 5px rgba(0,0,0,.1);
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+/* =========================================
+   VOCABULARY CARDS
+========================================= */
+
+.card {
+
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    margin-bottom: 14px;
+
+    box-shadow:
+        0 2px 7px rgba(0,0,0,.10);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
 }
 
-.cardInfo{
-    flex:1;
+.cardInfo {
+
+    flex: 1;
+
+    min-width: 0;
 }
 
-.title{
-    font-size:18px;
-    font-weight:bold;
+.title {
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #222;
+
+    margin-bottom: 5px;
 }
 
-.language{
-    color:#0078d4;
-    margin-top:5px;
+.language {
+
+    color: #0078d4;
+
+    font-weight: bold;
+
+    margin-bottom: 5px;
 }
 
-.meta{
-    color:#666;
-    font-size:14px;
-    margin-top:5px;
+.meta {
+
+    color: #666;
+
+    font-size: 14px;
 }
 
-.playButton{
-    background:#0078d4;
-    color:white;
-    text-decoration:none;
-    padding:10px 15px;
-    border-radius:5px;
+
+/* =========================================
+   GAME BUTTONS
+========================================= */
+
+.gameButtons {
+
+    display: flex;
+
+    gap: 8px;
+
+    flex-shrink: 0;
 }
 
-.playButton:hover{
-    background:#005ea8;
+.playButton {
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 11px 15px;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
 }
 
-.loading{
-    text-align:center;
-    color:#666;
+.playButton:hover {
+
+    transform: translateY(-1px);
+
+    filter: brightness(1.1);
+}
+
+.gemButton {
+
+    background: #7b2cbf;
+}
+
+.bubbleButton {
+
+    background: #0078d4;
+}
+
+
+/* =========================================
+   EMPTY / LOADING STATES
+========================================= */
+
+.loading {
+
+    text-align: center;
+
+    color: #666;
+
+    padding: 30px;
+}
+
+.noResults {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    color: #666;
+
+    box-shadow:
+        0 2px 7px rgba(0,0,0,.08);
+}
+
+
+/* =========================================
+   RECENT LABEL
+========================================= */
+
+.recentLabel {
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    color: #555;
+
+    margin-bottom: 5px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 800px) {
+
+    body {
+
+        padding: 15px;
+    }
+
+    .controls {
+
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .gameButtons {
+
+        width: 100%;
+    }
+
+    .playButton {
+
+        flex: 1;
+    }
+
 }
 
 </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
 
-    <h1>Vocabulary Library</h1>
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <div class="header">
+
+        <h1>Vocabulary Arcade</h1>
+
+        <p>
+            Search the vocabulary library and choose how you want to play.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         SEARCH / FILTERS
+    ====================================== -->
 
     <div class="controls">
 
@@ -115,22 +364,57 @@ select{
         >
 
         <select id="languageFilter">
-            <option value="all">All Languages</option>
+
+            <option value="all">
+                All Languages
+            </option>
+
+        </select>
+
+
+        <select id="recentSelect">
+
+            <option value="all">
+                Most Recent Additions
+            </option>
+
         </select>
 
     </div>
 
+
+    <!-- =====================================
+         RESULTS COUNT
+    ====================================== -->
+
     <div class="stats" id="stats">
+
         Loading...
+
     </div>
+
+
+    <!-- =====================================
+         RESULTS
+    ====================================== -->
 
     <div id="results">
+
         <div class="loading">
+
             Loading vocabulary library...
+
         </div>
+
     </div>
 
+
 </div>
+
+
+<!-- =========================================
+     FIREBASE
+========================================= -->
 
 <script type="module">
 
@@ -145,78 +429,282 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
 const firebaseConfig = {
-  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-  authDomain: "bubbleword-30367.firebaseapp.com",
-  projectId: "bubbleword-30367",
-  storageBucket: "bubbleword-30367.firebasestorage.app",
-  messagingSenderId: "1058393039019",
-  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
+
+
+/* =========================================
+   GAME URLS
+========================================= */
+
+const GEMWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/gemword.html";
+
+const BUBBLEWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/bubbleword.html";
+
+
+/* =========================================
+   DATA
+========================================= */
 
 let allLists = [];
+
+
+/* =========================================
+   LOAD LIBRARY
+========================================= */
 
 async function loadLibrary() {
 
     try {
 
         const q =
-            query(collection(db, "vocabSets"));
+            query(
+                collection(db, "vocabSets")
+            );
 
         const snapshot =
             await getDocs(q);
 
+
         allLists = [];
+
 
         snapshot.forEach(doc => {
 
-            const data = doc.data();
+            const data =
+                doc.data();
+
 
             allLists.push({
+
                 id: doc.id,
+
                 ...data
+
             });
 
         });
 
-        allLists.sort((a,b) =>
-            (a.title || "")
-            .localeCompare(b.title || "")
+
+        /*
+         * Sort newest first.
+         */
+
+        allLists.sort(
+            (a, b) =>
+                getTimestamp(b.createdAt)
+                -
+                getTimestamp(a.createdAt)
         );
 
+
         populateLanguageFilter();
+
+        populateRecentDropdown();
+
         renderLists();
 
     }
-    catch(error){
 
-        console.error(error);
+    catch(error) {
 
-        document.getElementById("results").innerHTML =
-            `<p>Error loading vocabulary library.</p>`;
+        console.error(
+            "Error loading vocabulary library:",
+            error
+        );
+
+
+        document.getElementById("results").innerHTML = `
+
+            <div class="noResults">
+
+                <strong>
+                    Unable to load the vocabulary library.
+                </strong>
+
+                <br><br>
+
+                Please try refreshing the page.
+
+            </div>
+
+        `;
+
+        document.getElementById("stats").textContent =
+            "Library unavailable.";
+
     }
+
 }
 
-function populateLanguageFilter(){
+
+/* =========================================
+   TIMESTAMP HELPER
+========================================= */
+
+function getTimestamp(timestamp) {
+
+    if (!timestamp) {
+
+        return 0;
+
+    }
+
+
+    /*
+     * Firebase Timestamp
+     */
+
+    if (timestamp.seconds) {
+
+        return timestamp.seconds;
+
+    }
+
+
+    /*
+     * JavaScript Date
+     */
+
+    if (timestamp instanceof Date) {
+
+        return timestamp.getTime();
+
+    }
+
+
+    /*
+     * String date
+     */
+
+    const parsed =
+        new Date(timestamp).getTime();
+
+
+    return isNaN(parsed)
+        ? 0
+        : parsed;
+
+}
+
+
+/* =========================================
+   DATE DISPLAY
+========================================= */
+
+function formatDate(timestamp) {
+
+    const value =
+        getTimestamp(timestamp);
+
+
+    if (!value) {
+
+        return "";
+
+    }
+
+
+    return new Date(
+        value < 10000000000
+            ? value * 1000
+            : value
+    ).toLocaleDateString();
+
+}
+
+
+/* =========================================
+   LANGUAGE FILTER
+========================================= */
+
+function populateLanguageFilter() {
 
     const filter =
-        document.getElementById("languageFilter");
+        document.getElementById(
+            "languageFilter"
+        );
 
-    const languages =
-        [...new Set(
-            allLists.map(list => list.language)
-        )].sort();
+
+    /*
+     * Clear existing language options
+     * except "All Languages".
+     */
+
+    filter.innerHTML = `
+
+        <option value="all">
+            All Languages
+        </option>
+
+    `;
+
+
+    const languages = [
+
+        ...new Set(
+
+            allLists
+
+                .map(
+                    list =>
+                        list.language
+                )
+
+                .filter(Boolean)
+
+        )
+
+    ].sort();
+
 
     languages.forEach(language => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value = language;
-        option.textContent = language;
+
+        option.value =
+            language;
+
+        option.textContent =
+            language;
+
 
         filter.appendChild(option);
 
@@ -224,109 +712,354 @@ function populateLanguageFilter(){
 
 }
 
-function renderLists(){
+
+/* =========================================
+   RECENT ADDITIONS DROPDOWN
+========================================= */
+
+function populateRecentDropdown() {
+
+    const dropdown =
+        document.getElementById(
+            "recentSelect"
+        );
+
+
+    dropdown.innerHTML = `
+
+        <option value="all">
+            Most Recent Additions
+        </option>
+
+    `;
+
+
+    /*
+     * Take the ten newest lists.
+     */
+
+    const recentLists =
+        allLists.slice(0, 10);
+
+
+    recentLists.forEach(list => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            list.id;
+
+
+        option.textContent =
+            list.title ||
+            "Untitled List";
+
+
+        dropdown.appendChild(
+            option
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   RENDER LISTS
+========================================= */
+
+function renderLists() {
 
     const search =
         document
-        .getElementById("search")
-        .value
-        .toLowerCase();
+            .getElementById("search")
+            .value
+            .trim()
+            .toLowerCase();
+
 
     const selectedLanguage =
         document
-        .getElementById("languageFilter")
-        .value;
+            .getElementById(
+                "languageFilter"
+            )
+            .value;
+
+
+    const selectedRecent =
+        document
+            .getElementById(
+                "recentSelect"
+            )
+            .value;
+
 
     const filtered =
         allLists.filter(list => {
 
-            const titleMatch =
-                (list.title || "")
-                .toLowerCase()
-                .includes(search);
+
+            /*
+             * Search title, language,
+             * and description.
+             */
+
+            const searchableText = `
+
+                ${list.title || ""}
+
+                ${list.language || ""}
+
+                ${list.description || ""}
+
+            `.toLowerCase();
+
+
+            const searchMatch =
+                searchableText.includes(
+                    search
+                );
+
 
             const languageMatch =
                 selectedLanguage === "all"
                 ||
-                list.language === selectedLanguage;
+                list.language ===
+                    selectedLanguage;
+
+
+            const recentMatch =
+                selectedRecent === "all"
+                ||
+                list.id === selectedRecent;
+
 
             return (
-                titleMatch &&
+
+                searchMatch
+                &&
                 languageMatch
+                &&
+                recentMatch
+
             );
+
         });
 
-    document.getElementById("stats").textContent =
-        `${filtered.length} list(s) found`;
+
+    document.getElementById(
+        "stats"
+    ).textContent =
+
+        `${filtered.length} vocabulary list(s) found`;
+
 
     const container =
-        document.getElementById("results");
+        document.getElementById(
+            "results"
+        );
+
 
     container.innerHTML = "";
 
-    if(filtered.length === 0){
 
-        container.innerHTML =
-            "<p>No vocabulary lists found.</p>";
+    if (filtered.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="noResults">
+
+                No vocabulary lists found.
+
+            </div>
+
+        `;
 
         return;
+
     }
+
 
     filtered.forEach(list => {
 
-        let createdDate = "";
 
-        if(list.createdAt?.seconds){
+        const createdDate =
+            formatDate(
+                list.createdAt
+            );
 
-            createdDate =
-                new Date(
-                    list.createdAt.seconds * 1000
-                ).toLocaleDateString();
-
-        }
 
         const card =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        card.className = "card";
+
+        card.className =
+            "card";
+
+
+        /*
+         * Build game URLs with
+         * the Firebase vocabulary ID.
+         */
+
+        const gemWordUrl =
+            `${GEMWORD_URL}?id=${encodeURIComponent(list.id)}`;
+
+
+        const bubbleWordUrl =
+            `${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}`;
+
 
         card.innerHTML = `
 
             <div class="cardInfo">
 
                 <div class="title">
-                    ${list.title || "Untitled List"}
+
+                    ${escapeHtml(
+                        list.title ||
+                        "Untitled List"
+                    )}
+
                 </div>
+
 
                 <div class="language">
-                    ${list.language || "Unknown"}
+
+                    ${escapeHtml(
+                        list.language ||
+                        "Unknown Language"
+                    )}
+
                 </div>
 
+
                 <div class="meta">
-                    ${list.itemCount || 0} words
-                    ${createdDate ? " • Created " + createdDate : ""}
+
+                    ${list.itemCount || 0}
+                    words
+
+                    ${
+                        createdDate
+                            ? " • Added " +
+                              createdDate
+                            : ""
+                    }
+
                 </div>
 
             </div>
 
-            play.html?id=${list.id}
-                Play
-            </a>
+
+            <div class="gameButtons">
+
+                <a
+                    class="playButton gemButton"
+                    href="${gemWordUrl}"
+                >
+                    💎 GemWords
+                </a>
+
+
+                <a
+                    class="playButton bubbleButton"
+                    href="${bubbleWordUrl}"
+                >
+                    🫧 BubbleWord
+                </a>
+
+            </div>
 
         `;
 
-        container.appendChild(card);
+
+        container.appendChild(
+            card
+        );
 
     });
 
 }
 
-document
-.getElementById("search")
-.addEventListener("input", renderLists);
+
+/* =========================================
+   HTML ESCAPE
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================
+   EVENT LISTENERS
+========================================= */
 
 document
-.getElementById("languageFilter")
-.addEventListener("change", renderLists);
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        renderLists
+    );
 
-loadLibrary
+
+document
+    .getElementById("languageFilter")
+    .addEventListener(
+        "change",
+        renderLists
+    );
+
+
+document
+    .getElementById("recentSelect")
+    .addEventListener(
+        "change",
+        renderLists
+    );
+
+
+/* =========================================
+   START
+========================================= */
+
+loadLibrary();
+
+</script>
+
+</body>
+
+</html>
+```
