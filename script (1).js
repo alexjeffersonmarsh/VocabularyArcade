@@ -9,14 +9,15 @@ const CLEAR_TIME = 100;
 
 // ===== COLORS =====
 const colorMap = {
-  red: "radial-gradient(circle at 30% 30%, #ff7e7e, #ff3e3e 70%, #a30000)",
-  blue: "radial-gradient(circle at 30% 30%, #82ccdd, #0a3d62 70%, #062c43)",
-  green: "radial-gradient(circle at 30% 30%, #a2ffaf, #27ae60 70%, #145a32)",
-  purple: "radial-gradient(circle at 30% 30%, #d982ff, #8e44ad 70%, #4a235a)",
-  gold: "radial-gradient(circle at 30% 30%, #ffeaa7, #f1c40f 70%, #967117)"
+  red: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-red.webp",
+  blue: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-blue.webp",
+  green: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-green.webp",
+  pink: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-pink.webp"
 };
 
 const colors = Object.keys(colorMap);
+```
+
 
 // ===== GAME STATE =====
 let score = 0;
