@@ -296,15 +296,18 @@ async function startGameWithSet(
 
     } catch(error) {
 
-        console.error(
-            error
-        );
+        console.error(error);
 
         alert(
             "Could not load vocabulary set."
         );
 
     }
+
+}
+
+window.startGameWithSet =
+    startGameWithSet;
 
 }
 
