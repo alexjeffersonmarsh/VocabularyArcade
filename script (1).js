@@ -95,18 +95,37 @@ function isAnyGemMoving() {
 
 async function loadVocab() {
 
-  if (!window.preloadedVocab || !window.preloadedVocab.length) {
-    alert("No Firebase vocabulary loaded.");
+  console.log(
+    "Preloaded vocab:",
+    window.preloadedVocab
+  );
+
+  if (
+    !window.preloadedVocab ||
+    !window.preloadedVocab.length
+  ) {
+
+    alert(
+      "No Firebase vocabulary loaded."
+    );
+
     return false;
   }
 
-  vocab = window.preloadedVocab.map((item, index) => ({
-    id: index + 1,
-    word: item.word,
-    definition: item.definition
-  }));
+  vocab =
+    window.preloadedVocab.map(
+      (item, index) => ({
+        id: index + 1,
+        word: item.word,
+        definition: item.definition
+      })
+    );
 
-  fullVocab = vocab.slice(0, 20);
+  fullVocab =
+    vocab.slice(
+      0,
+      Math.min(vocab.length, 20)
+    );
 
   masteredVocab = [];
   comboRecycle = [];
@@ -517,52 +536,8 @@ async function startLoadedGame() {
 
 window.startLoadedGame = startLoadedGame;
 
-// ===== BOOT =====
+// ===== READY =====
 
-const params =
-    new URLSearchParams(window.location.search);
-
-const setId =
-    params.get("id") ||
-    params.get("set");
-
-if (setId) {
-
-  // Vocabulary set was supplied by the library.
-  // StartGameWithSet will load Firebase vocabulary
-  // and then start the game.
-  startGameWithSet(setId);
-
-} else {
-
-  // No vocabulary set in the URL.
-  // Wait for another source to preload vocabulary.
-  (async () => {
-
-    let tries = 0;
-
-    while (
-      !window.preloadedVocab &&
-      tries < 30
-    ) {
-
-      await wait(200);
-      tries++;
-
-    }
-
-    if (window.preloadedVocab) {
-
-      startLoadedGame();
-
-    } else {
-
-      console.error(
-        "No vocabulary set was supplied."
-      );
-
-    }
-
-  })();
-
-}
+console.log(
+  "GemWords loaded and waiting for vocabulary."
+);
