@@ -232,12 +232,25 @@ selector.addEventListener("change", ()=>{
             selector.selectedIndex
         ];
 
-    if(!selected.dataset.items) return;
+    console.log(
+        "dataset.items:",
+        selected.dataset.items
+    );
 
-    currentItems =
+    if(
+        !selected.dataset.items ||
+        selected.dataset.items === "undefined"
+    ){
+        alert(
+            "This vocabulary set contains no items."
+        );
+        return;
+    }
+
+    const items =
         JSON.parse(selected.dataset.items);
 
-    startGame(currentItems);
+    startGame(items);
 
 });
 
