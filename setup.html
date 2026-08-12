@@ -91,7 +91,7 @@ button:disabled{
     text-decoration:underline;
 }
 
-    /* =========================
+/* =========================
    DARK MODE
 ========================= */
 
@@ -125,7 +125,7 @@ body.dark-mode .counter{
 body.dark-mode a{
     color:#66b3ff;
 }
-    
+
 </style>
 </head>
 
@@ -138,8 +138,8 @@ body.dark-mode a{
 <p>Enter vocabulary as:</p>
 
 <p>
-    
-<strong>WORD,DEFINITION</strong><br>
+<strong>WORD,DEFINITION</strong> or
+<strong>WORD[TAB]DEFINITION</strong><br>
 (one vocabulary item per line)
 </p>
 
@@ -171,9 +171,17 @@ placeholder="Vocabulary List Title"
 <textarea
 id="vocabInput"
 rows="12"
-placeholder="amicus,friend
+placeholder="Comma-separated:
+
+amicus,friend
 bellum,war
-hostis,enemy">
+hostis,enemy
+
+OR paste directly from Excel / Google Sheets:
+
+amicus	friend
+bellum	war
+hostis	enemy">
 </textarea>
 
 <div class="counter">
@@ -203,12 +211,12 @@ import {
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-  authDomain: "bubbleword-30367.firebaseapp.com",
-  projectId: "bubbleword-30367",
-  storageBucket: "bubbleword-30367.firebasestorage.app",
-  messagingSenderId: "1058393039019",
-  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+    apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+    authDomain: "bubbleword-30367.firebaseapp.com",
+    projectId: "bubbleword-30367",
+    storageBucket: "bubbleword-30367.firebasestorage.app",
+    messagingSenderId: "1058393039019",
+    appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -240,21 +248,21 @@ window.saveVocabularyList = async function() {
 
     const title =
         document.getElementById("listTitle")
-        .value
-        .trim();
+            .value
+            .trim();
 
     const language =
         document.getElementById("language")
-        .value;
+            .value;
 
     const visibility =
         document.getElementById("visibility")
-        .value;
+            .value;
 
     const text =
         document.getElementById("vocabInput")
-        .value
-        .trim();
+            .value
+            .trim();
 
     const status =
         document.getElementById("status");
@@ -278,8 +286,8 @@ window.saveVocabularyList = async function() {
 
     const lines =
         text
-        .split("\n")
-        .filter(line => line.trim() !== "");
+            .split("\n")
+            .filter(line => line.trim() !== "");
 
     if (lines.length < 5 || lines.length > 50) {
         alert("Vocabulary lists must contain between 5 and 50 entries.");
@@ -290,18 +298,28 @@ window.saveVocabularyList = async function() {
 
     for (const line of lines) {
 
-        const commaIndex = line.indexOf(",");
+        const separator =
+            line.includes("\t")
+                ? "\t"
+                : ",";
 
-        if (commaIndex === -1) {
-            alert(`Invalid format:\n\n${line}\n\nUse WORD,DEFINITION`);
+        const parts =
+            separator === "\t"
+                ? line.split("\t")
+                : line.split(/,(.+)/);
+
+        if (parts.length < 2) {
+            alert(
+                `Invalid format:\n\n${line}\n\nUse either:\nWORD,DEFINITION\nor\nWORD[TAB]DEFINITION`
+            );
             return;
         }
 
         const word =
-            line.substring(0, commaIndex).trim();
+            parts[0].trim();
 
         const definition =
-            line.substring(commaIndex + 1).trim();
+            parts.slice(1).join("").trim();
 
         if (!word || !definition) {
             alert(`Invalid entry:\n\n${line}`);
@@ -317,7 +335,9 @@ window.saveVocabularyList = async function() {
     try {
 
         saveBtn.disabled = true;
-        status.textContent = "Saving vocabulary list...";
+
+        status.textContent =
+            "Saving vocabulary list...";
 
         const docRef =
             await addDoc(
@@ -334,73 +354,15 @@ window.saveVocabularyList = async function() {
 
         status.innerHTML = `
             ✅ Vocabulary list saved successfully.<br><br>
-            Document ID: <strong>${docRef.id}</strong><br><br>
-
-            library.html
-                View Vocabulary Library →
-            </a>
+            Document ID:
+            <strong>${docRef.id}</strong>
         `;
 
         document.getElementById("listTitle").value = "";
-
         document.getElementById("language").selectedIndex = 0;
-
         document.getElementById("visibility").value = "public";
-
         document.getElementById("vocabInput").value = "";
 
-        /*
-
-=========================
-DARK MODE
-=========================
-*/
-
-const themeToggle =
-
-document.getElementById("themeToggle");
-
- 
-
-const savedTheme =
-
-localStorage.getItem("theme");
-
-
-if (savedTheme === "dark") {
-
- 
-document.body.classList.add("dark-mode");
-
-themeToggle.textContent =
-
-"☀️ Light Mode";
-
-}
- 
-themeToggle.addEventListener("click", () => {
- 
-document.body.classList.toggle("dark-mode");
- 
-const darkMode =
-document.body.classList.contains("dark-mode");
- 
-if (darkMode) {
- 
-localStorage.setItem("theme", "dark");
- 
-themeToggle.textContent =
-"☀️ Light Mode";
- 
-} else {
- 
-localStorage.setItem("theme", "light");
- 
-themeToggle.textContent =
-"🌙 Dark Mode";
-}
-});
-        
         updateCount();
 
     } catch(error) {
