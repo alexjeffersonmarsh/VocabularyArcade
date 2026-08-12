@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vocabulary Flashcards</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
+    text-align:center;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    font-size:16px;
+    margin-bottom:20px;
+}
+
+.flashcard{
+    background:white;
+    border-radius:15px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    min-height:250px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px;
+    font-size:32px;
+    cursor:pointer;
+    user-select:none;
+    margin-bottom:20px;
+}
+
+.flashcard:hover{
+    background:#fafafa;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+button{
+    padding:12px 20px;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#0078d4;
+    color:white;
+}
+
+button:hover{
+    background:#005ea8;
+}
+
+.progress{
+    margin-top:20px;
+    color:#666;
+    font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Vocabulary Flashcards</h1>
+
+<select id="setSelector">
+<option value="">Select Vocabulary Set</option>
+</select>
+
+<div class="flashcard" id="card">
+Choose a vocabulary set
+</div>
+
+<div class="controls">
+<button onclick="previousCard()">Previous</button>
+<button onclick="flipCard()">Flip</button>
+<button onclick="nextCard()">Next</button>
+<button onclick="shuffleCards()">Shuffle</button>
+</div>
+
+<div class="progress" id="progress"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.firebasestorage.app",
+    messagingSenderId: "XXXXXXXX",
+    appId: "XXXXXXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const setSelector =
+    document.getElementById("setSelector");
+
+const card =
+    document.getElementById("card");
+
+const progress =
+    document.getElementById("progress");
+
+let cards = [];
+let currentIndex = 0;
+let showingWord = true;
+
+async function loadSets() {
+
+    const snapshot =
+        await getDocs(
+            collection(db,"vocabSets")
+        );
+
+    snapshot.forEach(doc => {
+
+        const data = doc.data();
+
+        const option =
+            document.createElement("option");
+
+        option.value = doc.id;
+        option.textContent = data.title;
+
+        option.dataset.items =
+            JSON.stringify(data.items);
+
+        setSelector.appendChild(option);
+    });
+}
+
+setSelector.addEventListener("change", () => {
+
+    const selected =
+        setSelector.options[
+            setSelector.selectedIndex
+        ];
+
+    if (!selected.dataset.items) return;
+
+    cards =
+        JSON.parse(selected.dataset.items);
+
+    currentIndex = 0;
+    showingWord = true;
+
+    displayCard();
+});
+
+function displayCard() {
+
+    if (!cards.length) return;
+
+    const current =
+        cards[currentIndex];
+
+    card.textContent =
+        showingWord
+            ? current.word
+            : current.definition;
+
+    progress.textContent =
+        `Card ${currentIndex + 1} of ${cards.length}`;
+}
+
+window.flipCard = function() {
+
+    showingWord =
+        !showingWord;
+
+    displayCard();
+};
+
+window.nextCard = function() {
+
+    if (!cards.length) return;
+
+    currentIndex++;
+
+    if (currentIndex >= cards.length) {
+        currentIndex = 0;
+    }
+
+    showingWord = true;
+
+    displayCard();
+};
+
+window.previousCard = function() {
+
+    if (!cards.length) return;
+
+    currentIndex--;
+
+    if (currentIndex < 0) {
+        currentIndex =
+            cards.length - 1;
+    }
+
+    showingWord = true;
+
+    displayCard();
+};
+
+window.shuffleCards = function() {
+
+    for (
+        let i = cards.length - 1;
+        i > 0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [cards[i], cards[j]] =
+            [cards[j], cards[i]];
+    }
+
+    currentIndex = 0;
+    showingWord = true;
+
+    displayCard();
+};
+
+card.addEventListener(
+    "click",
+    flipCard
+);
+
+loadSets();
+
+</script>
+
+</body>
+</html>
