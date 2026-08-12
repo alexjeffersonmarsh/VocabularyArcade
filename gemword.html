@@ -8,7 +8,7 @@
 
 <title>Vocabulary Jewel Game</title>
 
-<link rel="stylesheet" href="style.css">
+style.css
 
 </head>
 
@@ -22,13 +22,15 @@
 
     <h2>GemWords</h2>
 
-    <p>Load a vocabulary set from Firebase.</p>
+    <p>Select a vocabulary set from your library.</p>
 
-    <input
-        type="text"
-        id="set-id-input"
-        placeholder="Enter Vocabulary Set ID"
-    >
+    <select id="setSelector">
+
+        <option value="">
+            Select Vocabulary Set
+        </option>
+
+    </select>
 
     <button id="load-set-btn">
         Start Game
@@ -75,7 +77,7 @@
 </div>
 
 <!-- =========================================
-     FIREBASE LOADER
+     FIREBASE
 ========================================= -->
 
 <script type="module">
@@ -86,61 +88,148 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
     getFirestore,
     doc,
-    getDoc
+    getDoc,
+    collection,
+    getDocs
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-  authDomain: "bubbleword-30367.firebaseapp.com",
-  projectId: "bubbleword-30367",
-  storageBucket: "bubbleword-30367.firebasestorage.app",
-  messagingSenderId: "1058393039019",
-  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+    apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+    authDomain: "bubbleword-30367.firebaseapp.com",
+    projectId: "bubbleword-30367",
+    storageBucket: "bubbleword-30367.firebasestorage.app",
+    messagingSenderId: "1058393039019",
+    appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
 
 /* =========================================
-   LOAD VOCABULARY SET
+   POPULATE DROPDOWN
+========================================= */
+
+async function loadVocabularySets() {
+
+    const selector =
+        document.getElementById(
+            "setSelector"
+        );
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "vocabSets"
+                )
+            );
+
+        snapshot.forEach(docSnap => {
+
+            const data =
+                docSnap.data();
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                docSnap.id;
+
+            option.textContent =
+                data.title ||
+                docSnap.id;
+
+            selector.appendChild(
+                option
+            );
+
+        });
+
+        console.log(
+            "Vocabulary sets loaded."
+        );
+
+    } catch(error) {
+
+        console.error(
+            "Error loading sets:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================
+   LOAD VOCAB SET
 ========================================= */
 
 async function loadSet(setId) {
 
-    const ref = doc(db, "vocabSets", setId);
+    const ref =
+        doc(
+            db,
+            "vocabSets",
+            setId
+        );
 
-    const snapshot = await getDoc(ref);
+    const snapshot =
+        await getDoc(ref);
 
     if (!snapshot.exists()) {
 
-        throw new Error("Vocabulary set not found.");
+        throw new Error(
+            "Vocabulary set not found."
+        );
 
     }
 
-    const data = snapshot.data();
+    const data =
+        snapshot.data();
 
-    // NEW FORMAT
+    /* New format */
 
-    if (Array.isArray(data.items)) {
+    if (
+        Array.isArray(
+            data.items
+        )
+    ) {
 
         return data.items;
 
     }
 
-    // LEGACY FORMAT
+    /* Legacy format */
 
-    let terms = data.terms;
+    let terms =
+        data.terms;
 
-    if (typeof terms === "string") {
+    if (
+        typeof terms ===
+        "string"
+    ) {
 
         try {
 
-            terms = JSON.parse(terms);
+            terms =
+                JSON.parse(
+                    terms
+                );
 
-        } catch (e) {
+        } catch(error) {
 
-            console.error("Parse error:", e);
+            console.error(
+                "Parse error:",
+                error
+            );
 
             terms = [];
 
@@ -156,23 +245,29 @@ async function loadSet(setId) {
    START GAME
 ========================================= */
 
-async function startGameWithSet(setId) {
+async function startGameWithSet(
+    setId
+) {
 
     try {
 
-        const vocab = await loadSet(setId);
+        const vocab =
+            await loadSet(
+                setId
+            );
 
-        window.preloadedVocab = vocab.map(item => ({
+        window.preloadedVocab =
+            vocab.map(item => ({
 
-            word:
-                item.word,
+                word:
+                    item.word,
 
-            definition:
-                item.definition ||
-                item.meaning ||
-                ""
+                definition:
+                    item.definition ||
+                    item.meaning ||
+                    ""
 
-        }));
+            }));
 
         console.log(
             "GemWords vocab loaded:",
@@ -180,36 +275,53 @@ async function startGameWithSet(setId) {
         );
 
         const panel =
-            document.getElementById("teacher-panel");
+            document.getElementById(
+                "teacher-panel"
+            );
 
         if (panel) {
 
-            panel.style.display = "none";
+            panel.style.display =
+                "none";
 
         }
 
-        if (window.startLoadedGame) {
+        if (
+            window.startLoadedGame
+        ) {
 
             window.startLoadedGame();
 
         }
 
-    } catch (err) {
+    } catch(error) {
 
-        console.error(err);
+        console.error(
+            error
+        );
 
-        alert("Could not load vocabulary set.");
+        alert(
+            "Could not load vocabulary set."
+        );
 
     }
 
 }
 
 /* =========================================
+   LOAD DROPDOWN ON PAGE OPEN
+========================================= */
+
+loadVocabularySets();
+
+/* =========================================
    URL PARAM SUPPORT
 ========================================= */
 
 const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const setId =
     params.get("id") ||
@@ -217,43 +329,57 @@ const setId =
 
 if (setId) {
 
-    startGameWithSet(setId);
+    startGameWithSet(
+        setId
+    );
 
 }
 
 /* =========================================
-   MANUAL SET ID LOADER
+   BUTTON CLICK
 ========================================= */
 
 document
-    .getElementById("load-set-btn")
-    .addEventListener("click", () => {
+.getElementById(
+    "load-set-btn"
+)
+.addEventListener(
+    "click",
+    () => {
 
-        const setId =
+        const selectedSet =
             document
-            .getElementById("set-id-input")
-            .value
-            .trim();
+            .getElementById(
+                "setSelector"
+            )
+            .value;
 
-        if (!setId) {
+        if (
+            !selectedSet
+        ) {
 
-            alert("Please enter a set ID.");
+            alert(
+                "Please select a vocabulary set."
+            );
 
             return;
 
         }
 
-        startGameWithSet(setId);
+        startGameWithSet(
+            selectedSet
+        );
 
-    });
-
-<script type="module">
-
-    // Firebase code here...
+    }
+);
 
 </script>
 
-<script src="script (1).js"></script>
+<!-- =========================================
+     MAIN GAME SCRIPT
+========================================= -->
+
+ (1).js"></script>
 
 </body>
 </html>
