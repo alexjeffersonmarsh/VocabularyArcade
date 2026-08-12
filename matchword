@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vocabulary Match Game</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    padding:20px;
+    text-align:center;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+select{
+    width:100%;
+    max-width:500px;
+    padding:10px;
+    margin-bottom:20px;
+    font-size:16px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+}
+
+.tile{
+    background:#0078d4;
+    color:white;
+    min-height:100px;
+    padding:10px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    font-size:16px;
+    user-select:none;
+    transition:.2s;
+}
+
+.tile:hover{
+    transform:scale(1.03);
+}
+
+.tile.hidden{
+    background:#0078d4;
+    color:transparent;
+}
+
+.tile.revealed{
+    background:white;
+    color:black;
+    border:2px solid #0078d4;
+}
+
+.tile.matched{
+    background:#28a745;
+    color:white;
+    cursor:default;
+}
+
+.stats{
+    margin:15px 0;
+    font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Vocabulary Match Game</h1>
+
+<select id="setSelector">
+<option value="">Choose a Vocabulary Set</option>
+</select>
+
+<div class="stats">
+Matches:
+<span id="score">0</span> / 10
+</div>
+
+<div id="gameBoard" class="grid"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.firebasestorage.app",
+    messagingSenderId: "XXXXXXXX",
+    appId: "XXXXXXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const selector =
+    document.getElementById("setSelector");
+
+const board =
+    document.getElementById("gameBoard");
+
+const scoreDisplay =
+    document.getElementById("score");
+
+let selectedTiles = [];
+let lockBoard = false;
+let score = 0;
+
+async function loadSets(){
+
+    const snapshot =
+        await getDocs(
+            collection(db,"vocabSets")
+        );
+
+    snapshot.forEach(doc=>{
+
+        const data = doc.data();
+
+        const option =
+            document.createElement("option");
+
+        option.value = doc.id;
+        option.textContent = data.title;
+
+        option.dataset.items =
+            JSON.stringify(data.items);
+
+        selector.appendChild(option);
+    });
+}
+
+selector.addEventListener("change", ()=>{
+
+    const option =
+        selector.options[
+            selector.selectedIndex
+        ];
+
+    if(!option.dataset.items) return;
+
+    const items =
+        JSON.parse(option.dataset.items);
+
+    startGame(items);
+});
+
+function shuffle(array){
+
+    for(let i=array.length-1;i>0;i--){
+
+        const j =
+            Math.floor(
+                Math.random()*(i+1)
+            );
+
+        [array[i],array[j]]
+            =
+        [array[j],array[i]];
+    }
+
+    return array;
+}
+
+function startGame(items){
+
+    board.innerHTML = "";
+
+    score = 0;
+    scoreDisplay.textContent = 0;
+
+    selectedTiles = [];
+
+    let selectedItems =
+        shuffle([...items]).slice(0,10);
+
+    const cards = [];
+
+    selectedItems.forEach((item,index)=>{
+
+        cards.push({
+            pair:index,
+            text:item.word
+        });
+
+        cards.push({
+            pair:index,
+            text:item.definition
+        });
+
+    });
+
+    shuffle(cards);
+
+    cards.forEach(card=>{
+
+        const tile =
+            document.createElement("div");
+
+        tile.className =
+            "tile hidden";
+
+        tile.dataset.pair =
+            card.pair;
+
+        tile.dataset.text =
+            card.text;
+
+        tile.textContent =
+            card.text;
+
+        tile.addEventListener(
+            "click",
+            ()=>handleTile(tile)
+        );
+
+        board.appendChild(tile);
+
+    });
+}
+
+function handleTile(tile){
+
+    if(lockBoard) return;
+
+    if(
+        tile.classList.contains("matched")
+    ) return;
+
+    if(
+        tile.classList.contains("revealed")
+    ) return;
+
+    tile.classList.remove("hidden");
+    tile.classList.add("revealed");
+
+    selectedTiles.push(tile);
+
+    if(selectedTiles.length !== 2){
+        return;
+    }
+
+    lockBoard = true;
+
+    const first = selectedTiles[0];
+    const second = selectedTiles[1];
+
+    if(
+        first.dataset.pair ===
+        second.dataset.pair
+    ){
+
+        first.classList.remove("revealed");
+        second.classList.remove("revealed");
+
+        first.classList.add("matched");
+        second.classList.add("matched");
+
+        score++;
+
+        scoreDisplay.textContent =
+            score;
+
+        selectedTiles = [];
+        lockBoard = false;
+
+        if(score === 10){
+
+            setTimeout(()=>{
+                alert(
+                    "🎉 Great job! You matched all pairs!"
+                );
+            },200);
+        }
+
+    } else {
+
+        setTimeout(()=>{
+
+            first.classList.remove("revealed");
+            second.classList.remove("revealed");
+
+            first.classList.add("hidden");
+            second.classList.add("hidden");
+
+            selectedTiles = [];
+            lockBoard = false;
+
+        },1000);
+    }
+}
+
+loadSets();
+
+</script>
+
+</body>
+</html>
