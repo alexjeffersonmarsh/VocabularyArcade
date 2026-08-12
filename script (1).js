@@ -16,8 +16,6 @@ const colorMap = {
 };
 
 const colors = Object.keys(colorMap);
-```
-
 
 // ===== GAME STATE =====
 let score = 0;
