@@ -518,15 +518,51 @@ async function startLoadedGame() {
 window.startLoadedGame = startLoadedGame;
 
 // ===== BOOT =====
-(async () => {
 
-  let tries = 0;
+const params =
+    new URLSearchParams(window.location.search);
 
-  while (!window.preloadedVocab && tries < 30) {
-    await wait(200);
-    tries++;
-  }
+const setId =
+    params.get("id") ||
+    params.get("set");
 
-  startLoadedGame();
+if (setId) {
 
-})();
+  // Vocabulary set was supplied by the library.
+  // StartGameWithSet will load Firebase vocabulary
+  // and then start the game.
+  startGameWithSet(setId);
+
+} else {
+
+  // No vocabulary set in the URL.
+  // Wait for another source to preload vocabulary.
+  (async () => {
+
+    let tries = 0;
+
+    while (
+      !window.preloadedVocab &&
+      tries < 30
+    ) {
+
+      await wait(200);
+      tries++;
+
+    }
+
+    if (window.preloadedVocab) {
+
+      startLoadedGame();
+
+    } else {
+
+      console.error(
+        "No vocabulary set was supplied."
+      );
+
+    }
+
+  })();
+
+}
