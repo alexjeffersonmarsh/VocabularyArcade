@@ -255,9 +255,17 @@ async function startGameWithSet(
             await loadSet(
                 setId
             );
-
+         
+console.log("GEMWORDS: Firebase set loaded:", vocab);
+console.log("GEMWORDS: Number of vocabulary items:", vocab.length);
+         
         window.preloadedVocab =
             vocab.map(item => ({
+
+console.log(
+    "GEMWORDS: preloadedVocab:",
+    window.preloadedVocab
+);
 
                 word:
                     item.word,
@@ -286,14 +294,24 @@ async function startGameWithSet(
 
         }
 
-        if (
-            window.startLoadedGame
-        ) {
+     if (
+    typeof window.startLoadedGame ===
+    "function"
+) {
 
-            window.startLoadedGame();
+    console.log(
+        "GEMWORDS: Starting game..."
+    );
 
-        }
+    window.startLoadedGame();
 
+} else {
+
+    console.error(
+        "GEMWORDS: startLoadedGame() does not exist."
+    );
+
+}
     } catch(error) {
 
         console.error(error);
