@@ -170,18 +170,59 @@ function positionGem(g) {
 
 // ===== GEM =====
 function createGemElement(g) {
-  const d = document.createElement("div");
-  d.className = "gem";
-  d.style.background = colorMap[g.color];
-  d.dataset.color = g.color;
 
-  const label = document.createElement("span");
-  label.className = "label";
-  label.textContent = g.word;
+    const d = document.createElement("div");
 
-  d.appendChild(label);
-  d.onclick = () => selectGem(g);
-  return d;
+    d.className = "gem";
+
+    d.dataset.color = g.color;
+
+
+    // ===== GEM IMAGE =====
+
+    const img = document.createElement("img");
+
+    img.src = colorMap[g.color];
+
+    img.alt = "";
+
+    img.draggable = false;
+
+    img.className = "gem-image";
+
+
+    // ===== GEM LABEL =====
+
+    const label = document.createElement("span");
+
+    label.className = "label";
+
+    label.textContent = g.word;
+
+
+    // ===== BUILD GEM =====
+
+    d.appendChild(img);
+
+    d.appendChild(label);
+
+
+    // ===== CLICK =====
+
+    d.addEventListener(
+        "click",
+        () => {
+
+            if (isProcessing) return;
+
+            selectGem(g);
+
+        }
+    );
+
+
+    return d;
+
 }
 
 // ===== BOARD =====
