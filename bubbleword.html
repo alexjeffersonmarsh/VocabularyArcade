@@ -13,17 +13,62 @@
 
 </head>
 
+
 <body>
 
+
 <!-- =========================================
-     GAME AREA
+     GAME HUD
 ========================================= -->
 
-<div id="game-container">
+<div id="game-ui">
 
-    <div id="bubble-area"></div>
+    <div id="score-display">
+        SCORE:
+        <span id="score">0</span>
+    </div>
+
+    <div id="level-display">
+        LEVEL:
+        <span id="level">1</span>
+    </div>
+
+    <div id="timer-display">
+        TIME:
+        <span id="timer">60</span>
+    </div>
+
+    <div id="attempts-display">
+        SHOTS:
+        <span id="attempts">20</span>
+    </div>
+
+    <div id="target-display">
+        FIND:
+        <span id="target-word"></span>
+    </div>
+
+    <button id="mute-btn">
+        🔊
+    </button>
 
 </div>
+
+
+<!-- =========================================
+     GAME CANVAS
+========================================= -->
+
+<canvas id="gameCanvas"></canvas>
+
+
+<!-- =========================================
+     HIDDEN TEACHER PANEL
+     
+     Kept because script.js references it.
+========================================= -->
+
+<div id="teacher-panel" style="display:none;"></div>
 
 
 <!-- =========================================
@@ -49,7 +94,8 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
 
     authDomain:
         "bubbleword-30367.firebaseapp.com",
@@ -87,12 +133,14 @@ async function loadSet(setId) {
         setId
     );
 
+
     const ref =
         doc(
             db,
             "vocabSets",
             setId
         );
+
 
     const snapshot =
         await getDoc(ref);
@@ -175,9 +223,6 @@ async function startGameWithSet(setId) {
             await loadSet(setId);
 
 
-        /* Convert Firebase vocabulary
-           into the format used by the game */
-
         window.preloadedVocab =
             vocab.map(item => ({
 
@@ -198,7 +243,7 @@ async function startGameWithSet(setId) {
         );
 
 
-        /* Start the actual game */
+        /* Give the game script time to load */
 
         if (
             typeof window.startLoadedGame ===
@@ -214,8 +259,18 @@ async function startGameWithSet(setId) {
         }
         else {
 
-            console.error(
-                "BUBBLEWORD: startLoadedGame() not found."
+            console.log(
+                "BUBBLEWORD: Game script has not loaded yet. Waiting..."
+            );
+
+            window.addEventListener(
+                "bubbleword-ready",
+                () => {
+
+                    window.startLoadedGame();
+
+                },
+                { once: true }
             );
 
         }
