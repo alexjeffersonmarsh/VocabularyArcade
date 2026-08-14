@@ -455,3 +455,7 @@ function loop() {
 }
 
 loop();
+
+window.dispatchEvent(
+    new Event("bubbleword-ready")
+);
