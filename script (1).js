@@ -1,5 +1,5 @@
 
-// ===== SETTINGS =====
+// ===== GEMWORD SETTINGS =====
 const rows = 5;
 const cols = 4;
 
