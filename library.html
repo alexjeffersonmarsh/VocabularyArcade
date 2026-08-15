@@ -16,10 +16,17 @@
 
 body {
     font-family: Arial, sans-serif;
+
     background:
-        linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+        linear-gradient(
+            135deg,
+            #f5f7fa 0%,
+            #e9edf2 100%
+        );
+
     margin: 0;
     padding: 30px;
+
     color: #222;
 }
 
@@ -57,27 +64,44 @@ body {
 
 .controls {
     display: grid;
-    grid-template-columns: 1fr 220px 260px;
+
+    grid-template-columns:
+        1fr
+        220px
+        260px;
+
     gap: 12px;
+
     margin-bottom: 20px;
 }
 
 input,
 select {
     padding: 13px;
+
     font-size: 16px;
+
     border: 1px solid #ccc;
+
     border-radius: 7px;
+
     background: white;
+
     box-sizing: border-box;
+
     width: 100%;
 }
 
 input:focus,
 select:focus {
+
     outline: none;
+
     border-color: #0078d4;
-    box-shadow: 0 0 0 2px rgba(0,120,212,.15);
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0,120,212,.15);
 }
 
 
@@ -86,9 +110,13 @@ select:focus {
 ========================================= */
 
 .stats {
+
     margin-bottom: 15px;
+
     font-weight: bold;
+
     color: #555;
+
     font-size: 15px;
 }
 
@@ -98,6 +126,7 @@ select:focus {
 ========================================= */
 
 .card {
+
     position: relative;
 
     background: white;
@@ -127,32 +156,46 @@ select:focus {
 }
 
 .card:hover {
-    transform: translateY(-2px);
+
+    transform:
+        translateY(-2px);
 
     box-shadow:
-        0 6px 16px rgba(0,0,0,.15);
+        0 6px 16px
+        rgba(0,0,0,.15);
 }
 
 .cardInfo {
+
     flex: 1;
+
     min-width: 0;
 }
 
 .title {
+
     font-size: 20px;
+
     font-weight: bold;
+
     color: #222;
+
     margin-bottom: 6px;
 }
 
 .language {
+
     color: #0078d4;
+
     font-weight: bold;
+
     margin-bottom: 5px;
 }
 
 .meta {
+
     color: #666;
+
     font-size: 14px;
 }
 
@@ -188,24 +231,36 @@ select:focus {
 
 
 /* =========================================
-   GAME BUTTONS
+   GAME BUTTONS ON CARDS
 ========================================= */
 
 .gameButtons {
-    display: flex;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
     gap: 8px;
+
     flex-shrink: 0;
+
+    width: 230px;
 }
 
 .playButton {
+
     color: white;
+
     text-decoration: none;
 
-    padding: 11px 15px;
+    padding: 10px 8px;
 
     border-radius: 6px;
 
     font-weight: bold;
+
+    font-size: 13px;
 
     text-align: center;
 
@@ -215,16 +270,37 @@ select:focus {
 }
 
 .playButton:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.1);
+
+    transform:
+        translateY(-1px);
+
+    filter:
+        brightness(1.1);
 }
 
+
+/* =========================================
+   INDIVIDUAL GAME COLORS
+========================================= */
+
 .gemButton {
+
     background: #7b2cbf;
 }
 
 .bubbleButton {
+
     background: #0078d4;
+}
+
+.matchButton {
+
+    background: #e67e22;
+}
+
+.flashButton {
+
+    background: #16a085;
 }
 
 
@@ -233,23 +309,33 @@ select:focus {
 ========================================= */
 
 .loading {
+
     text-align: center;
+
     color: #666;
+
     padding: 30px;
 }
 
 .noResults {
+
     background: white;
+
     padding: 30px;
+
     border-radius: 10px;
+
     text-align: center;
+
     color: #666;
 
     box-shadow:
-        0 2px 7px rgba(0,0,0,.08);
+        0 2px 7px
+        rgba(0,0,0,.08);
 }
 
 .errorBox {
+
     background: #fff0f0;
 
     border: 1px solid #e0a0a0;
@@ -274,7 +360,8 @@ select:focus {
 
     inset: 0;
 
-    background: rgba(0,0,0,.65);
+    background:
+        rgba(0,0,0,.65);
 
     display: none;
 
@@ -288,6 +375,7 @@ select:focus {
 }
 
 .modalOverlay.show {
+
     display: flex;
 }
 
@@ -297,7 +385,7 @@ select:focus {
 
     width: 100%;
 
-    max-width: 500px;
+    max-width: 550px;
 
     border-radius: 16px;
 
@@ -306,7 +394,8 @@ select:focus {
     text-align: center;
 
     box-shadow:
-        0 20px 50px rgba(0,0,0,.3);
+        0 20px 50px
+        rgba(0,0,0,.3);
 }
 
 .gameModal h2 {
@@ -323,11 +412,17 @@ select:focus {
     margin-bottom: 25px;
 }
 
+
+/* =========================================
+   MODAL GAME BUTTONS
+========================================= */
+
 .modalGames {
 
     display: grid;
 
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+        1fr 1fr;
 
     gap: 15px;
 }
@@ -355,10 +450,17 @@ select:focus {
 
 .modalGameButton:hover {
 
-    transform: translateY(-2px);
+    transform:
+        translateY(-2px);
 
-    filter: brightness(1.1);
+    filter:
+        brightness(1.1);
 }
+
+
+/* =========================================
+   MODAL GAME COLORS
+========================================= */
 
 .modalGem {
 
@@ -369,6 +471,21 @@ select:focus {
 
     background: #0078d4;
 }
+
+.modalMatch {
+
+    background: #e67e22;
+}
+
+.modalFlash {
+
+    background: #16a085;
+}
+
+
+/* =========================================
+   CLOSE MODAL
+========================================= */
 
 .closeModal {
 
@@ -387,6 +504,11 @@ select:focus {
     font-size: 15px;
 }
 
+.closeModal:hover {
+
+    background: #ccc;
+}
+
 
 /* =========================================
    MOBILE
@@ -399,25 +521,32 @@ select:focus {
     }
 
     .controls {
+
         grid-template-columns: 1fr;
     }
 
     .card {
+
         flex-direction: column;
+
         align-items: stretch;
     }
 
     .gameButtons {
+
         width: 100%;
     }
 
     .playButton {
+
         flex: 1;
     }
 
     .modalGames {
+
         grid-template-columns: 1fr;
     }
+
 }
 
 </style>
@@ -430,72 +559,79 @@ select:focus {
 <div class="container">
 
 
-    <!-- =====================================
-         HEADER
-    ====================================== -->
+<!-- =====================================
+     HEADER
+====================================== -->
 
-    <div class="header">
+<div class="header">
 
-        <h1>Vocabulary Arcade</h1>
+    <h1>Vocabulary Arcade</h1>
 
-        <p>
-            Choose a vocabulary set and pick your game.
-        </p>
+    <p>
+        Choose a vocabulary set and pick your game.
+    </p>
+
+</div>
+
+
+<!-- =====================================
+     SEARCH / FILTERS
+====================================== -->
+
+<div class="controls">
+
+    <input
+        id="search"
+        type="text"
+        placeholder="Search vocabulary lists..."
+    >
+
+    <select id="languageFilter">
+
+        <option value="all">
+            All Languages
+        </option>
+
+    </select>
+
+    <select id="recentSelect">
+
+        <option value="all">
+            Most Recent Additions
+        </option>
+
+    </select>
+
+</div>
+
+
+<!-- =====================================
+     RESULTS COUNT
+====================================== -->
+
+<div
+    class="stats"
+    id="stats"
+>
+
+    Connecting to vocabulary library...
+
+</div>
+
+
+<!-- =====================================
+     RESULTS
+====================================== -->
+
+<div id="results">
+
+    <div class="loading">
+
+        Loading vocabulary library...
 
     </div>
 
-
-    <!-- =====================================
-         SEARCH / FILTERS
-    ====================================== -->
-
-    <div class="controls">
-
-        <input
-            id="search"
-            type="text"
-            placeholder="Search vocabulary lists..."
-        >
-
-        <select id="languageFilter">
-
-            <option value="all">
-                All Languages
-            </option>
-
-        </select>
-
-        <select id="recentSelect">
-
-            <option value="all">
-                Most Recent Additions
-            </option>
-
-        </select>
-
-    </div>
-
-
-    <!-- =====================================
-         RESULTS COUNT
-    ====================================== -->
-
-    <div class="stats" id="stats">
-        Connecting to vocabulary library...
-    </div>
-
-
-    <!-- =====================================
-         RESULTS
-    ====================================== -->
-
-    <div id="results">
-
-        <div class="loading">
-            Loading vocabulary library...
-        </div>
-
-    </div>
+</div>
 
 </div>
 
@@ -519,31 +655,76 @@ select:focus {
             How would you like to practice this vocabulary?
         </p>
 
+
         <div class="modalGames">
+
+
+            <!-- GEMWORDS -->
 
             <button
                 id="modalGemButton"
                 class="modalGameButton modalGem"
             >
+
                 💎<br>
+
                 GemWords
+
             </button>
+
+
+            <!-- BUBBLEWORD -->
 
             <button
                 id="modalBubbleButton"
                 class="modalGameButton modalBubble"
             >
+
                 🫧<br>
+
                 BubbleWord
+
             </button>
 
+
+            <!-- MATCHWORD -->
+
+            <button
+                id="modalMatchButton"
+                class="modalGameButton modalMatch"
+            >
+
+                🎯<br>
+
+                MatchWord
+
+            </button>
+
+
+            <!-- FLASHWORD -->
+
+            <button
+                id="modalFlashButton"
+                class="modalGameButton modalFlash"
+            >
+
+                🃏<br>
+
+                FlashWord
+
+            </button>
+
+
         </div>
+
 
         <button
             id="closeModal"
             class="closeModal"
         >
+
             Cancel
+
         </button>
 
     </div>
@@ -558,13 +739,19 @@ select:focus {
 <script type="module">
 
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
 import {
+
     getFirestore,
+
     collection,
+
     getDocs
+
 }
+
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 
@@ -604,7 +791,9 @@ let db;
 try {
 
     const app =
-        initializeApp(firebaseConfig);
+        initializeApp(
+            firebaseConfig
+        );
 
     db =
         getFirestore(app);
@@ -614,6 +803,7 @@ try {
     );
 
 }
+
 catch (error) {
 
     console.error(
@@ -656,6 +846,12 @@ const GEMWORD_URL =
 
 const BUBBLEWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/bubbleword.html";
+
+const MATCHWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/matchword.html";
+
+const FLASHWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/flashcard.html";
 
 
 /* =========================================
@@ -744,8 +940,8 @@ async function loadLibrary() {
 
         renderLists();
 
-
     }
+
     catch(error) {
 
         console.error(
@@ -1189,9 +1385,11 @@ function renderLists() {
 
                     ${
                         isNew
-                            ? `<span class="newBadge">
-                                  New
-                               </span>`
+                            ? `
+                                <span class="newBadge">
+                                    New
+                                </span>
+                              `
                             : ""
                     }
 
@@ -1224,6 +1422,7 @@ function renderLists() {
 
             <div class="gameButtons">
 
+
                 <a
                     class="playButton gemButton"
                     href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
@@ -1239,13 +1438,30 @@ function renderLists() {
                     🫧 BubbleWord
                 </a>
 
+
+                <a
+                    class="playButton matchButton"
+                    href="${MATCHWORD_URL}?id=${encodeURIComponent(list.id)}"
+                >
+                    🎯 MatchWord
+                </a>
+
+
+                <a
+                    class="playButton flashButton"
+                    href="${FLASHWORD_URL}?id=${encodeURIComponent(list.id)}"
+                >
+                    🃏 FlashWord
+                </a>
+
+
             </div>
 
         `;
 
 
         /*
-         * Prevent the game buttons from
+         * Prevent game buttons from
          * opening the game chooser.
          */
 
@@ -1318,7 +1534,7 @@ function closeGameChooser() {
 
 
 /* =========================================
-   GAME BUTTONS IN MODAL
+   GEMWORDS BUTTON
 ========================================= */
 
 document
@@ -1341,6 +1557,10 @@ document
     );
 
 
+/* =========================================
+   BUBBLEWORD BUTTON
+========================================= */
+
 document
     .getElementById(
         "modalBubbleButton"
@@ -1362,6 +1582,54 @@ document
 
 
 /* =========================================
+   MATCHWORD BUTTON
+========================================= */
+
+document
+    .getElementById(
+        "modalMatchButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (!selectedList) {
+                return;
+            }
+
+
+            window.location.href =
+                `${MATCHWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+        }
+    );
+
+
+/* =========================================
+   FLASHWORD BUTTON
+========================================= */
+
+document
+    .getElementById(
+        "modalFlashButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (!selectedList) {
+                return;
+            }
+
+
+            window.location.href =
+                `${FLASHWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+        }
+    );
+
+
+/* =========================================
    CLOSE BUTTON
 ========================================= */
 
@@ -1376,7 +1644,7 @@ document
 
 
 /* =========================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
+   CLOSE MODAL OUTSIDE
 ========================================= */
 
 document
