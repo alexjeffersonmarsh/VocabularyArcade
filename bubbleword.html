@@ -18,9 +18,11 @@
 
 
 <!-- =========================================
+     GAME AREA
      GAME HUD
 ========================================= -->
 
+<div id="game-container">
 <div id="game-ui">
 
     <div id="score-display">
@@ -48,6 +50,7 @@
         <span id="target-word"></span>
     </div>
 
+    <div id="bubble-area"></div>
     <button id="mute-btn">
         🔊
     </button>
@@ -94,6 +97,7 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
+    apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
     apiKey:
         "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
 
@@ -223,6 +227,9 @@ async function startGameWithSet(setId) {
             await loadSet(setId);
 
 
+        /* Convert Firebase vocabulary
+           into the format used by the game */
+
         window.preloadedVocab =
             vocab.map(item => ({
 
@@ -243,6 +250,7 @@ async function startGameWithSet(setId) {
         );
 
 
+        /* Start the actual game */
         /* Give the game script time to load */
 
         if (
@@ -259,6 +267,8 @@ async function startGameWithSet(setId) {
         }
         else {
 
+            console.error(
+                "BUBBLEWORD: startLoadedGame() not found."
             console.log(
                 "BUBBLEWORD: Game script has not loaded yet. Waiting..."
             );
