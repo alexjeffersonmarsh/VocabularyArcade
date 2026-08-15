@@ -4,136 +4,213 @@
 <head>
 
 <meta charset="UTF-8">
+<title>BubbleWord Teacher Setup</title>
 
+<!-- ✅ CORRECT CSS LINK -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>BubbleWord</title>
 
 <link rel="stylesheet" href="styles.css">
 
+<!-- ✅ QR LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    background: linear-gradient(to bottom, #9ad9ff, #e6f7ff);
+    font-family: Arial, Helvetica, sans-serif;
+}
 </head>
 
-
+/* ✅ WIDE PANEL (this fixes skinny issue) */
+#teacher-box {
+    width: 1000px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
 <body>
 
-
+h2 { margin-bottom: 10px; color: #1d3d57; }
 <!-- =========================================
-     GAME HUD
+     GAME AREA
 ========================================= -->
 
-<div id="game-ui">
+p {
+    color: #4d6477;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+<div id="game-container">
 
-    <div id="score-display">
-        SCORE:
-        <span id="score">0</span>
-    </div>
+textarea, input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #b8d7e8;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+    <div id="bubble-area"></div>
 
-    <div id="level-display">
-        LEVEL:
-        <span id="level">1</span>
-    </div>
-
-    <div id="timer-display">
-        TIME:
-        <span id="timer">60</span>
-    </div>
-
-    <div id="attempts-display">
-        SHOTS:
-        <span id="attempts">20</span>
-    </div>
-
-    <div id="target-display">
-        FIND:
-        <span id="target-word"></span>
-    </div>
-
-    <button id="mute-btn">
-        🔊
-    </button>
-
+textarea {
+    height: 180px;
+    resize: none;
+}
 </div>
 
+/* ✅ BUTTONS */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #58d88f, #34bc6e);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
 
-<!-- =========================================
-     GAME CANVAS
-========================================= -->
-
-<canvas id="gameCanvas"></canvas>
-
-
-<!-- =========================================
-     HIDDEN TEACHER PANEL
-     
-     Kept because script.js references it.
-========================================= -->
-
-<div id="teacher-panel" style="display:none;"></div>
-
-
+button:hover {
+    transform: translateY(-2px);
+}
 <!-- =========================================
      FIREBASE LOADER
 ========================================= -->
 
+/* ✅ RESULT BOX */
+#result {
+    margin-top: 15px;
+    background: #f0f9ff;
+    padding: 10px;
+    border-radius: 10px;
+}
 <script type="module">
 
+/* ✅ PREVIEW */
+#preview-box table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+#preview-box th, #preview-box td {
+    border: 1px solid #ccc;
+    padding: 6px;
 import {
     getFirestore,
     doc,
     getDoc
 }
+</style>
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+</head>
 
+<body>
 /* =========================================
    FIREBASE CONFIG
 ========================================= */
 
+<div id="teacher-box">
 const firebaseConfig = {
 
-    apiKey:
-        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+<h2>BubbleWord Teacher CMS</h2>
+    apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
 
+<p>Paste vocabulary in format: <b>word, meaning</b></p>
     authDomain:
         "bubbleword-30367.firebaseapp.com",
 
+<input id="set-name" placeholder="Set Title">
+<input id="content-area" placeholder="Content Area">
     projectId:
         "bubbleword-30367",
 
+<!-- ✅ DROPDOWN (RESTORED + WORKING) -->
+<h4>Select Game:</h4>
+<select id="game-select">
+    <option value="BubbleWord">BubbleWord</option>
+    <option value="GemWord">GemWord</option>
+</select>
     storageBucket:
         "bubbleword-30367.firebasestorage.app",
 
+<textarea id="teacher-input">
+amicus, friend
+aqua, water
+arbor, tree
+bellum, war
+caelum, sky
+</textarea>
     messagingSenderId:
         "1058393039019",
 
+<button onclick="previewVocab()">Preview</button>
+<button onclick="createVocabSet()">Save</button>
     appId:
         "1:1058393039019:web:72ffaf6dab677b9a3657ee"
 
+<div id="preview-box"></div>
 };
 
+<div id="result"></div>
+<canvas id="qrCanvas"></canvas>
 
+</div>
 const app =
     initializeApp(firebaseConfig);
 
+<script>
 const db =
     getFirestore(app);
 
+// ===== HELPERS =====
+function generateID() {
+    return Math.random().toString(36).substring(2, 10);
+}
 
+function parseCSV(text) {
+    return text.split("\n")
+        .map(l => l.trim())
+        .filter(l => l.includes(","))
+        .map(line => {
+            const parts = line.split(",");
+            return {
+                word: parts[0].trim(),
+                meaning: parts.slice(1).join(",").trim()
+            };
+        });
+}
 /* =========================================
    LOAD VOCABULARY SET
 ========================================= */
 
+// ===== PREVIEW =====
+function previewVocab() {
+    const text = document.getElementById("teacher-input").value;
+    const terms = parseCSV(text);
 async function loadSet(setId) {
 
+    let html = "<h4>Preview</h4><table>";
+    html += "<tr><th>Word</th><th>Meaning</th></tr>";
     console.log(
         "BUBBLEWORD: Loading set:",
         setId
     );
 
-
+    terms.forEach(t => {
+        html += `<tr><td>${t.word}</td><td>${t.meaning}</td></tr>`;
+    });
     const ref =
         doc(
             db,
@@ -141,20 +218,34 @@ async function loadSet(setId) {
             setId
         );
 
-
+    html += "</table>";
     const snapshot =
         await getDoc(ref);
 
+    document.getElementById("preview-box").innerHTML = html;
+}
 
+// ===== SAVE =====
+async function createVocabSet() {
     if (!snapshot.exists()) {
 
+    const title = document.getElementById("set-name").value.trim();
+    const contentArea = document.getElementById("content-area").value.trim();
+    const text = document.getElementById("teacher-input").value;
         throw new Error(
             "Vocabulary set not found."
         );
 
+    if (!title) {
+        alert("Enter a title.");
+        return;
     }
 
+    const terms = parseCSV(text);
 
+    if (terms.length < 5) {
+        alert("Add at least 5 vocab items.");
+        return;
     const data =
         snapshot.data();
 
@@ -205,6 +296,7 @@ async function loadSet(setId) {
 
     }
 
+    const id = generateID();
 
     return terms || [];
 
@@ -219,9 +311,26 @@ async function startGameWithSet(setId) {
 
     try {
 
+        await fetch(
+            "https://firestore.googleapis.com/v1/projects/bubbleword-30367/databases/(default)/documents/vocabSets?documentId=" + id,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fields: {
+                        title: { stringValue: title },
+                        contentArea: { stringValue: contentArea },
+                        createdAt: { integerValue: Date.now().toString() },
+                        terms: { stringValue: JSON.stringify(terms) }
+                    }
+                })
+            }
         const vocab =
             await loadSet(setId);
 
+
+        /* Convert Firebase vocabulary
+           into the format used by the game */
 
         window.preloadedVocab =
             vocab.map(item => ({
@@ -242,8 +351,11 @@ async function startGameWithSet(setId) {
             window.preloadedVocab
         );
 
+        // ✅ GAME SELECTION WORKING
+        const game = document.getElementById("game-select").value;
 
-        /* Give the game script time to load */
+        let link = "";
+        /* Start the actual game */
 
         if (
             typeof window.startLoadedGame ===
@@ -256,28 +368,29 @@ async function startGameWithSet(setId) {
 
             window.startLoadedGame();
 
+        if (game === "BubbleWord") {
+            link = "https://alexjeffersonmarsh.github.io/BubbleWord/index.html?id=" + id;
         }
         else {
 
-            console.log(
-                "BUBBLEWORD: Game script has not loaded yet. Waiting..."
+            console.error(
+                "BUBBLEWORD: startLoadedGame() not found."
             );
 
-            window.addEventListener(
-                "bubbleword-ready",
-                () => {
-
-                    window.startLoadedGame();
-
-                },
-                { once: true }
-            );
-
+        if (game === "GemWord") {
+            link = "https://alexjeffersonmarsh.github.io/Latin-Vocab-Game/game.html?id=" + id;
         }
 
+        document.getElementById("result").innerHTML = `
+            ✅ Saved!<br><br>
+            <input id="shareLink" value="${link}" readonly>
+            <button onclick="copyLink()">Copy Link</button>
+            <strong></a>
+        `;
     }
     catch(error) {
 
+        QRCode.toCanvas(document.getElementById("qrCanvas"), link);
         console.error(
             "BUBBLEWORD: Could not load vocabulary:",
             error
@@ -287,10 +400,19 @@ async function startGameWithSet(setId) {
             "Could not load this vocabulary set."
         );
 
+    } catch (err) {
+        console.error(err);
+        alert("Save failed.");
     }
 
 }
 
+// ===== COPY =====
+function copyLink() {
+    const input = document.getElementById("shareLink");
+    input.select();
+    document.execCommand("copy");
+    alert("Copied!");
 
 /* =========================================
    GET SET ID FROM URL
