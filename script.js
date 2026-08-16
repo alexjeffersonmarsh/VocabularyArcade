@@ -1,104 +1,101 @@
 // =========================================
-// BUBBLEWORD
-// Main Game Script
+// BUBBLEWORD Main Game Script
 // =========================================
 
 // =========================================
-// CANVAS SETUP
+// CANVAS
 // =========================================
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // =========================================
-// GAME LAYOUT
+// GAME CONSTANTS
 // =========================================
 
-// Height reserved at the bottom for:
-// 1. HUD
-// 2. Vocabulary definition
+// Height reserved at bottom for
+// the game information and definition.
+const BOTTOM_PANEL_HEIGHT = 190;
 
-const HUD_HEIGHT = 85;
-const DEFINITION_HEIGHT = 145;
+// Bubble radius.
+const BUBBLE_RADIUS = 90;
 
-const BOTTOM_RESERVED =
-    HUD_HEIGHT + DEFINITION_HEIGHT;
+// Minimum distance between bubbles.
+const BUBBLE_SPACING = 2.35;
 
-// Keep bubbles away from the top HUD area
-const TOP_RESERVED = 25;
-
-
-// =========================================
-// RESIZE CANVAS
-// =========================================
-
-function resizeCanvas() {
-
-    const panel =
-        document.getElementById("teacher-panel");
-
-    const panelWidth =
-        panel &&
-        panel.style.display !== "none"
-            ? panel.offsetWidth
-            : 0;
-
-    const availableWidth =
-        window.innerWidth - panelWidth;
-
-    const availableHeight =
-        window.innerHeight;
-
-    canvas.width =
-        Math.max(
-            320,
-            availableWidth
-        );
-
-    canvas.height =
-        Math.max(
-            500,
-            availableHeight
-        );
-
-    // Keep Play Again button centered
-    if (playAgainButton) {
-
-        playAgainButton.x =
-            canvas.width / 2 -
-            playAgainButton.width / 2;
-
-        playAgainButton.y =
-            canvas.height / 2 + 90;
-
-    }
-
-    // Keep existing bubbles inside the
-    // newly resized playable area.
-    if (bubbles.length > 0) {
-
-        constrainAllBubbles();
-
-    }
-
-}
+// Starting number of bubbles.
+const BUBBLE_COUNT = 10;
 
 
 // =========================================
-// INITIAL RESIZE
+// GAME STATE
 // =========================================
 
-resizeCanvas();
+let score = 0;
+let level = 1;
+let timeLeft = 60;
+let shotsLeft = 20;
 
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
+let correctCount = 0;
+let totalClicks = 0;
+
+let vocab = [];
+let bubbles = [];
+
+let currentDefinition = "";
+
+let timer = null;
+let gameOver = false;
 
 
 // =========================================
-// SOUND SYSTEM
+// PLAY AGAIN BUTTON
+// IMPORTANT:
+// This MUST be declared before
+// resizeCanvas() is called.
 // =========================================
+
+let playAgainButton = {
+
+    x: 0,
+
+    y: 0,
+
+    width: 220,
+
+    height: 60,
+
+    visible: false
+
+};
+
+
+// =========================================
+// HUD ELEMENTS
+// =========================================
+
+const scoreDisplay =
+    document.getElementById("score");
+
+const levelDisplay =
+    document.getElementById("level");
+
+const timerDisplay =
+    document.getElementById("timer");
+
+const attemptsDisplay =
+    document.getElementById("attempts");
+
+const targetWordDisplay =
+    document.getElementById("target-word");
+
+
+// =========================================
+// MUTE BUTTON
+// =========================================
+
+const muteButton =
+    document.getElementById("mute-btn");
 
 let soundOn = true;
 
@@ -137,14 +134,6 @@ function playMiss() {
 }
 
 
-// =========================================
-// MUTE BUTTON
-// =========================================
-
-const muteButton =
-    document.getElementById("mute-btn");
-
-
 if (muteButton) {
 
     muteButton.onclick = () => {
@@ -160,120 +149,74 @@ if (muteButton) {
 
 
 // =========================================
-// GAME STATE
+// CANVAS RESIZE
 // =========================================
 
-let score = 0;
+function resizeCanvas() {
 
-let level = 1;
-
-let timeLeft = 60;
-
-let shotsLeft = 20;
-
-let correctCount = 0;
-
-let totalClicks = 0;
-
-let vocab = [];
-
-let bubbles = [];
-
-let currentDefinition = "";
-
-let timer;
-
-let gameOver = false;
+    const gameContainer =
+        document.getElementById("game-container");
 
 
-// =========================================
-// PLAY AGAIN BUTTON
-// =========================================
-
-let playAgainButton = {
-
-    x: 0,
-
-    y: 0,
-
-    width: 220,
-
-    height: 60,
-
-    visible: false
-
-};
+    if (!gameContainer) return;
 
 
-// =========================================
-// OLD HTML HUD REFERENCES
-// =========================================
+    // Get the actual visible size
+    // of the game container.
 
-// These are retained so the existing HTML
-// continues to work if those elements exist.
+    const width =
+        gameContainer.clientWidth;
 
-const scoreDisplay =
-    document.getElementById("score");
-
-
-const levelDisplay =
-    document.getElementById("level");
+    const height =
+        gameContainer.clientHeight;
 
 
-const timerDisplay =
-    document.getElementById("timer");
+    canvas.width =
+        Math.max(
+            320,
+            width
+        );
 
 
-const attemptsDisplay =
-    document.getElementById("attempts");
+    canvas.height =
+        Math.max(
+            500,
+            height
+        );
 
 
-const targetWordDisplay =
-    document.getElementById("target-word");
+    // Keep Play Again centered.
+
+    playAgainButton.x =
+        canvas.width / 2 -
+        playAgainButton.width / 2;
 
 
-// =========================================
-// SAFE HUD UPDATE
-// =========================================
+    playAgainButton.y =
+        canvas.height / 2 +
+        90;
 
-function updateHTMLHud() {
 
-    if (scoreDisplay) {
+    // Keep existing bubbles inside
+    // the new canvas if the window
+    // is resized.
 
-        scoreDisplay.textContent =
-            score;
-
-    }
-
-    if (levelDisplay) {
-
-        levelDisplay.textContent =
-            level;
-
-    }
-
-    if (timerDisplay) {
-
-        timerDisplay.textContent =
-            timeLeft;
-
-    }
-
-    if (attemptsDisplay) {
-
-        attemptsDisplay.textContent =
-            shotsLeft;
-
-    }
+    keepBubblesOnScreen();
 
 }
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
 
 
 // =========================================
 // START GAME
 // =========================================
 
-window.startLoadedGame = function() {
+window.startLoadedGame = function () {
 
     if (
         !window.preloadedVocab ||
@@ -289,9 +232,7 @@ window.startLoadedGame = function() {
     }
 
 
-    // =====================================
-    // NORMALIZE VOCABULARY
-    // =====================================
+    // Normalize Firebase vocabulary.
 
     vocab =
         window.preloadedVocab
@@ -315,7 +256,7 @@ window.startLoadedGame = function() {
     if (vocab.length < 5) {
 
         alert(
-            "Not enough valid vocabulary items."
+            "Not enough valid vocabulary items loaded."
         );
 
         return;
@@ -323,9 +264,7 @@ window.startLoadedGame = function() {
     }
 
 
-    // =====================================
-    // HIDE TEACHER PANEL
-    // =====================================
+    // Hide teacher panel.
 
     const teacherPanel =
         document.getElementById(
@@ -341,11 +280,12 @@ window.startLoadedGame = function() {
     }
 
 
-    // =====================================
-    // RESET GAME
-    // =====================================
+    // Reset canvas.
 
     resizeCanvas();
+
+
+    // Reset game.
 
     score = 0;
 
@@ -360,7 +300,22 @@ window.startLoadedGame = function() {
     gameOver = false;
 
 
-    updateHTMLHud();
+    // Update HUD.
+
+    if (scoreDisplay) {
+
+        scoreDisplay.textContent =
+            score;
+
+    }
+
+
+    if (levelDisplay) {
+
+        levelDisplay.textContent =
+            level;
+
+    }
 
 
     if (targetWordDisplay) {
@@ -374,6 +329,8 @@ window.startLoadedGame = function() {
     playAgainButton.visible =
         false;
 
+
+    // Start first level.
 
     createLevel();
 
@@ -390,16 +347,26 @@ function createLevel() {
 
     gameOver = false;
 
+
+    // Reset shots.
+
     shotsLeft = 20;
 
-    updateHTMLHud();
+
+    if (attemptsDisplay) {
+
+        attemptsDisplay.textContent =
+            shotsLeft;
+
+    }
+
+
+    // Start timer.
 
     startTimer();
 
 
-    // =====================================
-    // SELECT VOCABULARY
-    // =====================================
+    // Select up to 10 vocabulary items.
 
     const selected =
         [...vocab]
@@ -407,7 +374,10 @@ function createLevel() {
                 () =>
                     Math.random() - 0.5
             )
-            .slice(0, 10);
+            .slice(
+                0,
+                BUBBLE_COUNT
+            );
 
 
     if (selected.length === 0) {
@@ -421,9 +391,7 @@ function createLevel() {
     }
 
 
-    // =====================================
-    // CHOOSE TARGET
-    // =====================================
+    // Choose the correct answer.
 
     const answer =
         selected[
@@ -433,6 +401,8 @@ function createLevel() {
             )
         ];
 
+
+    // The definition is the question.
 
     currentDefinition =
         answer.meaning;
@@ -446,213 +416,34 @@ function createLevel() {
     }
 
 
-    // =====================================
-    // BUBBLE SIZE
-    // =====================================
-
-    const radius =
-        Math.min(
-            80,
-            Math.max(
-                55,
-                canvas.width / 13
-            )
-        );
-
-
-    // =====================================
-    // PLAYABLE AREA
-    // =====================================
-
-    const playableLeft =
-        radius;
-
-
-    const playableRight =
-        canvas.width -
-        radius;
-
-
-    const playableTop =
-        TOP_RESERVED +
-        radius;
-
-
-    const playableBottom =
-        canvas.height -
-        BOTTOM_RESERVED -
-        radius;
-
-
-    // Make absolutely sure the area is valid
-    const safeTop =
-        Math.min(
-            playableTop,
-            canvas.height / 2
-        );
-
-
-    const safeBottom =
-        Math.max(
-            playableBottom,
-            safeTop + 20
-        );
-
-
-    // =====================================
-    // CREATE BUBBLES
-    // =====================================
+    // Create bubbles.
 
     selected.forEach(item => {
 
-        let x = 0;
-
-        let y = 0;
-
-        let safe = false;
-
-        let attempts = 0;
+        const position =
+            findSafeBubblePosition();
 
 
-        // ---------------------------------
-        // FIND NON-OVERLAPPING POSITION
-        // ---------------------------------
-
-        while (
-            !safe &&
-            attempts < 1000
-        ) {
-
-            attempts++;
-
-
-            x =
-                playableLeft +
-                Math.random() *
-                Math.max(
-                    1,
-                    playableRight -
-                    playableLeft
-                );
-
-
-            y =
-                safeTop +
-                Math.random() *
-                Math.max(
-                    1,
-                    safeBottom -
-                    safeTop
-                );
-
-
-            safe = true;
-
-
-            for (
-                const other of bubbles
-            ) {
-
-                const dx =
-                    x - other.x;
-
-                const dy =
-                    y - other.y;
-
-                const distance =
-                    Math.sqrt(
-                        dx * dx +
-                        dy * dy
-                    );
-
-
-                // Keep bubbles separated
-                if (
-                    distance <
-                    radius * 2.05
-                ) {
-
-                    safe = false;
-
-                    break;
-
-                }
-
-            }
-
-        }
-
-
-        // ---------------------------------
-        // FALLBACK POSITION
-        // ---------------------------------
-
-        if (!safe) {
-
-            // Use a grid-like fallback
-            // instead of allowing the bubble
-            // to appear outside the canvas.
-
-            const index =
-                bubbles.length;
-
-            const columns =
-                Math.max(
-                    1,
-                    Math.floor(
-                        canvas.width /
-                        (radius * 2.2)
-                    )
-                );
-
-
-            const column =
-                index % columns;
-
-
-            const row =
-                Math.floor(
-                    index / columns
-                );
-
-
-            x =
-                Math.min(
-                    playableRight,
-                    playableLeft +
-                    column *
-                    radius *
-                    2.1
-                );
-
-
-            y =
-                Math.min(
-                    safeBottom,
-                    safeTop +
-                    row *
-                    radius *
-                    2.1
-                );
-
-        }
-
-
-        // =================================
-        // MOVEMENT SPEED
-        // =================================
+        // Bubble speed increases
+        // with level.
 
         const speed =
-            (level - 1) * 0.8;
+            Math.max(
+                0,
+                (level - 1) * 1
+            );
 
 
         bubbles.push({
 
-            x: x,
+            x:
+                position.x,
 
-            y: y,
+            y:
+                position.y,
 
-            r: radius,
+            r:
+                BUBBLE_RADIUS,
 
             text:
                 item.word,
@@ -676,6 +467,248 @@ function createLevel() {
 
 
 // =========================================
+// FIND SAFE BUBBLE POSITION
+// =========================================
+
+function findSafeBubblePosition() {
+
+    const radius =
+        BUBBLE_RADIUS;
+
+
+    // Keep bubbles below the top HUD
+    // area and above the bottom panel.
+
+    const topLimit =
+        radius + 25;
+
+
+    const bottomLimit =
+        Math.max(
+            topLimit,
+            canvas.height -
+            BOTTOM_PANEL_HEIGHT -
+            radius
+        );
+
+
+    const leftLimit =
+        radius;
+
+
+    const rightLimit =
+        Math.max(
+            leftLimit,
+            canvas.width -
+            radius
+        );
+
+
+    // Try many random positions.
+
+    for (
+        let attempt = 0;
+        attempt < 1000;
+        attempt++
+    ) {
+
+        const x =
+            leftLimit +
+            Math.random() *
+            Math.max(
+                1,
+                rightLimit -
+                leftLimit
+            );
+
+
+        const y =
+            topLimit +
+            Math.random() *
+            Math.max(
+                1,
+                bottomLimit -
+                topLimit
+            );
+
+
+        let safe = true;
+
+
+        // Check against existing bubbles.
+
+        for (
+            const other of bubbles
+        ) {
+
+            const dx =
+                x - other.x;
+
+
+            const dy =
+                y - other.y;
+
+
+            const distance =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+
+            if (
+                distance <
+                radius * BUBBLE_SPACING
+            ) {
+
+                safe = false;
+
+                break;
+
+            }
+
+        }
+
+
+        if (safe) {
+
+            return {
+                x,
+                y
+            };
+
+        }
+
+    }
+
+
+    // If the board is crowded,
+    // use a grid-style fallback.
+
+    const index =
+        bubbles.length;
+
+
+    const columns =
+        Math.max(
+            1,
+            Math.floor(
+                canvas.width /
+                (radius * 2.1)
+            )
+        );
+
+
+    const column =
+        index % columns;
+
+
+    const row =
+        Math.floor(
+            index / columns
+        );
+
+
+    const x =
+        Math.min(
+            rightLimit,
+            leftLimit +
+            column *
+            radius *
+            2.1
+        );
+
+
+    const y =
+        Math.min(
+            bottomLimit,
+            topLimit +
+            row *
+            radius *
+            2.0
+        );
+
+
+    return {
+        x,
+        y
+    };
+
+}
+
+
+// =========================================
+// KEEP BUBBLES ON SCREEN
+// =========================================
+
+function keepBubblesOnScreen() {
+
+    const topLimit =
+        BUBBLE_RADIUS + 25;
+
+
+    const bottomLimit =
+        Math.max(
+            topLimit,
+            canvas.height -
+            BOTTOM_PANEL_HEIGHT -
+            BUBBLE_RADIUS
+        );
+
+
+    bubbles.forEach(b => {
+
+        if (
+            b.x <
+            b.r
+        ) {
+
+            b.x =
+                b.r;
+
+        }
+
+
+        if (
+            b.x >
+            canvas.width -
+            b.r
+        ) {
+
+            b.x =
+                canvas.width -
+                b.r;
+
+        }
+
+
+        if (
+            b.y <
+            topLimit
+        ) {
+
+            b.y =
+                topLimit;
+
+        }
+
+
+        if (
+            b.y >
+            bottomLimit
+        ) {
+
+            b.y =
+                bottomLimit;
+
+        }
+
+    });
+
+}
+
+
+// =========================================
 // TIMER
 // =========================================
 
@@ -683,9 +716,16 @@ function startTimer() {
 
     clearInterval(timer);
 
+
     timeLeft = 60;
 
-    updateHTMLHud();
+
+    if (timerDisplay) {
+
+        timerDisplay.textContent =
+            timeLeft;
+
+    }
 
 
     timer =
@@ -702,12 +742,20 @@ function startTimer() {
 
             timeLeft--;
 
-            updateHTMLHud();
+
+            if (timerDisplay) {
+
+                timerDisplay.textContent =
+                    timeLeft;
+
+            }
 
 
             if (
                 timeLeft <= 0
             ) {
+
+                clearInterval(timer);
 
                 playMiss();
 
@@ -723,191 +771,73 @@ function startTimer() {
 
 
 // =========================================
-// GET PLAYABLE BOUNDS
-// =========================================
-
-function getPlayableBounds(radius) {
-
-    return {
-
-        left:
-            radius,
-
-        right:
-            Math.max(
-                radius,
-                canvas.width - radius
-            ),
-
-        top:
-            TOP_RESERVED +
-            radius,
-
-        bottom:
-            Math.max(
-                TOP_RESERVED +
-                radius,
-                canvas.height -
-                BOTTOM_RESERVED -
-                radius
-            )
-
-    };
-
-}
-
-
-// =========================================
-// KEEP BUBBLE INSIDE SCREEN
-// =========================================
-
-function constrainBubble(b) {
-
-    const bounds =
-        getPlayableBounds(b.r);
-
-
-    // LEFT
-    if (
-        b.x < bounds.left
-    ) {
-
-        b.x =
-            bounds.left;
-
-        b.vx =
-            Math.abs(b.vx);
-
-    }
-
-
-    // RIGHT
-    if (
-        b.x > bounds.right
-    ) {
-
-        b.x =
-            bounds.right;
-
-        b.vx =
-            -Math.abs(b.vx);
-
-    }
-
-
-    // TOP
-    if (
-        b.y < bounds.top
-    ) {
-
-        b.y =
-            bounds.top;
-
-        b.vy =
-            Math.abs(b.vy);
-
-    }
-
-
-    // BOTTOM
-    if (
-        b.y > bounds.bottom
-    ) {
-
-        b.y =
-            bounds.bottom;
-
-        b.vy =
-            -Math.abs(b.vy);
-
-    }
-
-}
-
-
-// =========================================
-// CONSTRAIN ALL BUBBLES
-// =========================================
-
-function constrainAllBubbles() {
-
-    bubbles.forEach(
-        constrainBubble
-    );
-
-}
-
-
-// =========================================
 // UPDATE
 // =========================================
 
 function update() {
 
-    if (gameOver) {
-
-        return;
-
-    }
+    if (gameOver) return;
 
 
     bubbles.forEach(b => {
 
-        // =================================
-        // LEVEL 1
-        // =================================
+        // Level 1:
+        // bubbles remain still.
 
-        if (level === 1) {
-
-            // Bubbles stay still
-
-            constrainBubble(b);
+        if (
+            level === 1
+        ) {
 
             return;
 
         }
 
 
-        // =================================
-        // LEVEL 2+
-        // =================================
+        // Level 2+:
+        // horizontal movement.
 
-        if (level >= 2) {
+        if (
+            level >= 2
+        ) {
 
             b.x += b.vx;
 
         }
 
 
-        // =================================
-        // LEVEL 3+
-        // =================================
+        // Level 3+:
+        // vertical movement.
 
-        if (level >= 3) {
+        if (
+            level >= 3
+        ) {
 
             b.y += b.vy;
 
         }
 
 
-        // =================================
-        // LEVEL 5+
-        // =================================
+        // Level 5+:
+        // slight random movement.
 
-        if (level >= 5) {
+        if (
+            level >= 5
+        ) {
 
             b.vx +=
                 (Math.random() - 0.5) *
-                0.05;
+                0.1;
+
 
             b.vy +=
                 (Math.random() - 0.5) *
-                0.05;
+                0.1;
 
 
-            // Prevent excessive speed
+            // Prevent excessive speed.
 
             const maxSpeed = 3;
+
 
             b.vx =
                 Math.max(
@@ -917,6 +847,7 @@ function update() {
                         b.vx
                     )
                 );
+
 
             b.vy =
                 Math.max(
@@ -930,11 +861,83 @@ function update() {
         }
 
 
-        // =================================
-        // SCREEN BOUNDARIES
-        // =================================
+        // LEFT WALL
 
-        constrainBubble(b);
+        if (
+            b.x <
+            b.r
+        ) {
+
+            b.x =
+                b.r;
+
+            b.vx =
+                Math.abs(b.vx);
+
+        }
+
+
+        // RIGHT WALL
+
+        if (
+            b.x >
+            canvas.width -
+            b.r
+        ) {
+
+            b.x =
+                canvas.width -
+                b.r;
+
+            b.vx =
+                -Math.abs(b.vx);
+
+        }
+
+
+        // TOP WALL
+
+        const topLimit =
+            b.r + 25;
+
+
+        if (
+            b.y <
+            topLimit
+        ) {
+
+            b.y =
+                topLimit;
+
+            b.vy =
+                Math.abs(b.vy);
+
+        }
+
+
+        // BOTTOM WALL
+
+        const bottomLimit =
+            Math.max(
+                topLimit,
+                canvas.height -
+                BOTTOM_PANEL_HEIGHT -
+                b.r
+            );
+
+
+        if (
+            b.y >
+            bottomLimit
+        ) {
+
+            b.y =
+                bottomLimit;
+
+            b.vy =
+                -Math.abs(b.vy);
+
+        }
 
     });
 
@@ -983,9 +986,7 @@ function draw() {
         );
 
 
-        // =================================
-        // BUBBLE GRADIENT
-        // =================================
+        // Bubble gradient.
 
         const gradient =
             ctx.createRadialGradient(
@@ -1021,7 +1022,7 @@ function draw() {
 
         gradient.addColorStop(
             1,
-            "rgba(150,200,255,0.35)"
+            "rgba(100,190,255,0.35)"
         );
 
 
@@ -1033,17 +1034,17 @@ function draw() {
 
 
         ctx.strokeStyle =
-            "rgba(255,255,255,0.75)";
+            "rgba(255,255,255,0.7)";
 
 
-        ctx.lineWidth = 2;
+        ctx.lineWidth =
+            2;
+
 
         ctx.stroke();
 
 
-        // =================================
-        // WORD
-        // =================================
+        // Bubble word.
 
         ctx.fillStyle =
             "#123";
@@ -1077,228 +1078,155 @@ function draw() {
 
 
     // =====================================
-    // BOTTOM HUD
+    // BOTTOM INFORMATION PANEL
     // =====================================
 
-    const hudY =
+    const panelY =
         canvas.height -
-        BOTTOM_RESERVED;
+        BOTTOM_PANEL_HEIGHT;
 
+
+    // Panel background.
 
     ctx.fillStyle =
-        "rgba(255,255,255,0.95)";
+        "rgba(255,255,255,0.96)";
 
 
     ctx.fillRect(
 
         0,
 
-        hudY,
+        panelY,
 
         canvas.width,
 
-        HUD_HEIGHT
+        BOTTOM_PANEL_HEIGHT
 
     );
 
 
-    // Top border
+    // Top border.
 
     ctx.strokeStyle =
-        "rgba(70,140,180,0.35)";
+        "#cde7f5";
 
-    ctx.lineWidth = 3;
+
+    ctx.lineWidth =
+        4;
+
 
     ctx.beginPath();
 
+
     ctx.moveTo(
         0,
-        hudY
+        panelY
     );
+
 
     ctx.lineTo(
         canvas.width,
-        hudY
+        panelY
     );
+
 
     ctx.stroke();
 
 
     // =====================================
-    // HUD TEXT
+    // BOTTOM HUD
     // =====================================
 
-    const hudCenterY =
-        hudY +
-        HUD_HEIGHT / 2;
-
-
-    ctx.textBaseline =
-        "middle";
+    const hudY =
+        panelY + 38;
 
 
     ctx.font =
         "bold 20px Arial";
 
 
-    // Score
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    // Score.
 
     ctx.fillStyle =
         "#1d3d57";
-
-
-    ctx.textAlign =
-        "left";
 
 
     ctx.fillText(
 
         "SCORE: " + score,
 
-        25,
+        canvas.width * 0.15,
 
-        hudCenterY
+        hudY
 
     );
 
 
-    // Level
-
-    ctx.textAlign =
-        "center";
-
+    // Level.
 
     ctx.fillText(
 
         "LEVEL: " + level,
 
-        canvas.width / 2,
+        canvas.width * 0.35,
 
-        hudCenterY
+        hudY
 
     );
 
 
-    // Timer
+    // Timer.
 
     ctx.fillStyle =
-        timeLeft <= 10
-            ? "#e53935"
-            : "#1d3d57";
-
-
-    ctx.textAlign =
-        "right";
+        "#d94a4a";
 
 
     ctx.fillText(
 
-        "TIME: " +
-        timeLeft,
+        "TIME: " + timeLeft,
 
-        canvas.width - 25,
+        canvas.width * 0.55,
 
-        hudCenterY
+        hudY
 
     );
 
 
-    // =====================================
-    // SHOTS
-    // =====================================
-
-    ctx.textAlign =
-        "center";
-
+    // Shots.
 
     ctx.fillStyle =
         "#1d3d57";
 
 
-    ctx.font =
-        "bold 18px Arial";
-
-
     ctx.fillText(
 
-        "SHOTS: " +
-        shotsLeft,
+        "SHOTS: " + shotsLeft,
 
-        canvas.width / 2,
+        canvas.width * 0.78,
 
-        hudCenterY + 27
-
-    );
-
-
-    // =====================================
-    // BOTTOM DEFINITION PANEL
-    // =====================================
-
-    const definitionY =
-        canvas.height -
-        DEFINITION_HEIGHT;
-
-
-    ctx.fillStyle =
-        "rgba(20,55,75,0.94)";
-
-
-    ctx.fillRect(
-
-        0,
-
-        definitionY,
-
-        canvas.width,
-
-        DEFINITION_HEIGHT
+        hudY
 
     );
 
 
     // =====================================
-    // DEFINITION BORDER
-    // =====================================
-
-    ctx.strokeStyle =
-        "rgba(255,255,255,0.4)";
-
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        definitionY
-    );
-
-    ctx.lineTo(
-        canvas.width,
-        definitionY
-    );
-
-    ctx.stroke();
-
-
-    // =====================================
-    // QUESTION LABEL
+    // DEFINITION QUESTION
     // =====================================
 
     ctx.fillStyle =
-        "#ffffff";
+        "#5a6d7c";
 
 
     ctx.font =
-        "bold 18px Arial";
-
-
-    ctx.textAlign =
-        "center";
-
-
-    ctx.textBaseline =
-        "alphabetic";
+        "bold 16px Arial";
 
 
     ctx.fillText(
@@ -1307,23 +1235,21 @@ function draw() {
 
         canvas.width / 2,
 
-        definitionY + 30
+        panelY + 78
 
     );
 
 
-    // =====================================
-    // DEFINITION
-    // =====================================
+    // Definition.
 
     if (currentDefinition) {
 
+        ctx.fillStyle =
+            "#123a52";
+
+
         ctx.font =
             "bold 24px Arial";
-
-
-        ctx.fillStyle =
-            "#ffffff";
 
 
         drawCenteredWrappedText(
@@ -1332,7 +1258,7 @@ function draw() {
 
             canvas.width / 2,
 
-            definitionY + 82,
+            panelY + 120,
 
             canvas.width - 80,
 
@@ -1373,7 +1299,7 @@ function draw() {
 
 
         ctx.font =
-            "22px Arial";
+            "bold 22px Arial";
 
 
         ctx.textAlign =
@@ -1401,7 +1327,7 @@ function draw() {
 
 
 // =========================================
-// BUBBLE TEXT
+// DRAW BUBBLE TEXT
 // =========================================
 
 function drawBubbleText(
@@ -1430,7 +1356,7 @@ function drawBubbleText(
 
         if (
             ctx.measureText(testLine).width >
-                maxWidth &&
+            maxWidth &&
             line !== ""
         ) {
 
@@ -1462,7 +1388,8 @@ function drawBubbleText(
     }
 
 
-    const lineHeight = 22;
+    const lineHeight =
+        22;
 
 
     const startY =
@@ -1504,7 +1431,7 @@ function drawCenteredWrappedText(
 
     centerX,
 
-    startY,
+    centerY,
 
     maxWidth,
 
@@ -1531,7 +1458,7 @@ function drawCenteredWrappedText(
 
         if (
             ctx.measureText(testLine).width >
-                maxWidth &&
+            maxWidth &&
             line !== ""
         ) {
 
@@ -1569,8 +1496,9 @@ function drawCenteredWrappedText(
 
 
     let y =
-        startY -
-        totalHeight / 2;
+        centerY -
+        totalHeight / 2 +
+        lineHeight / 2;
 
 
     lines.forEach(
@@ -1599,233 +1527,276 @@ function drawCenteredWrappedText(
 // CLICK HANDLER
 // =========================================
 
-canvas.onclick = (e) => {
+canvas.addEventListener(
+    "click",
+    (e) => {
 
-    const x =
-        e.offsetX;
-
-    const y =
-        e.offsetY;
+        const rect =
+            canvas.getBoundingClientRect();
 
 
-    // =====================================
-    // PLAY AGAIN
-    // =====================================
+        // Convert mouse coordinates
+        // to actual canvas coordinates.
 
-    if (
-        gameOver &&
-        playAgainButton.visible
-    ) {
+        const scaleX =
+            canvas.width /
+            rect.width;
+
+
+        const scaleY =
+            canvas.height /
+            rect.height;
+
+
+        const x =
+            (e.clientX -
+                rect.left) *
+            scaleX;
+
+
+        const y =
+            (e.clientY -
+                rect.top) *
+            scaleY;
+
+
+        // =================================
+        // PLAY AGAIN
+        // =================================
 
         if (
-
-            x >=
-                playAgainButton.x &&
-
-            x <=
-                playAgainButton.x +
-                playAgainButton.width &&
-
-            y >=
-                playAgainButton.y &&
-
-            y <=
-                playAgainButton.y +
-                playAgainButton.height
-
+            gameOver &&
+            playAgainButton.visible
         ) {
 
-            restartGame();
+            if (
+
+                x >=
+                    playAgainButton.x &&
+
+                x <=
+                    playAgainButton.x +
+                    playAgainButton.width &&
+
+                y >=
+                    playAgainButton.y &&
+
+                y <=
+                    playAgainButton.y +
+                    playAgainButton.height
+
+            ) {
+
+                restartGame();
+
+            }
+
+
+            return;
 
         }
 
 
-        return;
+        if (gameOver) {
 
-    }
+            return;
 
-
-    if (gameOver) {
-
-        return;
-
-    }
+        }
 
 
-    // =====================================
-    // IGNORE BOTTOM HUD
-    // =====================================
-
-    if (
-        y >=
-        canvas.height -
-        BOTTOM_RESERVED
-    ) {
-
-        return;
-
-    }
-
-
-    // =====================================
-    // CHECK BUBBLES
-    // =====================================
-
-    for (
-        const b of bubbles
-    ) {
-
-        const dx =
-            x - b.x;
-
-        const dy =
-            y - b.y;
-
-
-        const distance =
-            Math.sqrt(
-                dx * dx +
-                dy * dy
-            );
-
+        // Ignore clicks in bottom panel.
 
         if (
-            distance <
-            b.r * 1.1
+            y >=
+            canvas.height -
+            BOTTOM_PANEL_HEIGHT
         ) {
 
-            totalClicks++;
+            return;
+
+        }
 
 
-            // =================================
-            // CORRECT ANSWER
-            // =================================
+        // Check bubbles.
 
-            if (b.correct) {
+        for (
+            const b of bubbles
+        ) {
 
-                playPop();
-
-                correctCount++;
-
-                score += 10;
+            const dx =
+                x - b.x;
 
 
-                updateHTMLHud();
+            const dy =
+                y - b.y;
 
 
-                // Remove clicked bubble
+            const distance =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
 
-                bubbles =
-                    bubbles.filter(
-                        rem =>
-                            rem !== b
-                    );
+
+            if (
+                distance <
+                b.r * 1.1
+            ) {
+
+                totalClicks++;
 
 
                 // =================================
-                // MORE BUBBLES REMAIN
+                // CORRECT ANSWER
                 // =================================
 
-                if (
-                    bubbles.length > 0
-                ) {
+                if (b.correct) {
 
-                    const next =
-                        bubbles[
-                            Math.floor(
-                                Math.random() *
-                                bubbles.length
-                            )
-                        ];
+                    playPop();
 
 
-                    bubbles.forEach(
-                        bubble => {
+                    correctCount++;
 
-                            bubble.correct =
-                                (
-                                    bubble ===
-                                    next
-                                );
+
+                    score += 10;
+
+
+                    if (scoreDisplay) {
+
+                        scoreDisplay.textContent =
+                            score;
+
+                    }
+
+
+                    // Remove clicked bubble.
+
+                    bubbles =
+                        bubbles.filter(
+                            rem =>
+                                rem !== b
+                        );
+
+
+                    // More bubbles remain.
+
+                    if (
+                        bubbles.length > 0
+                    ) {
+
+                        // Pick a new correct bubble.
+
+                        const next =
+                            bubbles[
+                                Math.floor(
+                                    Math.random() *
+                                    bubbles.length
+                                )
+                            ];
+
+
+                        bubbles.forEach(
+                            bubble => {
+
+                                bubble.correct =
+                                    (
+                                        bubble ===
+                                        next
+                                    );
+
+                            }
+                        );
+
+
+                        // Update definition.
+
+                        currentDefinition =
+                            vocab.find(
+                                v =>
+                                    v.word ===
+                                    next.text
+                            )?.meaning || "";
+
+                    }
+
+
+                    // Level complete.
+
+                    else {
+
+                        // Time bonus.
+
+                        score +=
+                            timeLeft * 2;
+
+
+                        if (scoreDisplay) {
+
+                            scoreDisplay.textContent =
+                                score;
 
                         }
-                    );
 
 
-                    // Update definition
+                        level++;
 
-                    currentDefinition =
-                        next.text
-                            ? (
-                                vocab.find(
-                                    v =>
-                                        v.word ===
-                                        next.text
-                                )?.meaning || ""
-                            )
-                            : "";
+
+                        if (levelDisplay) {
+
+                            levelDisplay.textContent =
+                                level;
+
+                        }
+
+
+                        createLevel();
+
+                    }
 
                 }
 
 
                 // =================================
-                // LEVEL COMPLETE
+                // INCORRECT ANSWER
                 // =================================
 
                 else {
 
-                    score +=
-                        timeLeft * 2;
+                    playMiss();
 
 
-                    level++;
+                    shotsLeft--;
 
 
-                    updateHTMLHud();
+                    if (attemptsDisplay) {
+
+                        attemptsDisplay.textContent =
+                            shotsLeft;
+
+                    }
 
 
-                    createLevel();
+                    if (
+                        shotsLeft <= 0
+                    ) {
 
-                }
+                        endGame(
+                            "OUT OF SHOTS!"
+                        );
 
-            }
-
-
-            // =================================
-            // INCORRECT ANSWER
-            // =================================
-
-            else {
-
-                playMiss();
-
-
-                shotsLeft--;
-
-
-                updateHTMLHud();
-
-
-                if (
-                    shotsLeft <= 0
-                ) {
-
-                    endGame(
-                        "OUT OF SHOTS!"
-                    );
+                    }
 
                 }
 
+
+                break;
+
             }
-
-
-            break;
 
         }
 
     }
-
-};
+);
 
 
 // =========================================
@@ -1844,20 +1815,16 @@ function endGame(message) {
         totalClicks > 0
 
             ? Math.round(
-
                 (
                     correctCount /
                     totalClicks
                 ) * 100
-
             )
 
             : 0;
 
 
-    // =====================================
-    // DARK OVERLAY
-    // =====================================
+    // Dark overlay.
 
     ctx.fillStyle =
         "rgba(0,0,0,0.82)";
@@ -1876,9 +1843,7 @@ function endGame(message) {
     );
 
 
-    // =====================================
-    // GAME OVER MESSAGE
-    // =====================================
+    // Message.
 
     ctx.fillStyle =
         "white";
@@ -1907,9 +1872,7 @@ function endGame(message) {
     );
 
 
-    // =====================================
-    // FINAL SCORE
-    // =====================================
+    // Final score.
 
     ctx.font =
         "28px Arial";
@@ -1927,9 +1890,7 @@ function endGame(message) {
     );
 
 
-    // =====================================
-    // CORRECT ANSWERS
-    // =====================================
+    // Correct.
 
     ctx.fillText(
 
@@ -1943,9 +1904,7 @@ function endGame(message) {
     );
 
 
-    // =====================================
-    // ACCURACY
-    // =====================================
+    // Accuracy.
 
     ctx.fillText(
 
@@ -1960,9 +1919,7 @@ function endGame(message) {
     );
 
 
-    // =====================================
-    // PLAY AGAIN BUTTON
-    // =====================================
+    // Play Again.
 
     playAgainButton.x =
         canvas.width / 2 -
@@ -1986,6 +1943,9 @@ function endGame(message) {
 
 function restartGame() {
 
+    clearInterval(timer);
+
+
     score = 0;
 
     level = 1;
@@ -1999,7 +1959,20 @@ function restartGame() {
     currentDefinition = "";
 
 
-    updateHTMLHud();
+    if (scoreDisplay) {
+
+        scoreDisplay.textContent =
+            score;
+
+    }
+
+
+    if (levelDisplay) {
+
+        levelDisplay.textContent =
+            level;
+
+    }
 
 
     playAgainButton.visible =
@@ -2021,7 +1994,6 @@ function loop() {
 
     draw();
 
-
     requestAnimationFrame(
         loop
     );
@@ -2029,11 +2001,25 @@ function loop() {
 }
 
 
+// =========================================
+// INITIALIZE
+// =========================================
+
+// Set an initial canvas size.
+// This happens AFTER all variables
+// have been declared.
+
+resizeCanvas();
+
+
+// Start the rendering loop.
+
 loop();
 
 
 // =========================================
-// SIGNAL THAT SCRIPT IS READY
+// TELL FIREBASE LOADER THAT THE
+// GAME SCRIPT IS READY
 // =========================================
 
 window.dispatchEvent(
