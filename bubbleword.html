@@ -74,19 +74,19 @@
 <script type="module">
 
 import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
     getFirestore,
     doc,
     getDoc
 }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-/* =========================================
-   FIREBASE CONFIG
-========================================= */
+// =========================================
+// FIREBASE CONFIG
+// =========================================
 
 const firebaseConfig = {
 
@@ -111,10 +111,6 @@ const firebaseConfig = {
 };
 
 
-/* =========================================
-   INITIALIZE FIREBASE
-========================================= */
-
 const app =
     initializeApp(firebaseConfig);
 
@@ -122,14 +118,9 @@ const db =
     getFirestore(app);
 
 
-console.log(
-    "BUBBLEWORD: Firebase initialized."
-);
-
-
-/* =========================================
-   LOAD VOCABULARY SET
-========================================= */
+// =========================================
+// LOAD VOCABULARY SET
+// =========================================
 
 async function loadSet(setId) {
 
@@ -170,9 +161,7 @@ async function loadSet(setId) {
     );
 
 
-    /* =====================================
-       NEW FORMAT
-    ===================================== */
+    // NEW FORMAT
 
     if (
         Array.isArray(data.items)
@@ -183,9 +172,7 @@ async function loadSet(setId) {
     }
 
 
-    /* =====================================
-       LEGACY FORMAT
-    ===================================== */
+    // LEGACY FORMAT
 
     let terms =
         data.terms;
@@ -220,9 +207,9 @@ async function loadSet(setId) {
 }
 
 
-/* =========================================
-   START GAME WITH FIREBASE VOCABULARY
-========================================= */
+// =========================================
+// START GAME WITH FIREBASE VOCAB
+// =========================================
 
 async function startGameWithSet(setId) {
 
@@ -231,10 +218,6 @@ async function startGameWithSet(setId) {
         const vocab =
             await loadSet(setId);
 
-
-        /* =================================
-           CONVERT FIREBASE VOCABULARY
-        ================================= */
 
         window.preloadedVocab =
             vocab.map(item => ({
@@ -256,30 +239,6 @@ async function startGameWithSet(setId) {
         );
 
 
-        /* =================================
-           MAKE SURE THERE IS VOCABULARY
-        ================================= */
-
-        if (
-            !window.preloadedVocab ||
-            window.preloadedVocab.length === 0
-        ) {
-
-            throw new Error(
-                "This vocabulary set contains no words."
-            );
-
-        }
-
-
-        /* =================================
-           START THE GAME
-           
-           script.js has already loaded
-           above, so startLoadedGame()
-           should now exist.
-        ================================= */
-
         if (
             typeof window.startLoadedGame ===
             "function"
@@ -294,12 +253,23 @@ async function startGameWithSet(setId) {
         }
         else {
 
-            console.error(
-                "BUBBLEWORD: startLoadedGame() was not found."
+            console.log(
+                "BUBBLEWORD: Game script has not loaded yet. Waiting..."
             );
 
-            throw new Error(
-                "BubbleWord game script could not be loaded."
+
+            window.addEventListener(
+
+                "bubbleword-ready",
+
+                () => {
+
+                    window.startLoadedGame();
+
+                },
+
+                { once: true }
+
             );
 
         }
@@ -314,8 +284,7 @@ async function startGameWithSet(setId) {
 
 
         alert(
-            "Could not load this vocabulary set.\n\n" +
-            error.message
+            "Could not load this vocabulary set."
         );
 
     }
@@ -323,9 +292,9 @@ async function startGameWithSet(setId) {
 }
 
 
-/* =========================================
-   GET SET ID FROM URL
-========================================= */
+// =========================================
+// GET SET ID FROM URL
+// =========================================
 
 const params =
     new URLSearchParams(
@@ -338,34 +307,23 @@ const setId =
     params.get("set");
 
 
-/* =========================================
-   START AUTOMATICALLY
-========================================= */
+// =========================================
+// START AUTOMATICALLY
+// =========================================
 
 if (setId) {
-
-    console.log(
-        "BUBBLEWORD: URL set ID:",
-        setId
-    );
 
     startGameWithSet(setId);
 
 }
 else {
-
     console.error(
         "BUBBLEWORD: No vocabulary set ID found in URL."
-    );
-
-    alert(
-        "No vocabulary set was specified."
     );
 
 }
 
 </script>
-
 
 </body>
 
