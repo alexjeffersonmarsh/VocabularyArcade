@@ -1,403 +1,2041 @@
-/* =========================================
-   BUBBLEWORD GLOBAL RESET
-========================================= */
+// =========================================
+// BUBBLEWORD
+// Main Game Script
+// =========================================
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+// =========================================
+// CANVAS SETUP
+// =========================================
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// =========================================
+// GAME LAYOUT
+// =========================================
+
+// Height reserved at the bottom for:
+// 1. HUD
+// 2. Vocabulary definition
+
+const HUD_HEIGHT = 85;
+const DEFINITION_HEIGHT = 145;
+
+const BOTTOM_RESERVED =
+    HUD_HEIGHT + DEFINITION_HEIGHT;
+
+// Keep bubbles away from the top HUD area
+const TOP_RESERVED = 25;
 
 
-/* =========================================
-   BODY
-========================================= */
+// =========================================
+// RESIZE CANVAS
+// =========================================
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
+function resizeCanvas() {
 
-    background:
-        linear-gradient(
-            to bottom,
-            #9ad9ff,
-            #e6f7ff
+    const panel =
+        document.getElementById("teacher-panel");
+
+    const panelWidth =
+        panel &&
+        panel.style.display !== "none"
+            ? panel.offsetWidth
+            : 0;
+
+    const availableWidth =
+        window.innerWidth - panelWidth;
+
+    const availableHeight =
+        window.innerHeight;
+
+    canvas.width =
+        Math.max(
+            320,
+            availableWidth
         );
 
-    height: 100vh;
-    width: 100vw;
-
-    overflow: hidden;
-
-    color: #2b3a42;
-}
-
-
-/* =========================================
-   GAME CONTAINER
-========================================= */
-
-#game-container {
-    position: relative;
-
-    width: 100vw;
-    height: 100vh;
-
-    overflow: hidden;
-}
-
-
-/* =========================================
-   CANVAS
-========================================= */
-
-#gameCanvas {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #7fd6ff,
-            #e9faff
+    canvas.height =
+        Math.max(
+            500,
+            availableHeight
         );
 
-    z-index: 1;
+    // Keep Play Again button centered
+    if (playAgainButton) {
+
+        playAgainButton.x =
+            canvas.width / 2 -
+            playAgainButton.width / 2;
+
+        playAgainButton.y =
+            canvas.height / 2 + 90;
+
+    }
+
+    // Keep existing bubbles inside the
+    // newly resized playable area.
+    if (bubbles.length > 0) {
+
+        constrainAllBubbles();
+
+    }
+
 }
 
 
-/* =========================================
-   GAME UI
-========================================= */
+// =========================================
+// INITIAL RESIZE
+// =========================================
 
-#game-ui {
-    position: absolute;
+resizeCanvas();
 
-    top: 0;
-    left: 0;
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
 
-    width: 100%;
 
-    z-index: 10;
+// =========================================
+// SOUND SYSTEM
+// =========================================
 
-    pointer-events: none;
+let soundOn = true;
+
+
+const pop =
+    new Audio(
+        "https://actions.google.com/sounds/v1/bubbles/bubble_pop.ogg"
+    );
+
+
+const miss =
+    new Audio(
+        "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+    );
+
+
+function playPop() {
+
+    if (!soundOn) return;
+
+    pop.currentTime = 0;
+
+    pop.play().catch(() => {});
+
 }
 
 
-/* =========================================
-   TOP HUD
-========================================= */
+function playMiss() {
 
-#score-display,
-#level-display,
-#timer-display,
-#attempts-display {
+    if (!soundOn) return;
 
-    position: absolute;
+    miss.currentTime = 0;
 
-    top: 20px;
+    miss.play().catch(() => {});
 
-    background:
-        rgba(255, 255, 255, 0.94);
-
-    padding: 12px 18px;
-
-    border-radius: 12px;
-
-    font-size: 20px;
-
-    font-weight: bold;
-
-    color: #1d3d57;
-
-    box-shadow:
-        0 5px 12px rgba(0, 0, 0, 0.12);
-
-    white-space: nowrap;
 }
 
 
-/* =========================================
-   HUD POSITIONS
-========================================= */
+// =========================================
+// MUTE BUTTON
+// =========================================
 
-#score-display {
-    left: 20px;
-}
-
-#level-display {
-    left: 160px;
-}
-
-#timer-display {
-    right: 160px;
-}
-
-#attempts-display {
-    right: 20px;
-}
+const muteButton =
+    document.getElementById("mute-btn");
 
 
-/* =========================================
-   HUD VALUES
-========================================= */
+if (muteButton) {
 
-#score {
-    color: #d99a00;
-    margin-left: 5px;
-}
+    muteButton.onclick = () => {
 
-#level {
-    color: #3478b8;
-    margin-left: 5px;
-}
+        soundOn = !soundOn;
 
-#timer {
-    color: #e74c3c;
-    margin-left: 5px;
-}
+        muteButton.textContent =
+            soundOn ? "🔊" : "🔇";
 
-#attempts {
-    color: #3478b8;
-    margin-left: 5px;
+    };
+
 }
 
 
-/* =========================================
-   MUTE BUTTON
-========================================= */
+// =========================================
+// GAME STATE
+// =========================================
 
-#mute-btn {
-    position: absolute;
+let score = 0;
 
-    top: 85px;
-    right: 20px;
+let level = 1;
 
-    width: 48px;
-    height: 48px;
+let timeLeft = 60;
 
-    padding: 0;
+let shotsLeft = 20;
 
-    border: none;
-    border-radius: 50%;
+let correctCount = 0;
 
-    background:
-        rgba(255, 255, 255, 0.94);
+let totalClicks = 0;
 
-    font-size: 22px;
+let vocab = [];
 
-    cursor: pointer;
+let bubbles = [];
 
-    pointer-events: auto;
+let currentDefinition = "";
 
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.15);
+let timer;
 
-    z-index: 20;
-}
-
-#mute-btn:hover {
-    transform: scale(1.05);
-}
+let gameOver = false;
 
 
-/* =========================================
-   BOTTOM DEFINITION PANEL
-========================================= */
+// =========================================
+// PLAY AGAIN BUTTON
+// =========================================
 
-#target-display {
+let playAgainButton = {
 
-    position: absolute;
+    x: 0,
 
-    left: 0;
-    bottom: 0;
+    y: 0,
 
-    width: 100%;
+    width: 220,
 
-    min-height: 140px;
+    height: 60,
 
-    padding: 16px 30px 20px;
+    visible: false
 
-    background:
-        rgba(255, 255, 255, 0.97);
-
-    border-top:
-        4px solid #cde7f5;
-
-    box-shadow:
-        0 -5px 15px rgba(0, 0, 0, 0.12);
-
-    text-align: center;
-
-    z-index: 15;
-
-    pointer-events: none;
-}
+};
 
 
-/* =========================================
-   DEFINITION LABEL
-========================================= */
+// =========================================
+// OLD HTML HUD REFERENCES
+// =========================================
 
-#target-display::before {
-    content: "FIND THE WORD FOR:";
+// These are retained so the existing HTML
+// continues to work if those elements exist.
 
-    display: block;
-
-    margin-bottom: 8px;
-
-    font-size: 17px;
-
-    font-weight: bold;
-
-    color: #5a6d7c;
-}
+const scoreDisplay =
+    document.getElementById("score");
 
 
-/* =========================================
-   DEFINITION TEXT
-========================================= */
+const levelDisplay =
+    document.getElementById("level");
 
-#target-word {
 
-    display: block;
+const timerDisplay =
+    document.getElementById("timer");
 
-    max-width: 1000px;
 
-    margin: 0 auto;
+const attemptsDisplay =
+    document.getElementById("attempts");
 
-    font-size: 26px;
 
-    line-height: 1.25;
+const targetWordDisplay =
+    document.getElementById("target-word");
 
-    font-weight: bold;
 
-    color: #123a52;
+// =========================================
+// SAFE HUD UPDATE
+// =========================================
 
-    letter-spacing: 0.5px;
+function updateHTMLHud() {
 
-    text-transform: none;
+    if (scoreDisplay) {
+
+        scoreDisplay.textContent =
+            score;
+
+    }
+
+    if (levelDisplay) {
+
+        levelDisplay.textContent =
+            level;
+
+    }
+
+    if (timerDisplay) {
+
+        timerDisplay.textContent =
+            timeLeft;
+
+    }
+
+    if (attemptsDisplay) {
+
+        attemptsDisplay.textContent =
+            shotsLeft;
+
+    }
+
 }
 
 
-/* =========================================
-   HIDDEN TEACHER PANEL
-========================================= */
+// =========================================
+// START GAME
+// =========================================
 
-#teacher-panel {
-    display: none !important;
-}
+window.startLoadedGame = function() {
 
+    if (
+        !window.preloadedVocab ||
+        window.preloadedVocab.length < 5
+    ) {
 
-/* =========================================
-   MOBILE / SMALL SCREENS
-========================================= */
+        alert(
+            "No valid vocabulary loaded."
+        );
 
-@media (max-width: 900px) {
+        return;
 
-    #score-display,
-    #level-display,
-    #timer-display,
-    #attempts-display {
-
-        top: 10px;
-
-        padding: 8px 10px;
-
-        font-size: 15px;
-
-        border-radius: 9px;
     }
 
 
-    #score-display {
-        left: 8px;
+    // =====================================
+    // NORMALIZE VOCABULARY
+    // =====================================
+
+    vocab =
+        window.preloadedVocab
+            .map(v => ({
+
+                word:
+                    v.word,
+
+                meaning:
+                    v.meaning ||
+                    v.definition ||
+                    ""
+
+            }))
+            .filter(v =>
+                v.word &&
+                v.meaning
+            );
+
+
+    if (vocab.length < 5) {
+
+        alert(
+            "Not enough valid vocabulary items."
+        );
+
+        return;
+
     }
 
 
-    #level-display {
-        left: 90px;
+    // =====================================
+    // HIDE TEACHER PANEL
+    // =====================================
+
+    const teacherPanel =
+        document.getElementById(
+            "teacher-panel"
+        );
+
+
+    if (teacherPanel) {
+
+        teacherPanel.style.display =
+            "none";
+
     }
 
 
-    #timer-display {
-        right: 90px;
+    // =====================================
+    // RESET GAME
+    // =====================================
+
+    resizeCanvas();
+
+    score = 0;
+
+    level = 1;
+
+    correctCount = 0;
+
+    totalClicks = 0;
+
+    currentDefinition = "";
+
+    gameOver = false;
+
+
+    updateHTMLHud();
+
+
+    if (targetWordDisplay) {
+
+        targetWordDisplay.textContent =
+            "";
+
     }
 
 
-    #attempts-display {
-        right: 8px;
+    playAgainButton.visible =
+        false;
+
+
+    createLevel();
+
+};
+
+
+// =========================================
+// CREATE LEVEL
+// =========================================
+
+function createLevel() {
+
+    bubbles = [];
+
+    gameOver = false;
+
+    shotsLeft = 20;
+
+    updateHTMLHud();
+
+    startTimer();
+
+
+    // =====================================
+    // SELECT VOCABULARY
+    // =====================================
+
+    const selected =
+        [...vocab]
+            .sort(
+                () =>
+                    Math.random() - 0.5
+            )
+            .slice(0, 10);
+
+
+    if (selected.length === 0) {
+
+        endGame(
+            "NO VOCABULARY"
+        );
+
+        return;
+
     }
 
 
-    #mute-btn {
-        top: 58px;
-        right: 10px;
+    // =====================================
+    // CHOOSE TARGET
+    // =====================================
 
-        width: 40px;
-        height: 40px;
+    const answer =
+        selected[
+            Math.floor(
+                Math.random() *
+                selected.length
+            )
+        ];
 
-        font-size: 18px;
+
+    currentDefinition =
+        answer.meaning;
+
+
+    if (targetWordDisplay) {
+
+        targetWordDisplay.textContent =
+            "";
+
     }
 
 
-    #target-display {
+    // =====================================
+    // BUBBLE SIZE
+    // =====================================
 
-        min-height: 120px;
-
-        padding:
-            12px
-            15px
-            15px;
-    }
-
-
-    #target-display::before {
-        font-size: 14px;
-        margin-bottom: 6px;
-    }
+    const radius =
+        Math.min(
+            80,
+            Math.max(
+                55,
+                canvas.width / 13
+            )
+        );
 
 
-    #target-word {
-        font-size: 20px;
-    }
+    // =====================================
+    // PLAYABLE AREA
+    // =====================================
+
+    const playableLeft =
+        radius;
+
+
+    const playableRight =
+        canvas.width -
+        radius;
+
+
+    const playableTop =
+        TOP_RESERVED +
+        radius;
+
+
+    const playableBottom =
+        canvas.height -
+        BOTTOM_RESERVED -
+        radius;
+
+
+    // Make absolutely sure the area is valid
+    const safeTop =
+        Math.min(
+            playableTop,
+            canvas.height / 2
+        );
+
+
+    const safeBottom =
+        Math.max(
+            playableBottom,
+            safeTop + 20
+        );
+
+
+    // =====================================
+    // CREATE BUBBLES
+    // =====================================
+
+    selected.forEach(item => {
+
+        let x = 0;
+
+        let y = 0;
+
+        let safe = false;
+
+        let attempts = 0;
+
+
+        // ---------------------------------
+        // FIND NON-OVERLAPPING POSITION
+        // ---------------------------------
+
+        while (
+            !safe &&
+            attempts < 1000
+        ) {
+
+            attempts++;
+
+
+            x =
+                playableLeft +
+                Math.random() *
+                Math.max(
+                    1,
+                    playableRight -
+                    playableLeft
+                );
+
+
+            y =
+                safeTop +
+                Math.random() *
+                Math.max(
+                    1,
+                    safeBottom -
+                    safeTop
+                );
+
+
+            safe = true;
+
+
+            for (
+                const other of bubbles
+            ) {
+
+                const dx =
+                    x - other.x;
+
+                const dy =
+                    y - other.y;
+
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
+                    );
+
+
+                // Keep bubbles separated
+                if (
+                    distance <
+                    radius * 2.05
+                ) {
+
+                    safe = false;
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+
+        // ---------------------------------
+        // FALLBACK POSITION
+        // ---------------------------------
+
+        if (!safe) {
+
+            // Use a grid-like fallback
+            // instead of allowing the bubble
+            // to appear outside the canvas.
+
+            const index =
+                bubbles.length;
+
+            const columns =
+                Math.max(
+                    1,
+                    Math.floor(
+                        canvas.width /
+                        (radius * 2.2)
+                    )
+                );
+
+
+            const column =
+                index % columns;
+
+
+            const row =
+                Math.floor(
+                    index / columns
+                );
+
+
+            x =
+                Math.min(
+                    playableRight,
+                    playableLeft +
+                    column *
+                    radius *
+                    2.1
+                );
+
+
+            y =
+                Math.min(
+                    safeBottom,
+                    safeTop +
+                    row *
+                    radius *
+                    2.1
+                );
+
+        }
+
+
+        // =================================
+        // MOVEMENT SPEED
+        // =================================
+
+        const speed =
+            (level - 1) * 0.8;
+
+
+        bubbles.push({
+
+            x: x,
+
+            y: y,
+
+            r: radius,
+
+            text:
+                item.word,
+
+            correct:
+                item.word === answer.word,
+
+            vx:
+                (Math.random() - 0.5) *
+                speed,
+
+            vy:
+                (Math.random() - 0.5) *
+                speed
+
+        });
+
+    });
+
 }
 
 
-/* =========================================
-   VERY SMALL SCREENS
-========================================= */
+// =========================================
+// TIMER
+// =========================================
 
-@media (max-width: 500px) {
+function startTimer() {
 
-    #score-display,
-    #level-display,
-    #timer-display,
-    #attempts-display {
+    clearInterval(timer);
 
-        font-size: 12px;
+    timeLeft = 60;
 
-        padding: 7px 8px;
-    }
+    updateHTMLHud();
 
 
-    #level-display {
-        left: 78px;
-    }
+    timer =
+        setInterval(() => {
+
+            if (gameOver) {
+
+                clearInterval(timer);
+
+                return;
+
+            }
 
 
-    #timer-display {
-        right: 78px;
-    }
+            timeLeft--;
+
+            updateHTMLHud();
 
 
-    #target-word {
-        font-size: 18px;
-    }
+            if (
+                timeLeft <= 0
+            ) {
+
+                playMiss();
+
+                endGame(
+                    "TIME'S UP!"
+                );
+
+            }
+
+        }, 1000);
+
 }
+
+
+// =========================================
+// GET PLAYABLE BOUNDS
+// =========================================
+
+function getPlayableBounds(radius) {
+
+    return {
+
+        left:
+            radius,
+
+        right:
+            Math.max(
+                radius,
+                canvas.width - radius
+            ),
+
+        top:
+            TOP_RESERVED +
+            radius,
+
+        bottom:
+            Math.max(
+                TOP_RESERVED +
+                radius,
+                canvas.height -
+                BOTTOM_RESERVED -
+                radius
+            )
+
+    };
+
+}
+
+
+// =========================================
+// KEEP BUBBLE INSIDE SCREEN
+// =========================================
+
+function constrainBubble(b) {
+
+    const bounds =
+        getPlayableBounds(b.r);
+
+
+    // LEFT
+    if (
+        b.x < bounds.left
+    ) {
+
+        b.x =
+            bounds.left;
+
+        b.vx =
+            Math.abs(b.vx);
+
+    }
+
+
+    // RIGHT
+    if (
+        b.x > bounds.right
+    ) {
+
+        b.x =
+            bounds.right;
+
+        b.vx =
+            -Math.abs(b.vx);
+
+    }
+
+
+    // TOP
+    if (
+        b.y < bounds.top
+    ) {
+
+        b.y =
+            bounds.top;
+
+        b.vy =
+            Math.abs(b.vy);
+
+    }
+
+
+    // BOTTOM
+    if (
+        b.y > bounds.bottom
+    ) {
+
+        b.y =
+            bounds.bottom;
+
+        b.vy =
+            -Math.abs(b.vy);
+
+    }
+
+}
+
+
+// =========================================
+// CONSTRAIN ALL BUBBLES
+// =========================================
+
+function constrainAllBubbles() {
+
+    bubbles.forEach(
+        constrainBubble
+    );
+
+}
+
+
+// =========================================
+// UPDATE
+// =========================================
+
+function update() {
+
+    if (gameOver) {
+
+        return;
+
+    }
+
+
+    bubbles.forEach(b => {
+
+        // =================================
+        // LEVEL 1
+        // =================================
+
+        if (level === 1) {
+
+            // Bubbles stay still
+
+            constrainBubble(b);
+
+            return;
+
+        }
+
+
+        // =================================
+        // LEVEL 2+
+        // =================================
+
+        if (level >= 2) {
+
+            b.x += b.vx;
+
+        }
+
+
+        // =================================
+        // LEVEL 3+
+        // =================================
+
+        if (level >= 3) {
+
+            b.y += b.vy;
+
+        }
+
+
+        // =================================
+        // LEVEL 5+
+        // =================================
+
+        if (level >= 5) {
+
+            b.vx +=
+                (Math.random() - 0.5) *
+                0.05;
+
+            b.vy +=
+                (Math.random() - 0.5) *
+                0.05;
+
+
+            // Prevent excessive speed
+
+            const maxSpeed = 3;
+
+            b.vx =
+                Math.max(
+                    -maxSpeed,
+                    Math.min(
+                        maxSpeed,
+                        b.vx
+                    )
+                );
+
+            b.vy =
+                Math.max(
+                    -maxSpeed,
+                    Math.min(
+                        maxSpeed,
+                        b.vy
+                    )
+                );
+
+        }
+
+
+        // =================================
+        // SCREEN BOUNDARIES
+        // =================================
+
+        constrainBubble(b);
+
+    });
+
+}
+
+
+// =========================================
+// DRAW
+// =========================================
+
+function draw() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    // =====================================
+    // DRAW BUBBLES
+    // =====================================
+
+    bubbles.forEach(b => {
+
+        ctx.beginPath();
+
+
+        ctx.ellipse(
+
+            b.x,
+
+            b.y,
+
+            b.r * 1.05,
+
+            b.r * 0.9,
+
+            0,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+
+        // =================================
+        // BUBBLE GRADIENT
+        // =================================
+
+        const gradient =
+            ctx.createRadialGradient(
+
+                b.x -
+                    b.r * 0.3,
+
+                b.y -
+                    b.r * 0.3,
+
+                b.r * 0.2,
+
+                b.x,
+
+                b.y,
+
+                b.r
+
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "rgba(255,255,255,0.95)"
+        );
+
+
+        gradient.addColorStop(
+            0.4,
+            "rgba(200,230,255,0.65)"
+        );
+
+
+        gradient.addColorStop(
+            1,
+            "rgba(150,200,255,0.35)"
+        );
+
+
+        ctx.fillStyle =
+            gradient;
+
+
+        ctx.fill();
+
+
+        ctx.strokeStyle =
+            "rgba(255,255,255,0.75)";
+
+
+        ctx.lineWidth = 2;
+
+        ctx.stroke();
+
+
+        // =================================
+        // WORD
+        // =================================
+
+        ctx.fillStyle =
+            "#123";
+
+
+        ctx.font =
+            "bold 20px Arial";
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        drawBubbleText(
+
+            b.text,
+
+            b.x,
+
+            b.y,
+
+            b.r * 1.6
+
+        );
+
+    });
+
+
+    // =====================================
+    // BOTTOM HUD
+    // =====================================
+
+    const hudY =
+        canvas.height -
+        BOTTOM_RESERVED;
+
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.95)";
+
+
+    ctx.fillRect(
+
+        0,
+
+        hudY,
+
+        canvas.width,
+
+        HUD_HEIGHT
+
+    );
+
+
+    // Top border
+
+    ctx.strokeStyle =
+        "rgba(70,140,180,0.35)";
+
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        hudY
+    );
+
+    ctx.lineTo(
+        canvas.width,
+        hudY
+    );
+
+    ctx.stroke();
+
+
+    // =====================================
+    // HUD TEXT
+    // =====================================
+
+    const hudCenterY =
+        hudY +
+        HUD_HEIGHT / 2;
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.font =
+        "bold 20px Arial";
+
+
+    // Score
+
+    ctx.fillStyle =
+        "#1d3d57";
+
+
+    ctx.textAlign =
+        "left";
+
+
+    ctx.fillText(
+
+        "SCORE: " + score,
+
+        25,
+
+        hudCenterY
+
+    );
+
+
+    // Level
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+
+        "LEVEL: " + level,
+
+        canvas.width / 2,
+
+        hudCenterY
+
+    );
+
+
+    // Timer
+
+    ctx.fillStyle =
+        timeLeft <= 10
+            ? "#e53935"
+            : "#1d3d57";
+
+
+    ctx.textAlign =
+        "right";
+
+
+    ctx.fillText(
+
+        "TIME: " +
+        timeLeft,
+
+        canvas.width - 25,
+
+        hudCenterY
+
+    );
+
+
+    // =====================================
+    // SHOTS
+    // =====================================
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillStyle =
+        "#1d3d57";
+
+
+    ctx.font =
+        "bold 18px Arial";
+
+
+    ctx.fillText(
+
+        "SHOTS: " +
+        shotsLeft,
+
+        canvas.width / 2,
+
+        hudCenterY + 27
+
+    );
+
+
+    // =====================================
+    // BOTTOM DEFINITION PANEL
+    // =====================================
+
+    const definitionY =
+        canvas.height -
+        DEFINITION_HEIGHT;
+
+
+    ctx.fillStyle =
+        "rgba(20,55,75,0.94)";
+
+
+    ctx.fillRect(
+
+        0,
+
+        definitionY,
+
+        canvas.width,
+
+        DEFINITION_HEIGHT
+
+    );
+
+
+    // =====================================
+    // DEFINITION BORDER
+    // =====================================
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.4)";
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        definitionY
+    );
+
+    ctx.lineTo(
+        canvas.width,
+        definitionY
+    );
+
+    ctx.stroke();
+
+
+    // =====================================
+    // QUESTION LABEL
+    // =====================================
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.font =
+        "bold 18px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "alphabetic";
+
+
+    ctx.fillText(
+
+        "FIND THE WORD FOR:",
+
+        canvas.width / 2,
+
+        definitionY + 30
+
+    );
+
+
+    // =====================================
+    // DEFINITION
+    // =====================================
+
+    if (currentDefinition) {
+
+        ctx.font =
+            "bold 24px Arial";
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        drawCenteredWrappedText(
+
+            currentDefinition,
+
+            canvas.width / 2,
+
+            definitionY + 82,
+
+            canvas.width - 80,
+
+            28
+
+        );
+
+    }
+
+
+    // =====================================
+    // PLAY AGAIN BUTTON
+    // =====================================
+
+    if (
+        playAgainButton.visible
+    ) {
+
+        ctx.fillStyle =
+            "#34bc6e";
+
+
+        ctx.fillRect(
+
+            playAgainButton.x,
+
+            playAgainButton.y,
+
+            playAgainButton.width,
+
+            playAgainButton.height
+
+        );
+
+
+        ctx.fillStyle =
+            "white";
+
+
+        ctx.font =
+            "22px Arial";
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        ctx.fillText(
+
+            "Play Again",
+
+            canvas.width / 2,
+
+            playAgainButton.y +
+            playAgainButton.height / 2
+
+        );
+
+    }
+
+}
+
+
+// =========================================
+// BUBBLE TEXT
+// =========================================
+
+function drawBubbleText(
+    text,
+    x,
+    y,
+    maxWidth
+) {
+
+    const words =
+        String(text).split(" ");
+
+
+    let line = "";
+
+    const lines = [];
+
+
+    words.forEach(word => {
+
+        const testLine =
+            line +
+            word +
+            " ";
+
+
+        if (
+            ctx.measureText(testLine).width >
+                maxWidth &&
+            line !== ""
+        ) {
+
+            lines.push(
+                line.trim()
+            );
+
+
+            line =
+                word + " ";
+
+        }
+        else {
+
+            line =
+                testLine;
+
+        }
+
+    });
+
+
+    if (line) {
+
+        lines.push(
+            line.trim()
+        );
+
+    }
+
+
+    const lineHeight = 22;
+
+
+    const startY =
+        y -
+        (
+            (lines.length - 1) *
+            lineHeight
+        ) / 2;
+
+
+    lines.forEach(
+        (currentLine, index) => {
+
+            ctx.fillText(
+
+                currentLine,
+
+                x,
+
+                startY +
+                index *
+                lineHeight
+
+            );
+
+        }
+    );
+
+}
+
+
+// =========================================
+// DEFINITION TEXT WRAP
+// =========================================
+
+function drawCenteredWrappedText(
+
+    text,
+
+    centerX,
+
+    startY,
+
+    maxWidth,
+
+    lineHeight
+
+) {
+
+    const words =
+        String(text).split(" ");
+
+
+    let line = "";
+
+    const lines = [];
+
+
+    words.forEach(word => {
+
+        const testLine =
+            line +
+            word +
+            " ";
+
+
+        if (
+            ctx.measureText(testLine).width >
+                maxWidth &&
+            line !== ""
+        ) {
+
+            lines.push(
+                line.trim()
+            );
+
+
+            line =
+                word + " ";
+
+        }
+        else {
+
+            line =
+                testLine;
+
+        }
+
+    });
+
+
+    if (line) {
+
+        lines.push(
+            line.trim()
+        );
+
+    }
+
+
+    const totalHeight =
+        lines.length *
+        lineHeight;
+
+
+    let y =
+        startY -
+        totalHeight / 2;
+
+
+    lines.forEach(
+        currentLine => {
+
+            ctx.fillText(
+
+                currentLine,
+
+                centerX,
+
+                y
+
+            );
+
+
+            y += lineHeight;
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CLICK HANDLER
+// =========================================
+
+canvas.onclick = (e) => {
+
+    const x =
+        e.offsetX;
+
+    const y =
+        e.offsetY;
+
+
+    // =====================================
+    // PLAY AGAIN
+    // =====================================
+
+    if (
+        gameOver &&
+        playAgainButton.visible
+    ) {
+
+        if (
+
+            x >=
+                playAgainButton.x &&
+
+            x <=
+                playAgainButton.x +
+                playAgainButton.width &&
+
+            y >=
+                playAgainButton.y &&
+
+            y <=
+                playAgainButton.y +
+                playAgainButton.height
+
+        ) {
+
+            restartGame();
+
+        }
+
+
+        return;
+
+    }
+
+
+    if (gameOver) {
+
+        return;
+
+    }
+
+
+    // =====================================
+    // IGNORE BOTTOM HUD
+    // =====================================
+
+    if (
+        y >=
+        canvas.height -
+        BOTTOM_RESERVED
+    ) {
+
+        return;
+
+    }
+
+
+    // =====================================
+    // CHECK BUBBLES
+    // =====================================
+
+    for (
+        const b of bubbles
+    ) {
+
+        const dx =
+            x - b.x;
+
+        const dy =
+            y - b.y;
+
+
+        const distance =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+
+        if (
+            distance <
+            b.r * 1.1
+        ) {
+
+            totalClicks++;
+
+
+            // =================================
+            // CORRECT ANSWER
+            // =================================
+
+            if (b.correct) {
+
+                playPop();
+
+                correctCount++;
+
+                score += 10;
+
+
+                updateHTMLHud();
+
+
+                // Remove clicked bubble
+
+                bubbles =
+                    bubbles.filter(
+                        rem =>
+                            rem !== b
+                    );
+
+
+                // =================================
+                // MORE BUBBLES REMAIN
+                // =================================
+
+                if (
+                    bubbles.length > 0
+                ) {
+
+                    const next =
+                        bubbles[
+                            Math.floor(
+                                Math.random() *
+                                bubbles.length
+                            )
+                        ];
+
+
+                    bubbles.forEach(
+                        bubble => {
+
+                            bubble.correct =
+                                (
+                                    bubble ===
+                                    next
+                                );
+
+                        }
+                    );
+
+
+                    // Update definition
+
+                    currentDefinition =
+                        next.text
+                            ? (
+                                vocab.find(
+                                    v =>
+                                        v.word ===
+                                        next.text
+                                )?.meaning || ""
+                            )
+                            : "";
+
+                }
+
+
+                // =================================
+                // LEVEL COMPLETE
+                // =================================
+
+                else {
+
+                    score +=
+                        timeLeft * 2;
+
+
+                    level++;
+
+
+                    updateHTMLHud();
+
+
+                    createLevel();
+
+                }
+
+            }
+
+
+            // =================================
+            // INCORRECT ANSWER
+            // =================================
+
+            else {
+
+                playMiss();
+
+
+                shotsLeft--;
+
+
+                updateHTMLHud();
+
+
+                if (
+                    shotsLeft <= 0
+                ) {
+
+                    endGame(
+                        "OUT OF SHOTS!"
+                    );
+
+                }
+
+            }
+
+
+            break;
+
+        }
+
+    }
+
+};
+
+
+// =========================================
+// GAME OVER
+// =========================================
+
+function endGame(message) {
+
+    gameOver = true;
+
+
+    clearInterval(timer);
+
+
+    const accuracy =
+        totalClicks > 0
+
+            ? Math.round(
+
+                (
+                    correctCount /
+                    totalClicks
+                ) * 100
+
+            )
+
+            : 0;
+
+
+    // =====================================
+    // DARK OVERLAY
+    // =====================================
+
+    ctx.fillStyle =
+        "rgba(0,0,0,0.82)";
+
+
+    ctx.fillRect(
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    );
+
+
+    // =====================================
+    // GAME OVER MESSAGE
+    // =====================================
+
+    ctx.fillStyle =
+        "white";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "alphabetic";
+
+
+    ctx.font =
+        "44px Arial";
+
+
+    ctx.fillText(
+
+        message,
+
+        canvas.width / 2,
+
+        canvas.height / 2 - 100
+
+    );
+
+
+    // =====================================
+    // FINAL SCORE
+    // =====================================
+
+    ctx.font =
+        "28px Arial";
+
+
+    ctx.fillText(
+
+        "Final Score: " +
+        score,
+
+        canvas.width / 2,
+
+        canvas.height / 2 - 30
+
+    );
+
+
+    // =====================================
+    // CORRECT ANSWERS
+    // =====================================
+
+    ctx.fillText(
+
+        "Correct: " +
+        correctCount,
+
+        canvas.width / 2,
+
+        canvas.height / 2 + 10
+
+    );
+
+
+    // =====================================
+    // ACCURACY
+    // =====================================
+
+    ctx.fillText(
+
+        "Accuracy: " +
+        accuracy +
+        "%",
+
+        canvas.width / 2,
+
+        canvas.height / 2 + 50
+
+    );
+
+
+    // =====================================
+    // PLAY AGAIN BUTTON
+    // =====================================
+
+    playAgainButton.x =
+        canvas.width / 2 -
+        playAgainButton.width / 2;
+
+
+    playAgainButton.y =
+        canvas.height / 2 +
+        90;
+
+
+    playAgainButton.visible =
+        true;
+
+}
+
+
+// =========================================
+// RESTART GAME
+// =========================================
+
+function restartGame() {
+
+    score = 0;
+
+    level = 1;
+
+    correctCount = 0;
+
+    totalClicks = 0;
+
+    gameOver = false;
+
+    currentDefinition = "";
+
+
+    updateHTMLHud();
+
+
+    playAgainButton.visible =
+        false;
+
+
+    createLevel();
+
+}
+
+
+// =========================================
+// GAME LOOP
+// =========================================
+
+function loop() {
+
+    update();
+
+    draw();
+
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+loop();
+
+
+// =========================================
+// SIGNAL THAT SCRIPT IS READY
+// =========================================
+
+window.dispatchEvent(
+    new Event("bubbleword-ready")
+);
