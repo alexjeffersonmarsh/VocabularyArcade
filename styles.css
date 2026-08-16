@@ -1,5 +1,4 @@
 /* =========================================
-   BUBBLEWORD
    GLOBAL RESET
 ========================================= */
 
@@ -15,11 +14,7 @@
 ========================================= */
 
 body {
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 
     background:
         linear-gradient(
@@ -28,8 +23,8 @@ body {
             #e6f7ff
         );
 
-    width: 100vw;
     height: 100vh;
+    width: 100vw;
 
     overflow: hidden;
 
@@ -38,272 +33,16 @@ body {
 
 
 /* =========================================
-   TEACHER PANEL
-========================================= */
-
-#teacher-panel {
-
-    width: 300px;
-
-    max-width: 400px;
-
-    height: 100vh;
-
-    background:
-        rgba(255,255,255,0.95);
-
-    border-right:
-        4px solid #cde7f5;
-
-    padding: 15px;
-
-    overflow-y: auto;
-
-    box-shadow:
-        4px 0 12px rgba(0,0,0,0.08);
-
-    position: relative;
-
-    z-index: 100;
-}
-
-
-#teacher-panel h2 {
-
-    font-size: 24px;
-
-    margin-bottom: 12px;
-
-    color: #1d3d57;
-}
-
-
-#bulk-vocab-input {
-
-    width: 100%;
-
-    height: 300px;
-
-    padding: 10px;
-
-    border-radius: 10px;
-
-    border:
-        2px solid #b8d7e8;
-
-    font-size: 14px;
-}
-
-
-/* =========================================
-   INPUTS
-========================================= */
-
-input,
-textarea {
-
-    width: 100%;
-
-    padding: 10px;
-
-    border-radius: 10px;
-
-    border:
-        2px solid #b8d7e8;
-
-    font-size: 14px;
-
-    margin-top: 8px;
-}
-
-
-/* =========================================
-   BUTTONS
-========================================= */
-
-button {
-
-    margin-top: 12px;
-
-    width: 100%;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    border: none;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #58d88f,
-            #34bc6e
-        );
-
-    color: white;
-
-    font-weight: bold;
-
-    cursor: pointer;
-}
-
-
-button:hover {
-
-    transform:
-        translateY(-2px);
-}
-
-
-/* =========================================
-   SECONDARY BUTTON
-========================================= */
-
-button.secondary {
-
-    background:
-        linear-gradient(
-            to bottom,
-            #d0e8f7,
-            #a8d4ef
-        );
-
-    color: #1d3d57;
-}
-
-
-/* =========================================
-   START BUTTON
-========================================= */
-
-#start-game-btn:hover {
-
-    background:
-        linear-gradient(
-            to bottom,
-            #69e59d,
-            #2cab63
-        );
-}
-
-
-/* =========================================
-   PREVIEW TABLE
-========================================= */
-
-#preview-box {
-
-    margin-top: 15px;
-}
-
-
-#preview-box table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 10px;
-}
-
-
-#preview-box th {
-
-    background: #e8f4fb;
-
-    color: #1d3d57;
-
-    padding: 10px;
-
-    text-align: left;
-
-    border:
-        1px solid #ccc;
-}
-
-
-#preview-box td {
-
-    padding: 8px;
-
-    border:
-        1px solid #ccc;
-
-    background: #ffffff;
-}
-
-
-#preview-box tr:nth-child(even) td {
-
-    background: #f7fbff;
-}
-
-
-/* =========================================
-   RESULT AREA
-========================================= */
-
-#result {
-
-    margin-top: 15px;
-}
-
-
-#result input {
-
-    margin-top: 10px;
-
-    font-size: 13px;
-}
-
-
-#result button {
-
-    margin-top: 8px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #4aa3df,
-            #2b7bbf
-        );
-}
-
-
-/* =========================================
-   QR CODE
-========================================= */
-
-#qrCanvas {
-
-    margin-top: 15px;
-
-    display: block;
-}
-
-
-/* =========================================
    GAME CONTAINER
 ========================================= */
 
 #game-container {
-
     position: relative;
 
-    width: 100%;
-
+    width: 100vw;
     height: 100vh;
 
-    flex: 1;
-
     overflow: hidden;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #7fd6ff 0%,
-            #e9faff 100%
-        );
 }
 
 
@@ -312,18 +51,15 @@ button.secondary {
 ========================================= */
 
 #gameCanvas {
-
     position: absolute;
 
     top: 0;
-
     left: 0;
 
-    display: block;
-
     width: 100%;
-
     height: 100%;
+
+    display: block;
 
     background:
         linear-gradient(
@@ -332,94 +68,127 @@ button.secondary {
             #e9faff
         );
 
-    cursor: crosshair;
-
-    touch-action: none;
+    z-index: 1;
 }
 
 
 /* =========================================
-   BOTTOM GAME HUD
-=========================================
-
-   The JavaScript draws the actual HUD
-   onto the canvas.
-
-   These rules simply make sure that any
-   HTML HUD elements from older versions
-   do not interfere with the new layout.
+   GAME UI
 ========================================= */
 
-#hud-left,
-#hud-right {
+#game-ui {
+    position: absolute;
 
-    display: none;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    z-index: 10;
+
+    pointer-events: none;
 }
 
 
 /* =========================================
-   OLD TARGET WORD BAR
-=========================================
-
-   The vocabulary definition is now drawn
-   directly onto the canvas by script.js.
-
-   Hide the old HTML version so there is
-   only one definition display.
+   TOP HUD
 ========================================= */
 
-#target-word-bar {
-
-    display: none;
-}
-
-
-/* =========================================
-   OLD TARGET WORD ELEMENTS
-========================================= */
-
-#target-label,
-#target-word {
-
-    display: none;
-}
-
-
-/* =========================================
-   MUTE BUTTON
-=========================================
-
-   Keep the mute button available if it is
-   part of the HTML interface.
-========================================= */
-
-#mute-btn {
+#score-display,
+#level-display,
+#timer-display,
+#attempts-display {
 
     position: absolute;
 
     top: 20px;
 
-    left: 20px;
+    background:
+        rgba(255, 255, 255, 0.94);
 
-    width: auto;
-
-    min-width: 50px;
-
-    height: 50px;
-
-    margin: 0;
-
-    padding: 8px 12px;
+    padding: 12px 18px;
 
     border-radius: 12px;
 
-    border:
-        2px solid rgba(255,255,255,0.8);
+    font-size: 20px;
 
-    background:
-        rgba(255,255,255,0.9);
+    font-weight: bold;
 
     color: #1d3d57;
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.12);
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   HUD POSITIONS
+========================================= */
+
+#score-display {
+    left: 20px;
+}
+
+#level-display {
+    left: 160px;
+}
+
+#timer-display {
+    right: 160px;
+}
+
+#attempts-display {
+    right: 20px;
+}
+
+
+/* =========================================
+   HUD VALUES
+========================================= */
+
+#score {
+    color: #d99a00;
+    margin-left: 5px;
+}
+
+#level {
+    color: #3478b8;
+    margin-left: 5px;
+}
+
+#timer {
+    color: #e74c3c;
+    margin-left: 5px;
+}
+
+#attempts {
+    color: #3478b8;
+    margin-left: 5px;
+}
+
+
+/* =========================================
+   MUTE BUTTON
+========================================= */
+
+#mute-btn {
+    position: absolute;
+
+    top: 85px;
+    right: 20px;
+
+    width: 48px;
+    height: 48px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.94);
 
     font-size: 22px;
 
@@ -427,255 +196,208 @@ button.secondary {
 
     pointer-events: auto;
 
-    z-index: 1000;
-
     box-shadow:
-        0 4px 10px rgba(0,0,0,0.12);
+        0 4px 10px rgba(0, 0, 0, 0.15);
+
+    z-index: 20;
 }
 
-
 #mute-btn:hover {
-
-    transform:
-        translateY(-2px);
-
-    background:
-        #ffffff;
+    transform: scale(1.05);
 }
 
 
 /* =========================================
-   BOTTOM HUD VISUAL SUPPORT
-=========================================
-
-   This class is available if we decide
-   later to move the HUD from the canvas
-   into HTML.
-
-   It does not interfere with the current
-   canvas-based implementation.
+   BOTTOM DEFINITION PANEL
 ========================================= */
 
-.bottom-hud {
+#target-display {
 
     position: absolute;
 
     left: 0;
-
-    right: 0;
-
     bottom: 0;
 
-    display: flex;
+    width: 100%;
 
-    justify-content: center;
+    min-height: 140px;
 
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 10px 15px;
+    padding: 16px 30px 20px;
 
     background:
-        rgba(255,255,255,0.95);
+        rgba(255, 255, 255, 0.97);
 
     border-top:
-        3px solid #cde7f5;
+        4px solid #cde7f5;
 
     box-shadow:
-        0 -4px 12px rgba(0,0,0,0.12);
-
-    z-index: 50;
-}
-
-
-.bottom-hud .hud-box {
-
-    background:
-        linear-gradient(
-            to bottom,
-            #ffffff,
-            #edf7fc
-        );
-
-    padding:
-        8px 16px;
-
-    border-radius: 10px;
-
-    font-size: 18px;
-
-    font-weight: bold;
-
-    color: #1d3d57;
-
-    min-width: 110px;
+        0 -5px 15px rgba(0, 0, 0, 0.12);
 
     text-align: center;
 
-    box-shadow:
-        0 3px 8px rgba(0,0,0,0.1);
+    z-index: 15;
+
+    pointer-events: none;
 }
 
 
 /* =========================================
-   HUD COLORS
+   DEFINITION LABEL
 ========================================= */
 
-#score {
+#target-display::before {
+    content: "FIND THE WORD FOR:";
 
-    color: #c58a00;
-}
+    display: block;
 
+    margin-bottom: 8px;
 
-#timer {
+    font-size: 17px;
 
-    color: #d93636;
-}
+    font-weight: bold;
 
-
-#attempts {
-
-    color: #2878a8;
-}
-
-
-#level {
-
-    color: #34a866;
+    color: #5a6d7c;
 }
 
 
 /* =========================================
-   MOBILE
+   DEFINITION TEXT
+========================================= */
+
+#target-word {
+
+    display: block;
+
+    max-width: 1000px;
+
+    margin: 0 auto;
+
+    font-size: 26px;
+
+    line-height: 1.25;
+
+    font-weight: bold;
+
+    color: #123a52;
+
+    letter-spacing: 0.5px;
+
+    text-transform: none;
+}
+
+
+/* =========================================
+   HIDDEN TEACHER PANEL
+========================================= */
+
+#teacher-panel {
+    display: none !important;
+}
+
+
+/* =========================================
+   MOBILE / SMALL SCREENS
 ========================================= */
 
 @media (max-width: 900px) {
 
-    body {
+    #score-display,
+    #level-display,
+    #timer-display,
+    #attempts-display {
 
-        flex-direction: column;
+        top: 10px;
 
-        height: 100vh;
+        padding: 8px 10px;
 
-        overflow: hidden;
+        font-size: 15px;
+
+        border-radius: 9px;
     }
 
 
-    #teacher-panel {
-
-        width: 100%;
-
-        max-width: none;
-
-        height: 40vh;
-
-        max-height: 40vh;
-
-        border-right: none;
-
-        border-bottom:
-            4px solid #cde7f5;
+    #score-display {
+        left: 8px;
     }
 
 
-    #game-container {
-
-        width: 100%;
-
-        height: 60vh;
-
-        min-height: 0;
+    #level-display {
+        left: 90px;
     }
 
 
-    #gameCanvas {
+    #timer-display {
+        right: 90px;
+    }
 
-        width: 100%;
 
-        height: 100%;
+    #attempts-display {
+        right: 8px;
     }
 
 
     #mute-btn {
+        top: 58px;
+        right: 10px;
 
-        top: 10px;
+        width: 40px;
+        height: 40px;
 
-        left: 10px;
+        font-size: 18px;
+    }
 
-        width: 45px;
 
-        height: 45px;
+    #target-display {
 
-        min-width: 45px;
+        min-height: 120px;
 
-        padding: 5px;
+        padding:
+            12px
+            15px
+            15px;
+    }
 
+
+    #target-display::before {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+
+    #target-word {
         font-size: 20px;
     }
-
-
-    .bottom-hud {
-
-        gap: 5px;
-
-        padding:
-            7px 5px;
-
-        flex-wrap: wrap;
-    }
-
-
-    .bottom-hud .hud-box {
-
-        min-width: 70px;
-
-        padding:
-            6px 8px;
-
-        font-size: 14px;
-    }
-
 }
 
 
 /* =========================================
-   SMALL PHONES
+   VERY SMALL SCREENS
 ========================================= */
 
 @media (max-width: 500px) {
 
-    #teacher-panel {
-
-        height: 35vh;
-
-        max-height: 35vh;
-    }
-
-
-    #game-container {
-
-        height: 65vh;
-    }
-
-
-    .bottom-hud {
-
-        gap: 3px;
-
-        padding:
-            5px 3px;
-    }
-
-
-    .bottom-hud .hud-box {
-
-        min-width: 60px;
-
-        padding:
-            5px 6px;
+    #score-display,
+    #level-display,
+    #timer-display,
+    #attempts-display {
 
         font-size: 12px;
+
+        padding: 7px 8px;
     }
 
+
+    #level-display {
+        left: 78px;
+    }
+
+
+    #timer-display {
+        right: 78px;
+    }
+
+
+    #target-word {
+        font-size: 18px;
+    }
 }
