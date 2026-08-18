@@ -1,276 +1,745 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Vocabulary Flashcards</title>
 
 <style>
 
-body{
-    font-family:Arial,sans-serif;
-    background:#f4f4f4;
-    margin:0;
-    padding:20px;
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
 }
 
-.container{
-    max-width:800px;
-    margin:auto;
-    text-align:center;
+.container {
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
 }
 
-h1{
-    margin-bottom:20px;
+h1 {
+    margin-bottom: 20px;
 }
 
-select{
-    width:100%;
-    padding:10px;
-    font-size:16px;
-    margin-bottom:20px;
+/* =========================================
+   FLASHCARD
+========================================= */
+
+.flashcard {
+    background: white;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.15);
+
+    min-height: 250px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 30px;
+
+    font-size: 32px;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    margin-bottom: 20px;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
 }
 
-.flashcard{
-    background:white;
-    border-radius:15px;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
-    min-height:250px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:30px;
-    font-size:32px;
-    cursor:pointer;
-    user-select:none;
-    margin-bottom:20px;
+.flashcard:hover {
+    background: #fafafa;
 }
 
-.flashcard:hover{
-    background:#fafafa;
+.flashcard:active {
+    transform: scale(0.98);
 }
 
-.controls{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap:wrap;
+/* =========================================
+   CONTROLS
+========================================= */
+
+.controls {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
 }
 
-button{
-    padding:12px 20px;
-    font-size:16px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    background:#0078d4;
-    color:white;
+button {
+    padding: 12px 20px;
+
+    font-size: 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    background: #0078d4;
+
+    color: white;
 }
 
-button:hover{
-    background:#005ea8;
+button:hover {
+    background: #005ea8;
 }
 
-.progress{
-    margin-top:20px;
-    color:#666;
-    font-size:18px;
+/* =========================================
+   PROGRESS
+========================================= */
+
+.progress {
+    margin-top: 20px;
+
+    color: #666;
+
+    font-size: 18px;
+}
+
+/* =========================================
+   LOADING / ERROR
+========================================= */
+
+#status {
+    margin-bottom: 20px;
+
+    font-size: 18px;
+
+    color: #666;
 }
 
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-<h1>Vocabulary Flashcards</h1>
+    <h1>Vocabulary Flashcards</h1>
 
-<select id="setSelector">
-<option value="">Select Vocabulary Set</option>
-</select>
 
-<div class="flashcard" id="card">
-Choose a vocabulary set
+    <!-- =====================================
+         LOADING / STATUS MESSAGE
+    ====================================== -->
+
+    <div id="status">
+        Loading vocabulary...
+    </div>
+
+
+    <!-- =====================================
+         FLASHCARD
+    ====================================== -->
+
+    <div
+        class="flashcard"
+        id="card"
+    >
+        Loading...
+    </div>
+
+
+    <!-- =====================================
+         CONTROLS
+    ====================================== -->
+
+    <div class="controls">
+
+        <button onclick="previousCard()">
+            Previous
+        </button>
+
+        <button onclick="flipCard()">
+            Flip
+        </button>
+
+        <button onclick="nextCard()">
+            Next
+        </button>
+
+        <button onclick="shuffleCards()">
+            Shuffle
+        </button>
+
+    </div>
+
+
+    <!-- =====================================
+         PROGRESS
+    ====================================== -->
+
+    <div
+        class="progress"
+        id="progress"
+    ></div>
+
+
 </div>
 
-<div class="controls">
-<button onclick="previousCard()">Previous</button>
-<button onclick="flipCard()">Flip</button>
-<button onclick="nextCard()">Next</button>
-<button onclick="shuffleCards()">Shuffle</button>
-</div>
 
-<div class="progress" id="progress"></div>
-
-</div>
+<!-- =========================================
+     FIREBASE + FLASHCARD SCRIPT
+========================================= -->
 
 <script type="module">
 
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
+
 import {
+
     getFirestore,
-    collection,
-    getDocs
+
+    doc,
+
+    getDoc
+
 }
+
 from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
 const firebaseConfig = {
-  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-  authDomain: "bubbleword-30367.firebaseapp.com",
-  projectId: "bubbleword-30367",
-  storageBucket: "bubbleword-30367.firebasestorage.app",
-  messagingSenderId: "1058393039019",
-  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
-const setSelector =
-    document.getElementById("setSelector");
+/* =========================================
+   FIREBASE INITIALIZATION
+========================================= */
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const db =
+    getFirestore(app);
+
+
+/* =========================================
+   DOM ELEMENTS
+========================================= */
 
 const card =
     document.getElementById("card");
 
+
 const progress =
     document.getElementById("progress");
 
+
+const status =
+    document.getElementById("status");
+
+
+/* =========================================
+   GAME STATE
+========================================= */
+
 let cards = [];
+
 let currentIndex = 0;
+
 let showingWord = true;
 
-async function loadSets() {
 
-    const snapshot =
-        await getDocs(
-            collection(db,"vocabSets")
+/* =========================================
+   GET VOCABULARY SET ID FROM URL
+========================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const setId =
+    params.get("id") ||
+    params.get("set");
+
+
+/* =========================================
+   LOAD VOCABULARY SET
+========================================= */
+
+async function loadSet(setId) {
+
+    console.log(
+        "FLASHCARDS: Loading set:",
+        setId
+    );
+
+
+    const ref =
+        doc(
+            db,
+            "vocabSets",
+            setId
         );
 
-    snapshot.forEach(doc => {
 
-        const data = doc.data();
+    const snapshot =
+        await getDoc(ref);
 
-        const option =
-            document.createElement("option");
 
-        option.value = doc.id;
-        option.textContent = data.title;
+    if (!snapshot.exists()) {
 
-        option.dataset.items =
-            JSON.stringify(data.items);
+        throw new Error(
+            "Vocabulary set not found."
+        );
 
-        setSelector.appendChild(option);
-    });
+    }
+
+
+    const data =
+        snapshot.data();
+
+
+    console.log(
+        "FLASHCARDS: Firebase data:",
+        data
+    );
+
+
+    /* =====================================
+       NEW FORMAT
+
+       vocabSets
+          ↓
+       document
+          ↓
+       items: [...]
+    ====================================== */
+
+    if (
+        Array.isArray(data.items)
+    ) {
+
+        return data.items;
+
+    }
+
+
+    /* =====================================
+       LEGACY FORMAT
+    ====================================== */
+
+    let terms =
+        data.terms;
+
+
+    if (
+        typeof terms === "string"
+    ) {
+
+        try {
+
+            terms =
+                JSON.parse(terms);
+
+        }
+        catch(error) {
+
+            console.error(
+                "FLASHCARDS: Parse error:",
+                error
+            );
+
+            terms = [];
+
+        }
+
+    }
+
+
+    return terms || [];
+
 }
 
-setSelector.addEventListener("change", () => {
 
-    const selected =
-        setSelector.options[
-            setSelector.selectedIndex
-        ];
+/* =========================================
+   START FLASHCARD GAME
+========================================= */
 
-    if (!selected.dataset.items) return;
+async function startGame() {
 
-    cards =
-        JSON.parse(selected.dataset.items);
+    /* -------------------------------------
+       Make sure a set ID was supplied
+    ------------------------------------- */
 
-    currentIndex = 0;
-    showingWord = true;
+    if (!setId) {
 
-    displayCard();
-});
+        status.textContent =
+            "No vocabulary set was specified.";
+
+        card.textContent =
+            "No vocabulary set found.";
+
+        console.error(
+            "FLASHCARDS: No vocabulary set ID found in URL."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        /* ---------------------------------
+           Load vocabulary from Firebase
+        --------------------------------- */
+
+        const vocab =
+            await loadSet(setId);
+
+
+        /* ---------------------------------
+           Make sure vocabulary exists
+        --------------------------------- */
+
+        if (
+            !Array.isArray(vocab) ||
+            vocab.length === 0
+        ) {
+
+            throw new Error(
+                "This vocabulary set contains no words."
+            );
+
+        }
+
+
+        /* ---------------------------------
+           Normalize vocabulary
+        --------------------------------- */
+
+        cards =
+            vocab.map(item => ({
+
+                word:
+                    item.word || "",
+
+                definition:
+                    item.definition ||
+                    item.meaning ||
+                    ""
+
+            }));
+
+
+        console.log(
+            "FLASHCARDS: Vocabulary loaded:",
+            cards
+        );
+
+
+        /* ---------------------------------
+           Reset game
+        --------------------------------- */
+
+        currentIndex = 0;
+
+        showingWord = true;
+
+
+        /* ---------------------------------
+           Update interface
+        --------------------------------- */
+
+        status.textContent =
+            "";
+
+
+        displayCard();
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "FLASHCARDS: Could not load vocabulary:",
+            error
+        );
+
+
+        status.textContent =
+            "Could not load this vocabulary set.";
+
+
+        card.textContent =
+            "Error loading vocabulary.";
+
+
+        progress.textContent =
+            "";
+
+    }
+
+}
+
+
+/* =========================================
+   DISPLAY CARD
+========================================= */
 
 function displayCard() {
 
-    if (!cards.length) return;
+    if (
+        !cards.length
+    ) {
+
+        return;
+
+    }
+
 
     const current =
         cards[currentIndex];
 
+
     card.textContent =
         showingWord
+
             ? current.word
+
             : current.definition;
 
+
     progress.textContent =
-        `Card ${currentIndex + 1} of ${cards.length}`;
+        `Card ${
+            currentIndex + 1
+        } of ${
+            cards.length
+        }`;
+
 }
 
-window.flipCard = function() {
+
+/* =========================================
+   FLIP CARD
+========================================= */
+
+window.flipCard =
+function() {
+
+    if (
+        !cards.length
+    ) {
+
+        return;
+
+    }
+
 
     showingWord =
         !showingWord;
 
+
     displayCard();
+
 };
 
-window.nextCard = function() {
 
-    if (!cards.length) return;
+/* =========================================
+   NEXT CARD
+========================================= */
+
+window.nextCard =
+function() {
+
+    if (
+        !cards.length
+    ) {
+
+        return;
+
+    }
+
 
     currentIndex++;
 
-    if (currentIndex >= cards.length) {
+
+    if (
+        currentIndex >=
+        cards.length
+    ) {
+
         currentIndex = 0;
+
     }
+
 
     showingWord = true;
 
+
     displayCard();
+
 };
 
-window.previousCard = function() {
 
-    if (!cards.length) return;
+/* =========================================
+   PREVIOUS CARD
+========================================= */
+
+window.previousCard =
+function() {
+
+    if (
+        !cards.length
+    ) {
+
+        return;
+
+    }
+
 
     currentIndex--;
 
-    if (currentIndex < 0) {
+
+    if (
+        currentIndex < 0
+    ) {
+
         currentIndex =
             cards.length - 1;
+
     }
+
 
     showingWord = true;
 
+
     displayCard();
+
 };
 
-window.shuffleCards = function() {
+
+/* =========================================
+   SHUFFLE
+========================================= */
+
+window.shuffleCards =
+function() {
+
+    if (
+        !cards.length
+    ) {
+
+        return;
+
+    }
+
 
     for (
-        let i = cards.length - 1;
+        let i =
+            cards.length - 1;
+
         i > 0;
+
         i--
-    ){
+    ) {
 
         const j =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
 
-        [cards[i], cards[j]] =
-            [cards[j], cards[i]];
+
+        [
+            cards[i],
+            cards[j]
+        ] =
+        [
+            cards[j],
+            cards[i]
+        ];
+
     }
 
+
     currentIndex = 0;
+
     showingWord = true;
 
+
     displayCard();
+
 };
+
+
+/* =========================================
+   CLICK CARD TO FLIP
+========================================= */
 
 card.addEventListener(
     "click",
-    flipCard
+    () => {
+
+        flipCard();
+
+    }
 );
 
-loadSets();
+
+/* =========================================
+   START
+========================================= */
+
+startGame();
 
 </script>
 
+
 </body>
+
 </html>
