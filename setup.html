@@ -64,6 +64,17 @@ button:hover{
     background:#005ea8;
 }
 
+    .libraryButton {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+    margin-left: 8px;
+}
+
+.libraryButton:hover {
+    background: #f0f0f0;
+    color: black;
+}
 button:disabled{
     opacity:.6;
     cursor:not-allowed;
@@ -190,7 +201,15 @@ Vocabulary Entries:
 </div>
 
 <button id="saveBtn" onclick="saveVocabularyList()">
-Save To Library
+    Save To Library
+</button>
+
+<button
+    type="button"
+    class="libraryButton"
+    onclick="window.location.href='https://alexjeffersonmarsh.github.io/VocabularyArcade/library.html'"
+>
+    LIBRARY
 </button>
 
 <p id="status"></p>
