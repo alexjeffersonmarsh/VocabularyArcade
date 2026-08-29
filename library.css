@@ -342,6 +342,10 @@ select:focus {
     background: #198754;
 }
 
+.choiceButton {
+    background: #D97706;
+}
+
 .matchButton {
 
     background: #5925A3;
@@ -519,6 +523,10 @@ select:focus {
 .modalBubble {
 
     background: #1A9A5F;
+}
+
+.modalChoice {
+    background: #D97706;
 }
 
 .modalMatch {
