@@ -1,0 +1,1885 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ChoiceWord</title>
+
+<style>
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+body {
+
+    font-family: Arial, sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f4f7fa 0%,
+            #dfe6ed 100%
+        );
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    color: #222;
+}
+
+
+/* =========================================
+   GAME CONTAINER
+========================================= */
+
+.game-container {
+
+    width: 100%;
+
+    max-width: 800px;
+
+    margin: 20px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.15);
+
+    text-align: center;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+h1 {
+
+    margin-top: 0;
+
+    margin-bottom: 5px;
+
+    font-size: 38px;
+
+}
+
+.subtitle {
+
+    color: #666;
+
+    margin-bottom: 30px;
+
+}
+
+
+/* =========================================
+   STATS
+========================================= */
+
+.stats {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 30px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 30px;
+
+}
+
+.stat {
+
+    background: #f1f3f5;
+
+    border-radius: 10px;
+
+    padding: 10px 20px;
+
+    min-width: 110px;
+
+}
+
+.stat-label {
+
+    display: block;
+
+    font-size: 13px;
+
+    color: #666;
+
+    margin-bottom: 4px;
+
+}
+
+.stat-value {
+
+    font-size: 25px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================
+   QUESTION
+========================================= */
+
+.question-label {
+
+    color: #666;
+
+    font-size: 16px;
+
+    margin-bottom: 10px;
+
+}
+
+#question {
+
+    font-size: 42px;
+
+    font-weight: bold;
+
+    margin-bottom: 35px;
+
+    min-height: 55px;
+
+}
+
+
+/* =========================================
+   ANSWERS
+========================================= */
+
+.answers {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 15px;
+
+}
+
+.answer-button {
+
+    min-height: 100px;
+
+    padding: 20px;
+
+    border: 3px solid #ddd;
+
+    border-radius: 12px;
+
+    background: #f8f9fa;
+
+    color: #222;
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease;
+
+}
+
+.answer-button:hover {
+
+    transform: translateY(-2px);
+
+    background: #eef5ff;
+
+    border-color: #0078d4;
+
+}
+
+.answer-button:disabled {
+
+    cursor: default;
+
+}
+
+
+/* =========================================
+   CORRECT / INCORRECT
+========================================= */
+
+.answer-button.correct {
+
+    background: #d4edda;
+
+    border-color: #28a745;
+
+    color: #155724;
+
+}
+
+.answer-button.incorrect {
+
+    background: #f8d7da;
+
+    border-color: #dc3545;
+
+    color: #721c24;
+
+}
+
+
+/* =========================================
+   FEEDBACK
+========================================= */
+
+#feedback {
+
+    min-height: 35px;
+
+    margin-top: 25px;
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+}
+
+.feedback-correct {
+
+    color: #198754;
+
+}
+
+.feedback-incorrect {
+
+    color: #dc3545;
+
+}
+
+
+/* =========================================
+   NEXT BUTTON
+========================================= */
+
+#nextButton {
+
+    display: none;
+
+    margin-top: 15px;
+
+    padding: 13px 25px;
+
+    background: #0078d4;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+#nextButton:hover {
+
+    background: #005ea8;
+
+}
+
+
+/* =========================================
+   START / PLAY AGAIN
+========================================= */
+
+#playAgainButton {
+
+    display: none;
+
+    margin-top: 25px;
+
+    padding: 14px 28px;
+
+    background: #198754;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+#playAgainButton:hover {
+
+    background: #146c43;
+
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+#loading {
+
+    font-size: 20px;
+
+    color: #666;
+
+    padding: 40px 0;
+
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+#error {
+
+    display: none;
+
+    background: #fff0f0;
+
+    border: 1px solid #e0a0a0;
+
+    color: #8a1c1c;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================
+   GAME OVER
+========================================= */
+
+#gameOver {
+
+    display: none;
+
+}
+
+.final-score {
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    margin: 20px 0;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .game-container {
+
+        padding: 25px 15px;
+
+    }
+
+    h1 {
+
+        font-size: 32px;
+
+    }
+
+    #question {
+
+        font-size: 32px;
+
+    }
+
+    .answers {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .answer-button {
+
+        min-height: 75px;
+
+    }
+
+    .stats {
+
+        gap: 10px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="game-container">
+
+
+    <h1>ChoiceWord</h1>
+
+    <div class="subtitle">
+        Choose the correct definition.
+    </div>
+
+
+    <!-- =====================================
+         STATS
+    ====================================== -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <span class="stat-label">
+                SCORE
+            </span>
+
+            <span
+                class="stat-value"
+                id="score"
+            >
+                0
+            </span>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span class="stat-label">
+                STREAK
+            </span>
+
+            <span
+                class="stat-value"
+                id="streak"
+            >
+                0
+            </span>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span class="stat-label">
+                QUESTION
+            </span>
+
+            <span
+                class="stat-value"
+                id="questionNumber"
+            >
+                0
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         LOADING
+    ====================================== -->
+
+    <div id="loading">
+
+        Loading vocabulary...
+
+    </div>
+
+
+    <!-- =====================================
+         ERROR
+    ====================================== -->
+
+    <div id="error"></div>
+
+
+    <!-- =====================================
+         GAME
+    ====================================== -->
+
+    <div id="game" style="display:none;">
+
+
+        <div class="question-label">
+            What is the definition of:
+        </div>
+
+
+        <div id="question"></div>
+
+
+        <div
+            class="answers"
+            id="answers"
+        ></div>
+
+
+        <div id="feedback"></div>
+
+
+        <button id="nextButton">
+            Next Question
+        </button>
+
+
+    </div>
+
+
+    <!-- =====================================
+         GAME OVER
+    ====================================== -->
+
+    <div id="gameOver">
+
+        <h2>🎉 Great Job!</h2>
+
+        <div class="final-score">
+
+            Final Score:
+            <span id="finalScore">
+                0
+            </span>
+
+        </div>
+
+
+        <p>
+
+            You answered
+            <span id="finalCorrect">
+                0
+            </span>
+            questions correctly.
+
+        </p>
+
+
+        <button id="playAgainButton">
+
+            🔄 Play Again
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================
+     FIREBASE + GAME SCRIPT
+========================================= -->
+
+<script type="module">
+
+
+/* =========================================
+   FIREBASE IMPORTS
+========================================= */
+
+import { initializeApp }
+
+from
+"https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+
+import {
+
+    getFirestore,
+
+    doc,
+
+    getDoc
+
+}
+
+from
+"https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ff6dab677b9a3657ee"
+
+};
+
+
+/* =========================================
+   INITIALIZE FIREBASE
+========================================= */
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const loading =
+    document.getElementById("loading");
+
+const errorBox =
+    document.getElementById("error");
+
+const game =
+    document.getElementById("game");
+
+const gameOver =
+    document.getElementById("gameOver");
+
+const question =
+    document.getElementById("question");
+
+const answers =
+    document.getElementById("answers");
+
+const feedback =
+    document.getElementById("feedback");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const playAgainButton =
+    document.getElementById("playAgainButton");
+
+const scoreDisplay =
+    document.getElementById("score");
+
+const streakDisplay =
+    document.getElementById("streak");
+
+const questionNumberDisplay =
+    document.getElementById("questionNumber");
+
+const finalScoreDisplay =
+    document.getElementById("finalScore");
+
+const finalCorrectDisplay =
+    document.getElementById("finalCorrect");
+
+
+/* =========================================
+   GAME VARIABLES
+========================================= */
+
+let vocabulary = [];
+
+let usableVocabulary = [];
+
+let currentQuestion = null;
+
+let currentQuestionIndex = 0;
+
+let score = 0;
+
+let streak = 0;
+
+let correctAnswers = 0;
+
+let answered = false;
+
+
+/*
+ * Number of questions per game.
+ *
+ * This is set to the number of usable
+ * vocabulary items, up to 20.
+ */
+
+let totalQuestions = 0;
+
+
+/* =========================================
+   GET FIREBASE SET ID
+========================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const setId =
+    params.get("id") ||
+    params.get("set");
+
+
+/* =========================================
+   LOAD VOCABULARY SET
+========================================= */
+
+async function loadVocabularySet() {
+
+    if (!setId) {
+
+        showError(
+            "No vocabulary set was selected."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        console.log(
+            "CHOICEWORD: Loading set:",
+            setId
+        );
+
+
+        const reference =
+            doc(
+                db,
+                "vocabSets",
+                setId
+            );
+
+
+        const snapshot =
+            await getDoc(
+                reference
+            );
+
+
+        if (!snapshot.exists()) {
+
+            throw new Error(
+                "Vocabulary set not found."
+            );
+
+        }
+
+
+        const data =
+            snapshot.data();
+
+
+        console.log(
+            "CHOICEWORD: Firebase data:",
+            data
+        );
+
+
+        /*
+         * Current Firebase format.
+         */
+
+        if (
+            Array.isArray(data.items)
+        ) {
+
+            vocabulary =
+                data.items;
+
+        }
+
+
+        /*
+         * Legacy Firebase format.
+         */
+
+        else if (
+            Array.isArray(data.terms)
+        ) {
+
+            vocabulary =
+                data.terms;
+
+        }
+
+
+        else if (
+            typeof data.terms === "string"
+        ) {
+
+            try {
+
+                vocabulary =
+                    JSON.parse(
+                        data.terms
+                    );
+
+            }
+
+            catch(error) {
+
+                vocabulary = [];
+
+            }
+
+        }
+
+
+        /*
+         * Make sure every item has a
+         * word and definition.
+         */
+
+        vocabulary =
+            vocabulary
+                .filter(item =>
+                    item &&
+                    item.word &&
+                    (
+                        item.definition ||
+                        item.meaning
+                    )
+                )
+                .map(item => ({
+
+                    word:
+                        String(
+                            item.word
+                        ).trim(),
+
+                    definition:
+                        String(
+                            item.definition ||
+                            item.meaning ||
+                            ""
+                        ).trim()
+
+                }))
+                .filter(item =>
+                    item.word &&
+                    item.definition
+                );
+
+
+        console.log(
+            "CHOICEWORD: Vocabulary loaded:",
+            vocabulary
+        );
+
+
+        /*
+         * Find vocabulary items whose
+         * definitions are unique.
+         *
+         * If two different words have
+         * exactly the same definition,
+         * neither will be used as a question.
+         */
+
+        usableVocabulary =
+            getUniqueDefinitionItems(
+                vocabulary
+            );
+
+
+        console.log(
+            "CHOICEWORD: Usable vocabulary:",
+            usableVocabulary
+        );
+
+
+        /*
+         * Need at least four vocabulary
+         * items to create four choices.
+         */
+
+        if (
+            usableVocabulary.length < 4
+        ) {
+
+            showError(
+                "This vocabulary set does not contain enough unique definitions to create ChoiceWord questions. At least four vocabulary items with different definitions are required."
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Shuffle the vocabulary so the
+         * questions appear in random order.
+         */
+
+        shuffleArray(
+            usableVocabulary
+        );
+
+
+        /*
+         * Use up to 20 questions.
+         */
+
+        totalQuestions =
+            Math.min(
+                usableVocabulary.length,
+                20
+            );
+
+
+        /*
+         * Reset game.
+         */
+
+        currentQuestionIndex = 0;
+
+        score = 0;
+
+        streak = 0;
+
+        correctAnswers = 0;
+
+
+        updateStats();
+
+
+        loading.style.display =
+            "none";
+
+        errorBox.style.display =
+            "none";
+
+        game.style.display =
+            "block";
+
+        gameOver.style.display =
+            "none";
+
+
+        showQuestion();
+
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "CHOICEWORD: Error loading vocabulary:",
+            error
+        );
+
+
+        showError(
+            "Could not load the vocabulary set.<br><br>" +
+            escapeHtml(
+                error.message
+            )
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   UNIQUE DEFINITION CHECK
+========================================= */
+
+function getUniqueDefinitionItems(items) {
+
+    const definitionCounts =
+        new Map();
+
+
+    /*
+     * Count each definition.
+     *
+     * Lowercase comparison makes
+     * "Friend" and "friend" count
+     * as the same definition.
+     */
+
+    items.forEach(item => {
+
+        const key =
+            item.definition
+                .trim()
+                .toLowerCase();
+
+
+        definitionCounts.set(
+            key,
+            (
+                definitionCounts.get(key)
+                || 0
+            ) + 1
+        );
+
+    });
+
+
+    /*
+     * Only keep items whose definition
+     * occurs exactly once.
+     */
+
+    return items.filter(item => {
+
+        const key =
+            item.definition
+                .trim()
+                .toLowerCase();
+
+
+        return (
+            definitionCounts.get(key)
+            === 1
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   CREATE QUESTION
+========================================= */
+
+function createQuestion() {
+
+    /*
+     * Safety check.
+     */
+
+    if (
+        usableVocabulary.length < 4
+    ) {
+
+        return null;
+
+    }
+
+
+    const correctItem =
+        usableVocabulary[
+            currentQuestionIndex
+        ];
+
+
+    const correctDefinition =
+        correctItem.definition.trim();
+
+
+    /*
+     * Get possible distractors.
+     */
+
+    const possibleDistractors =
+        usableVocabulary.filter(
+            (item, index) => {
+
+                if (
+                    index ===
+                    currentQuestionIndex
+                ) {
+
+                    return false;
+
+                }
+
+
+                return (
+                    item.definition
+                        .trim()
+                        .toLowerCase()
+                    !==
+                    correctDefinition
+                        .toLowerCase()
+                );
+
+            }
+        );
+
+
+    /*
+     * Randomize distractors.
+     */
+
+    shuffleArray(
+        possibleDistractors
+    );
+
+
+    /*
+     * Take three incorrect answers.
+     */
+
+    const distractors =
+        possibleDistractors
+            .slice(0, 3);
+
+
+    /*
+     * Safety check.
+     */
+
+    if (
+        distractors.length < 3
+    ) {
+
+        return null;
+
+    }
+
+
+    /*
+     * Create the four choices.
+     */
+
+    const choices = [
+
+        correctItem,
+
+        ...distractors
+
+    ];
+
+
+    /*
+     * Final duplicate-definition
+     * safety check.
+     *
+     * This guarantees that no two
+     * choices have the same definition.
+     */
+
+    const definitions =
+        choices.map(item =>
+            item.definition
+                .trim()
+                .toLowerCase()
+        );
+
+
+    const uniqueDefinitions =
+        new Set(
+            definitions
+        );
+
+
+    if (
+        uniqueDefinitions.size !== 4
+    ) {
+
+        console.warn(
+            "CHOICEWORD: Duplicate definitions detected. Skipping question."
+        );
+
+        return null;
+
+    }
+
+
+    /*
+     * Randomize answer order.
+     */
+
+    shuffleArray(
+        choices
+    );
+
+
+    return {
+
+        word:
+            correctItem.word,
+
+        correctDefinition:
+            correctDefinition,
+
+        choices
+
+    };
+
+}
+
+
+/* =========================================
+   SHOW QUESTION
+========================================= */
+
+function showQuestion() {
+
+    answered = false;
+
+    feedback.textContent = "";
+
+    feedback.className = "";
+
+    nextButton.style.display =
+        "none";
+
+
+    /*
+     * Check for end of game.
+     */
+
+    if (
+        currentQuestionIndex >=
+        totalQuestions
+    ) {
+
+        endGame();
+
+        return;
+
+    }
+
+
+    /*
+     * Generate a question.
+     */
+
+    let attempts = 0;
+
+    currentQuestion = null;
+
+
+    while (
+        !currentQuestion &&
+        attempts < 10
+    ) {
+
+        currentQuestion =
+            createQuestion();
+
+        /*
+         * If a question cannot be
+         * created, move to another
+         * vocabulary item.
+         */
+
+        if (
+            !currentQuestion
+        ) {
+
+            currentQuestionIndex++;
+
+        }
+
+        attempts++;
+
+    }
+
+
+    /*
+     * If we couldn't create a valid
+     * question, end the game.
+     */
+
+    if (
+        !currentQuestion
+    ) {
+
+        endGame();
+
+        return;
+
+    }
+
+
+    question.textContent =
+        currentQuestion.word;
+
+
+    questionNumberDisplay.textContent =
+        `${currentQuestionIndex + 1}/${totalQuestions}`;
+
+
+    answers.innerHTML = "";
+
+
+    /*
+     * Create the four answer buttons.
+     */
+
+    currentQuestion.choices
+        .forEach(choice => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "answer-button";
+
+
+            button.textContent =
+                choice.definition;
+
+
+            button.dataset.definition =
+                choice.definition;
+
+
+            button.addEventListener(
+                "click",
+                () =>
+                    checkAnswer(
+                        button,
+                        choice
+                    )
+            );
+
+
+            answers.appendChild(
+                button
+            );
+
+        });
+
+
+    updateStats();
+
+}
+
+
+/* =========================================
+   CHECK ANSWER
+========================================= */
+
+function checkAnswer(
+    selectedButton,
+    selectedChoice
+) {
+
+    if (answered) {
+        return;
+    }
+
+
+    answered = true;
+
+
+    /*
+     * Disable all answer buttons.
+     */
+
+    const buttons =
+        answers.querySelectorAll(
+            ".answer-button"
+        );
+
+
+    buttons.forEach(button => {
+
+        button.disabled =
+            true;
+
+    });
+
+
+    const correct =
+        selectedChoice.definition
+            .trim()
+            .toLowerCase()
+        ===
+        currentQuestion.correctDefinition
+            .trim()
+            .toLowerCase();
+
+
+    if (correct) {
+
+        /*
+         * Correct answer.
+         */
+
+        selectedButton.classList.add(
+            "correct"
+        );
+
+
+        streak++;
+
+        correctAnswers++;
+
+
+        /*
+         * Base points.
+         */
+
+        let points = 100;
+
+
+        /*
+         * Streak bonus.
+         *
+         * 1st correct = 100
+         * 2nd correct = 150
+         * 3rd correct = 200
+         * etc.
+         */
+
+        const streakBonus =
+            Math.max(
+                0,
+                (streak - 1) * 50
+            );
+
+
+        points +=
+            streakBonus;
+
+
+        score += points;
+
+
+        if (streak > 1) {
+
+            feedback.textContent =
+                `✅ Correct! +${points} points — ${streak} question streak!`;
+
+        }
+
+        else {
+
+            feedback.textContent =
+                `✅ Correct! +${points} points!`;
+
+        }
+
+
+        feedback.className =
+            "feedback-correct";
+
+
+        /*
+         * Highlight the correct answer.
+         */
+
+        buttons.forEach(button => {
+
+            if (
+                button.dataset.definition
+                    .trim()
+                    .toLowerCase()
+                ===
+                currentQuestion.correctDefinition
+                    .trim()
+                    .toLowerCase()
+            ) {
+
+                button.classList.add(
+                    "correct"
+                );
+
+            }
+
+        });
+
+    }
+
+    else {
+
+        /*
+         * Incorrect answer.
+         */
+
+        selectedButton.classList.add(
+            "incorrect"
+        );
+
+
+        /*
+         * Reset streak.
+         */
+
+        streak = 0;
+
+
+        /*
+         * Find and highlight correct
+         * answer.
+         */
+
+        buttons.forEach(button => {
+
+            if (
+                button.dataset.definition
+                    .trim()
+                    .toLowerCase()
+                ===
+                currentQuestion.correctDefinition
+                    .trim()
+                    .toLowerCase()
+            ) {
+
+                button.classList.add(
+                    "correct"
+                );
+
+            }
+
+        });
+
+
+        feedback.textContent =
+            `❌ Incorrect. The answer was "${currentQuestion.correctDefinition}".`;
+
+
+        feedback.className =
+            "feedback-incorrect";
+
+    }
+
+
+    updateStats();
+
+
+    /*
+     * Show next button.
+     */
+
+    if (
+        currentQuestionIndex + 1
+        < totalQuestions
+    ) {
+
+        nextButton.style.display =
+            "inline-block";
+
+    }
+
+    else {
+
+        setTimeout(
+            endGame,
+            1000
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   NEXT QUESTION
+========================================= */
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        currentQuestionIndex++;
+
+        showQuestion();
+
+    }
+);
+
+
+/* =========================================
+   PLAY AGAIN
+========================================= */
+
+playAgainButton.addEventListener(
+    "click",
+    () => {
+
+        /*
+         * Shuffle the vocabulary again.
+         */
+
+        shuffleArray(
+            usableVocabulary
+        );
+
+
+        currentQuestionIndex = 0;
+
+        score = 0;
+
+        streak = 0;
+
+        correctAnswers = 0;
+
+
+        gameOver.style.display =
+            "none";
+
+        game.style.display =
+            "block";
+
+
+        updateStats();
+
+        showQuestion();
+
+    }
+);
+
+
+/* =========================================
+   END GAME
+========================================= */
+
+function endGame() {
+
+    stopGameButtons();
+
+
+    game.style.display =
+        "none";
+
+
+    gameOver.style.display =
+        "block";
+
+
+    finalScoreDisplay.textContent =
+        score;
+
+
+    finalCorrectDisplay.textContent =
+        correctAnswers;
+
+
+    playAgainButton.style.display =
+        "inline-block";
+
+}
+
+
+/* =========================================
+   DISABLE GAME BUTTONS
+========================================= */
+
+function stopGameButtons() {
+
+    const buttons =
+        answers.querySelectorAll(
+            ".answer-button"
+        );
+
+
+    buttons.forEach(button => {
+
+        button.disabled =
+            true;
+
+    });
+
+
+    nextButton.style.display =
+        "none";
+
+}
+
+
+/* =========================================
+   UPDATE STATS
+========================================= */
+
+function updateStats() {
+
+    scoreDisplay.textContent =
+        score;
+
+
+    streakDisplay.textContent =
+        streak;
+
+
+    questionNumberDisplay.textContent =
+        totalQuestions
+            ? `${Math.min(
+                currentQuestionIndex + 1,
+                totalQuestions
+              )}/${totalQuestions}`
+            : "0";
+
+}
+
+
+/* =========================================
+   SHUFFLE
+========================================= */
+
+function shuffleArray(array) {
+
+    for (
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            array[i],
+            array[j]
+        ] =
+        [
+            array[j],
+            array[i]
+        ];
+
+    }
+
+
+    return array;
+
+}
+
+
+/* =========================================
+   ERROR DISPLAY
+========================================= */
+
+function showError(message) {
+
+    loading.style.display =
+        "none";
+
+
+    game.style.display =
+        "none";
+
+
+    gameOver.style.display =
+        "none";
+
+
+    errorBox.innerHTML =
+        message;
+
+
+    errorBox.style.display =
+        "block";
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadVocabularySet();
+
+
+</script>
+
+
+</body>
+
+</html>
+```
