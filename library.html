@@ -13,8 +13,6 @@
 
 </head>
 
-</head>
-
 
 <body>
 
@@ -158,6 +156,18 @@
 
             </button>
 
+                         <!-- CHOICEWORD -->
+
+            <button
+                id="modalChoiceButton"
+                class="modalGameButton modalChoice"
+            >
+
+             🧠<br>
+                 
+              ChoiceWord
+
+            </button>
 
             <!-- MATCHWORD -->
 
@@ -318,6 +328,9 @@ const GEMWORD_URL =
 
 const BUBBLEWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/bubbleword.html";
+
+const CHOICEWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/choiceword.html";
 
 const MATCHWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/matchword.html";
@@ -910,6 +923,13 @@ function renderLists() {
                     🫧 BubbleWord
                 </a>
 
+                <a
+                    class="playButton choiceButton"
+                    href="${CHOICEWORD_URL}?id=${encodeURIComponent(list.id)}"
+                >
+                    🫧 ChoiceWord
+                </a>
+
 
                 <a
                     class="playButton matchButton"
@@ -1052,6 +1072,28 @@ document
         }
     );
 
+/* =========================================
+   CHOICEWORD BUTTON
+========================================= */
+
+document
+    .getElementById(
+        "modalChoiceButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (!selectedList) {
+                return;
+            }
+
+
+            window.location.href =
+                `${CHOICEWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+        }
+    );
 
 /* =========================================
    MATCHWORD BUTTON
