@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -100,7 +101,7 @@ h1 {
 
     justify-content: center;
 
-    gap: 30px;
+    gap: 20px;
 
     flex-wrap: wrap;
 
@@ -137,6 +138,50 @@ h1 {
     font-size: 25px;
 
     font-weight: bold;
+
+}
+
+
+/* =========================================
+   TIMER
+========================================= */
+
+.timer-stat {
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+#timer {
+
+    color: #0078d4;
+
+}
+
+.timer-warning {
+
+    background: #fff3cd;
+
+}
+
+.timer-warning #timer {
+
+    color: #d97706;
+
+}
+
+.timer-danger {
+
+    background: #f8d7da;
+
+    transform: scale(1.05);
+
+}
+
+.timer-danger #timer {
+
+    color: #dc3545;
 
 }
 
@@ -189,13 +234,11 @@ h1 {
 
     padding: 20px;
 
-    border: 3px solid #ddd;
+    border: 3px solid transparent;
 
     border-radius: 12px;
 
-    background: #f8f9fa;
-
-    color: #222;
+    color: white;
 
     font-size: 19px;
 
@@ -205,18 +248,58 @@ h1 {
 
     transition:
         transform .15s ease,
-        background .15s ease,
+        filter .15s ease,
         border-color .15s ease;
 
 }
 
-.answer-button:hover {
 
-    transform: translateY(-2px);
+/* =========================================
+   FOUR ANSWER COLORS
+========================================= */
 
-    background: #eef5ff;
+.answer-button:nth-child(1) {
 
-    border-color: #0078d4;
+    background: #0078d4;
+
+    border-color: #005ea8;
+
+}
+
+.answer-button:nth-child(2) {
+
+    background: #7b3fb6;
+
+    border-color: #612e91;
+
+}
+
+.answer-button:nth-child(3) {
+
+    background: #e67e22;
+
+    border-color: #c45f0a;
+
+}
+
+.answer-button:nth-child(4) {
+
+    background: #198754;
+
+    border-color: #146c43;
+
+}
+
+
+/* =========================================
+   ANSWER HOVER
+========================================= */
+
+.answer-button:hover:not(:disabled) {
+
+    transform: translateY(-3px);
+
+    filter: brightness(1.1);
 
 }
 
@@ -233,21 +316,21 @@ h1 {
 
 .answer-button.correct {
 
-    background: #d4edda;
+    background: #28a745 !important;
 
-    border-color: #28a745;
+    border-color: #155724 !important;
 
-    color: #155724;
+    color: white;
 
 }
 
 .answer-button.incorrect {
 
-    background: #f8d7da;
+    background: #dc3545 !important;
 
-    border-color: #dc3545;
+    border-color: #721c24 !important;
 
-    color: #721c24;
+    color: white;
 
 }
 
@@ -317,7 +400,7 @@ h1 {
 
 
 /* =========================================
-   START / PLAY AGAIN
+   PLAY AGAIN
 ========================================= */
 
 #playAgainButton {
@@ -399,6 +482,26 @@ h1 {
 
 }
 
+#gameOver h2 {
+
+    font-size: 32px;
+
+    margin-bottom: 10px;
+
+}
+
+.list-name {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #0078d4;
+
+    margin: 10px 0 25px;
+
+}
+
 .final-score {
 
     font-size: 32px;
@@ -406,6 +509,18 @@ h1 {
     font-weight: bold;
 
     margin: 20px 0;
+
+}
+
+.final-percentage {
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    margin: 15px 0;
+
+    color: #198754;
 
 }
 
@@ -458,166 +573,221 @@ h1 {
 
 </head>
 
-
 <body>
-
 
 <div class="game-container">
 
+```
+<h1>ChoiceWord</h1>
 
-    <h1>ChoiceWord</h1>
-
-    <div class="subtitle">
-        Choose the correct definition.
-    </div>
-
-
-    <!-- =====================================
-         STATS
-    ====================================== -->
-
-    <div class="stats">
-
-        <div class="stat">
-
-            <span class="stat-label">
-                SCORE
-            </span>
-
-            <span
-                class="stat-value"
-                id="score"
-            >
-                0
-            </span>
-
-        </div>
+<div class="subtitle">
+    Choose the correct definition.
+</div>
 
 
-        <div class="stat">
+<!-- =====================================
+     STATS
+====================================== -->
 
-            <span class="stat-label">
-                STREAK
-            </span>
+<div class="stats">
 
-            <span
-                class="stat-value"
-                id="streak"
-            >
-                0
-            </span>
+    <div class="stat">
 
-        </div>
+        <span class="stat-label">
+            SCORE
+        </span>
 
-
-        <div class="stat">
-
-            <span class="stat-label">
-                QUESTION
-            </span>
-
-            <span
-                class="stat-value"
-                id="questionNumber"
-            >
-                0
-            </span>
-
-        </div>
+        <span
+            class="stat-value"
+            id="score"
+        >
+            0
+        </span>
 
     </div>
 
 
-    <!-- =====================================
-         LOADING
-    ====================================== -->
+    <div class="stat">
 
-    <div id="loading">
+        <span class="stat-label">
+            STREAK
+        </span>
 
-        Loading vocabulary...
-
-    </div>
-
-
-    <!-- =====================================
-         ERROR
-    ====================================== -->
-
-    <div id="error"></div>
-
-
-    <!-- =====================================
-         GAME
-    ====================================== -->
-
-    <div id="game" style="display:none;">
-
-
-        <div class="question-label">
-            What is the definition of:
-        </div>
-
-
-        <div id="question"></div>
-
-
-        <div
-            class="answers"
-            id="answers"
-        ></div>
-
-
-        <div id="feedback"></div>
-
-
-        <button id="nextButton">
-            Next Question
-        </button>
-
+        <span
+            class="stat-value"
+            id="streak"
+        >
+            0
+        </span>
 
     </div>
 
 
-    <!-- =====================================
-         GAME OVER
-    ====================================== -->
+    <div class="stat">
 
-    <div id="gameOver">
+        <span class="stat-label">
+            QUESTION
+        </span>
 
-        <h2>🎉 Great Job!</h2>
-
-        <div class="final-score">
-
-            Final Score:
-            <span id="finalScore">
-                0
-            </span>
-
-        </div>
-
-
-        <p>
-
-            You answered
-            <span id="finalCorrect">
-                0
-            </span>
-            questions correctly.
-
-        </p>
-
-
-        <button id="playAgainButton">
-
-            🔄 Play Again
-
-        </button>
+        <span
+            class="stat-value"
+            id="questionNumber"
+        >
+            0
+        </span>
 
     </div>
+
+
+    <div
+        class="stat timer-stat"
+        id="timerStat"
+    >
+
+        <span class="stat-label">
+            TIME
+        </span>
+
+        <span
+            class="stat-value"
+            id="timer"
+        >
+            10
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     LOADING
+====================================== -->
+
+<div id="loading">
+
+    Loading vocabulary...
+
+</div>
+
+
+<!-- =====================================
+     ERROR
+====================================== -->
+
+<div id="error"></div>
+
+
+<!-- =====================================
+     GAME
+====================================== -->
+
+<div
+    id="game"
+    style="display:none;"
+>
+
+
+    <div class="question-label">
+
+        What is the definition of:
+
+    </div>
+
+
+    <div id="question"></div>
+
+
+    <div
+        class="answers"
+        id="answers"
+    ></div>
+
+
+    <div id="feedback"></div>
+
+
+    <button id="nextButton">
+
+        Next Question
+
+    </button>
 
 
 </div>
 
+
+<!-- =====================================
+     GAME OVER
+====================================== -->
+
+<div id="gameOver">
+
+
+    <h2>
+        🎉 Great Job!
+    </h2>
+
+
+    <div class="list-name">
+
+        <span id="finalListName">
+            Vocabulary List
+        </span>
+
+    </div>
+
+
+    <div class="final-score">
+
+        Final Score:
+        <span id="finalScore">
+            0
+        </span>
+
+    </div>
+
+
+    <div class="final-percentage">
+
+        <span id="finalPercentage">
+            0%
+        </span>
+        Correct
+
+    </div>
+
+
+    <p>
+
+        You answered
+        <strong>
+            <span id="finalCorrect">
+                0
+            </span>
+        </strong>
+        of
+        <strong>
+            <span id="finalTotal">
+                0
+            </span>
+        </strong>
+        questions correctly.
+
+    </p>
+
+
+    <button id="playAgainButton">
+
+        🔄 Play Again
+
+    </button>
+
+
+</div>
+```
+
+</div>
 
 <!-- =========================================
      FIREBASE + GAME SCRIPT
@@ -734,6 +904,21 @@ const finalScoreDisplay =
 const finalCorrectDisplay =
     document.getElementById("finalCorrect");
 
+const finalTotalDisplay =
+    document.getElementById("finalTotal");
+
+const finalPercentageDisplay =
+    document.getElementById("finalPercentage");
+
+const finalListNameDisplay =
+    document.getElementById("finalListName");
+
+const timerDisplay =
+    document.getElementById("timer");
+
+const timerStat =
+    document.getElementById("timerStat");
+
 
 /* =========================================
    GAME VARIABLES
@@ -755,12 +940,15 @@ let correctAnswers = 0;
 
 let answered = false;
 
+let timerInterval = null;
+
+let timeRemaining = 10;
+
+let vocabularyListName = "Vocabulary List";
+
 
 /*
  * Number of questions per game.
- *
- * This is set to the number of usable
- * vocabulary items, up to 20.
  */
 
 let totalQuestions = 0;
@@ -840,6 +1028,15 @@ async function loadVocabularySet() {
 
 
         /*
+         * Store the Firebase list name.
+         */
+
+        vocabularyListName =
+            data.title ||
+            "Vocabulary List";
+
+
+        /*
          * Current Firebase format.
          */
 
@@ -890,12 +1087,13 @@ async function loadVocabularySet() {
 
 
         /*
-         * Make sure every item has a
-         * word and definition.
+         * Make sure every item has
+         * a word and definition.
          */
 
         vocabulary =
             vocabulary
+
                 .filter(item =>
                     item &&
                     item.word &&
@@ -904,6 +1102,7 @@ async function loadVocabularySet() {
                         item.meaning
                     )
                 )
+
                 .map(item => ({
 
                     word:
@@ -919,6 +1118,7 @@ async function loadVocabularySet() {
                         ).trim()
 
                 }))
+
                 .filter(item =>
                     item.word &&
                     item.definition
@@ -971,8 +1171,7 @@ async function loadVocabularySet() {
 
 
         /*
-         * Shuffle the vocabulary so the
-         * questions appear in random order.
+         * Shuffle vocabulary.
          */
 
         shuffleArray(
@@ -1058,9 +1257,7 @@ function getUniqueDefinitionItems(items) {
     /*
      * Count each definition.
      *
-     * Lowercase comparison makes
-     * "Friend" and "friend" count
-     * as the same definition.
+     * Comparison is case-insensitive.
      */
 
     items.forEach(item => {
@@ -1110,10 +1307,6 @@ function getUniqueDefinitionItems(items) {
 ========================================= */
 
 function createQuestion() {
-
-    /*
-     * Safety check.
-     */
 
     if (
         usableVocabulary.length < 4
@@ -1165,10 +1358,6 @@ function createQuestion() {
         );
 
 
-    /*
-     * Randomize distractors.
-     */
-
     shuffleArray(
         possibleDistractors
     );
@@ -1183,10 +1372,6 @@ function createQuestion() {
             .slice(0, 3);
 
 
-    /*
-     * Safety check.
-     */
-
     if (
         distractors.length < 3
     ) {
@@ -1195,10 +1380,6 @@ function createQuestion() {
 
     }
 
-
-    /*
-     * Create the four choices.
-     */
 
     const choices = [
 
@@ -1212,9 +1393,6 @@ function createQuestion() {
     /*
      * Final duplicate-definition
      * safety check.
-     *
-     * This guarantees that no two
-     * choices have the same definition.
      */
 
     const definitions =
@@ -1274,6 +1452,8 @@ function createQuestion() {
 
 function showQuestion() {
 
+    stopTimer();
+
     answered = false;
 
     feedback.textContent = "";
@@ -1301,7 +1481,7 @@ function showQuestion() {
 
 
     /*
-     * Generate a question.
+     * Generate question.
      */
 
     let attempts = 0;
@@ -1317,11 +1497,6 @@ function showQuestion() {
         currentQuestion =
             createQuestion();
 
-        /*
-         * If a question cannot be
-         * created, move to another
-         * vocabulary item.
-         */
 
         if (
             !currentQuestion
@@ -1331,15 +1506,11 @@ function showQuestion() {
 
         }
 
+
         attempts++;
 
     }
 
-
-    /*
-     * If we couldn't create a valid
-     * question, end the game.
-     */
 
     if (
         !currentQuestion
@@ -1364,7 +1535,7 @@ function showQuestion() {
 
 
     /*
-     * Create the four answer buttons.
+     * Create four answer buttons.
      */
 
     currentQuestion.choices
@@ -1407,6 +1578,220 @@ function showQuestion() {
 
     updateStats();
 
+
+    /*
+     * Start the 10-second timer.
+     */
+
+    startTimer();
+
+}
+
+
+/* =========================================
+   START TIMER
+========================================= */
+
+function startTimer() {
+
+    stopTimer();
+
+
+    timeRemaining = 10;
+
+    updateTimerDisplay();
+
+
+    timerInterval =
+        setInterval(
+            () => {
+
+                timeRemaining--;
+
+                updateTimerDisplay();
+
+
+                if (
+                    timeRemaining <= 0
+                ) {
+
+                    stopTimer();
+
+                    timeExpired();
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+/* =========================================
+   STOP TIMER
+========================================= */
+
+function stopTimer() {
+
+    if (timerInterval) {
+
+        clearInterval(
+            timerInterval
+        );
+
+        timerInterval = null;
+
+    }
+
+}
+
+
+/* =========================================
+   UPDATE TIMER DISPLAY
+========================================= */
+
+function updateTimerDisplay() {
+
+    timerDisplay.textContent =
+        timeRemaining;
+
+
+    timerStat.classList.remove(
+        "timer-warning",
+        "timer-danger"
+    );
+
+
+    if (
+        timeRemaining <= 3
+    ) {
+
+        timerStat.classList.add(
+            "timer-danger"
+        );
+
+    }
+
+    else if (
+        timeRemaining <= 5
+    ) {
+
+        timerStat.classList.add(
+            "timer-warning"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   TIME EXPIRED
+========================================= */
+
+function timeExpired() {
+
+    if (answered) {
+
+        return;
+
+    }
+
+
+    answered = true;
+
+
+    const buttons =
+        answers.querySelectorAll(
+            ".answer-button"
+        );
+
+
+    buttons.forEach(button => {
+
+        button.disabled =
+            true;
+
+    });
+
+
+    /*
+     * Timer expiration counts as
+     * an incorrect answer.
+     */
+
+    streak = 0;
+
+
+    /*
+     * Highlight the correct answer.
+     */
+
+    buttons.forEach(button => {
+
+        if (
+            button.dataset.definition
+                .trim()
+                .toLowerCase()
+            ===
+            currentQuestion.correctDefinition
+                .trim()
+                .toLowerCase()
+        ) {
+
+            button.classList.add(
+                "correct"
+            );
+
+        }
+
+    });
+
+
+    feedback.textContent =
+        `⏰ Time's up! The answer was "${currentQuestion.correctDefinition}".`;
+
+
+    feedback.className =
+        "feedback-incorrect";
+
+
+    updateStats();
+
+
+    /*
+     * Move automatically to the next
+     * question after a short pause.
+     */
+
+    if (
+        currentQuestionIndex + 1
+        < totalQuestions
+    ) {
+
+        setTimeout(
+            () => {
+
+                currentQuestionIndex++;
+
+                showQuestion();
+
+            },
+            1200
+        );
+
+    }
+
+    else {
+
+        setTimeout(
+            endGame,
+            1200
+        );
+
+    }
+
 }
 
 
@@ -1420,16 +1805,16 @@ function checkAnswer(
 ) {
 
     if (answered) {
+
         return;
+
     }
 
 
     answered = true;
 
+    stopTimer();
 
-    /*
-     * Disable all answer buttons.
-     */
 
     const buttons =
         answers.querySelectorAll(
@@ -1456,10 +1841,6 @@ function checkAnswer(
 
 
     if (correct) {
-
-        /*
-         * Correct answer.
-         */
 
         selectedButton.classList.add(
             "correct"
@@ -1521,7 +1902,7 @@ function checkAnswer(
 
 
         /*
-         * Highlight the correct answer.
+         * Highlight correct answer.
          */
 
         buttons.forEach(button => {
@@ -1548,10 +1929,6 @@ function checkAnswer(
 
     else {
 
-        /*
-         * Incorrect answer.
-         */
-
         selectedButton.classList.add(
             "incorrect"
         );
@@ -1565,8 +1942,7 @@ function checkAnswer(
 
 
         /*
-         * Find and highlight correct
-         * answer.
+         * Highlight correct answer.
          */
 
         buttons.forEach(button => {
@@ -1604,7 +1980,7 @@ function checkAnswer(
 
 
     /*
-     * Show next button.
+     * Show next button or end game.
      */
 
     if (
@@ -1653,8 +2029,11 @@ playAgainButton.addEventListener(
     "click",
     () => {
 
+        stopTimer();
+
+
         /*
-         * Shuffle the vocabulary again.
+         * Shuffle vocabulary again.
          */
 
         shuffleArray(
@@ -1692,6 +2071,9 @@ playAgainButton.addEventListener(
 
 function endGame() {
 
+    stopTimer();
+
+
     stopGameButtons();
 
 
@@ -1709,6 +2091,37 @@ function endGame() {
 
     finalCorrectDisplay.textContent =
         correctAnswers;
+
+
+    finalTotalDisplay.textContent =
+        totalQuestions;
+
+
+    /*
+     * Calculate percentage correct.
+     */
+
+    const percentage =
+        totalQuestions > 0
+            ? Math.round(
+                (
+                    correctAnswers /
+                    totalQuestions
+                ) * 100
+            )
+            : 0;
+
+
+    finalPercentageDisplay.textContent =
+        `${percentage}%`;
+
+
+    /*
+     * Display Firebase list name.
+     */
+
+    finalListNameDisplay.textContent =
+        vocabularyListName;
 
 
     playAgainButton.style.display =
@@ -1810,6 +2223,9 @@ function shuffleArray(array) {
 
 function showError(message) {
 
+    stopTimer();
+
+
     loading.style.display =
         "none";
 
@@ -1876,7 +2292,6 @@ loadVocabularySet();
 
 
 </script>
-
 
 </body>
 
