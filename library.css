@@ -539,6 +539,9 @@ select:focus {
     background: #E01A74;
 }
 
+.modalQuiz {
+    background: #F59E0B;
+}
 
 /* =========================================
    CLOSE MODAL
