@@ -4,7 +4,6 @@
 
 body {
     font-family: Arial, sans-serif;
-
     background:
         linear-gradient(
             135deg,
@@ -356,6 +355,10 @@ select:focus {
     background: #B80C59;
 }
 
+.quizButton {
+
+    background: #D1D5DB;
+}
 
 /* =========================================
    LOADING / ERROR
