@@ -196,6 +196,18 @@
 
             </button>
 
+                         <!-- QUIZWORD -->
+
+            <button
+                id="modalQuizButton"
+                class="modalGameButton modalQuiz"
+            >
+
+                🃏<br>
+
+                QuizWord
+
+            </button>
 
         </div>
 
@@ -338,6 +350,8 @@ const MATCHWORD_URL =
 const FLASHWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/flashcard.html";
 
+     const QUIZWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/quizword.html";
 
 /* =========================================
    DATA
@@ -1148,6 +1162,28 @@ document
         }
     );
 
+     /* =========================================
+   QUIZWORD BUTTON
+========================================= */
+
+document
+    .getElementById(
+        "modalQuizButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (!selectedList) {
+                return;
+            }
+
+
+            window.location.href =
+                `${QUIZWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+        }
+    );
 
 /* =========================================
    CLOSE BUTTON
