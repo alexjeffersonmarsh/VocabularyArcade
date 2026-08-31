@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -7,7 +6,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>QuizWord</title>
+<title>QuizWord Test Crafter</title>
+
+<!--
+    JSZip is used to create the Canvas QTI ZIP package.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 
 <style>
 
@@ -15,26 +20,2382 @@
    GLOBAL
 ========================================= */
 
+* {
+    box-sizing: border-box;
+}
+
+
 body {
+
+    margin: 0;
+
+    min-height: 100vh;
 
     font-family: Arial, sans-serif;
 
     background:
         linear-gradient(
             135deg,
-            #f4f7fa 0%,
-            #dfe6ed 100%
+            #eef2f7 0%,
+            #d8e0e8 100%
         );
+
+    color: #222;
+
+    padding: 30px 15px;
+}
+
+
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
+.container {
+
+    width: 100%;
+
+    max-width: 850px;
+
+    margin: 0 auto;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.15);
+
+    padding: 35px;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+h1 {
+
+    margin:
+        0 0 8px;
+
+    text-align: center;
+
+    font-size: 38px;
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #666;
+
+    margin:
+        0 0 30px;
+
+}
+
+
+/* =========================================
+   SECTIONS
+========================================= */
+
+.section {
+
+    margin-bottom: 25px;
+
+    padding: 22px;
+
+    background: #f7f9fb;
+
+    border:
+        1px solid #dde3e9;
+
+    border-radius: 12px;
+}
+
+
+.section h2 {
+
+    margin:
+        0 0 15px;
+
+    font-size: 20px;
+}
+
+
+/* =========================================
+   FORM ELEMENTS
+========================================= */
+
+label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: bold;
+}
+
+
+input {
+
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 16px;
+
+    border:
+        1px solid #bbb;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+
+    background: white;
+}
+
+
+input:focus {
+
+    outline: none;
+
+    border-color: #0078d4;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0,120,212,.12);
+}
+
+
+/* =========================================
+   FIREBASE SOURCE DISPLAY
+========================================= */
+
+.source-info {
+
+    padding: 15px;
+
+    background: #eaf3ff;
+
+    border-left:
+        4px solid #0078d4;
+
+    border-radius: 6px;
+
+    color: #234;
+
+    line-height: 1.6;
+}
+
+
+.source-title {
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #0d5c91;
+
+}
+
+
+.source-detail {
+
+    color: #555;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   EXPORT FORMAT
+========================================= */
+
+.format-options {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 15px;
+}
+
+
+.format-option {
+
+    position: relative;
+}
+
+
+.format-option input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+.format-option label {
 
     margin: 0;
 
-    min-height: 100vh;
+    padding: 18px;
+
+    border:
+        2px solid #ccd3da;
+
+    border-radius: 10px;
+
+    background: white;
+
+    cursor: pointer;
+
+    text-align: center;
+
+    transition:
+        .15s ease;
+}
+
+
+.format-option label:hover {
+
+    border-color: #0078d4;
+
+    transform:
+        translateY(-1px);
+}
+
+
+.format-option input:checked + label {
+
+    border-color: #0078d4;
+
+    background: #eef7ff;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0,120,212,.12);
+}
+
+
+.format-name {
+
+    display: block;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin-bottom: 5px;
+}
+
+
+.format-description {
+
+    display: block;
+
+    color: #666;
+
+    font-size: 14px;
+
+    font-weight: normal;
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.button-row {
 
     display: flex;
 
-    justify-content: center;
+    gap: 12px;
 
-    align-items: center;
-
-    color: #222;
+    flex-wrap: wrap;
 }
+
+
+button {
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 13px 20px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+#generateButton {
+
+    flex: 1;
+
+    min-width: 220px;
+
+    background: #0078d4;
+
+    color: white;
+}
+
+
+#generateButton:hover {
+
+    background: #005ea8;
+}
+
+
+#previewButton {
+
+    background: #555;
+
+    color: white;
+}
+
+
+#previewButton:hover {
+
+    background: #333;
+}
+
+
+button:disabled {
+
+    opacity: .55;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+#status {
+
+    margin-top: 18px;
+
+    min-height: 25px;
+
+    font-weight: bold;
+
+    line-height: 1.5;
+}
+
+
+.success {
+
+    color: #198754;
+}
+
+
+.error {
+
+    color: #b02a37;
+}
+
+
+/* =========================================
+   PREVIEW
+========================================= */
+
+#preview {
+
+    display: none;
+
+    margin-top: 25px;
+}
+
+
+#preview pre {
+
+    background: #20252b;
+
+    color: #f4f4f4;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    overflow-x: auto;
+
+    white-space: pre-wrap;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================
+   CANVAS INSTRUCTIONS
+========================================= */
+
+.instructions {
+
+    font-size: 14px;
+
+    color: #555;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .container {
+
+        padding:
+            22px 16px;
+    }
+
+
+    h1 {
+
+        font-size: 30px;
+    }
+
+
+    .format-options {
+
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <h1>
+        QuizWord
+    </h1>
+
+
+    <p class="subtitle">
+
+        Create printable vocabulary quizzes
+        or Canvas-ready QTI quizzes.
+
+    </p>
+
+
+    <!-- =====================================
+         QUIZ INFORMATION
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            1. Quiz Information
+        </h2>
+
+
+        <label for="quizName">
+            Quiz Name
+        </label>
+
+
+        <input
+            id="quizName"
+            type="text"
+            placeholder="Example: Latin Vocabulary Quiz"
+        >
+
+
+        <label for="classUnit">
+            Class / Unit
+        </label>
+
+
+        <input
+            id="classUnit"
+            type="text"
+            placeholder="Example: Latin I — Unit 3"
+        >
+
+    </div>
+
+
+    <!-- =====================================
+         VOCABULARY SOURCE
+         LOADED AUTOMATICALLY FROM FIREBASE
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            2. Vocabulary Source
+        </h2>
+
+
+        <div
+            id="sourceInfo"
+            class="source-info"
+        >
+
+            Loading vocabulary list...
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         EXPORT FORMAT
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            3. Export Format
+        </h2>
+
+
+        <div class="format-options">
+
+
+            <!-- TXT -->
+
+            <div class="format-option">
+
+                <input
+                    type="radio"
+                    id="formatTxt"
+                    name="format"
+                    value="txt"
+                    checked
+                >
+
+
+                <label for="formatTxt">
+
+                    <span class="format-name">
+                        📄 TXT
+                    </span>
+
+
+                    <span class="format-description">
+
+                        Printable test with answer key
+
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <!-- CANVAS QTI -->
+
+            <div class="format-option">
+
+                <input
+                    type="radio"
+                    id="formatQti"
+                    name="format"
+                    value="qti"
+                >
+
+
+                <label for="formatQti">
+
+                    <span class="format-name">
+                        🎓 Canvas QTI
+                    </span>
+
+
+                    <span class="format-description">
+
+                        Canvas-compatible QTI 1.2 ZIP
+
+                    </span>
+
+                </label>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         GENERATE
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            4. Generate Quiz
+        </h2>
+
+
+        <div class="button-row">
+
+
+            <button
+                id="generateButton"
+            >
+
+                Generate &amp; Download
+
+            </button>
+
+
+            <button
+                id="previewButton"
+            >
+
+                Preview
+
+            </button>
+
+
+        </div>
+
+
+        <div id="status"></div>
+
+    </div>
+
+
+    <!-- =====================================
+         PREVIEW
+    ====================================== -->
+
+    <div
+        id="preview"
+        class="section"
+    >
+
+        <h2>
+            Quiz Preview
+        </h2>
+
+
+        <pre
+            id="previewContent"
+        ></pre>
+
+    </div>
+
+
+    <!-- =====================================
+         INSTRUCTIONS
+    ====================================== -->
+
+    <div class="instructions">
+
+        <strong>
+            Canvas QTI:
+        </strong>
+
+        Select Canvas QTI and click
+        Generate &amp; Download.
+
+        QuizWord creates a QTI 1.2 ZIP package
+        that can be imported into Canvas using
+        the course import tools.
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<script type="module">
+
+
+/* =========================================
+   FIREBASE IMPORTS
+========================================= */
+
+import {
+    initializeApp
+}
+
+from
+"https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+
+import {
+
+    getFirestore,
+
+    doc,
+
+    getDoc
+
+}
+
+from
+"https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
+};
+
+
+/* =========================================
+   INITIALIZE FIREBASE
+========================================= */
+
+const app =
+    initializeApp(
+        firebaseConfig
+    );
+
+
+const db =
+    getFirestore(
+        app
+    );
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const sourceInfo =
+    document.getElementById(
+        "sourceInfo"
+    );
+
+
+const quizNameInput =
+    document.getElementById(
+        "quizName"
+    );
+
+
+const classUnitInput =
+    document.getElementById(
+        "classUnit"
+    );
+
+
+const generateButton =
+    document.getElementById(
+        "generateButton"
+    );
+
+
+const previewButton =
+    document.getElementById(
+        "previewButton"
+    );
+
+
+const statusBox =
+    document.getElementById(
+        "status"
+    );
+
+
+const previewBox =
+    document.getElementById(
+        "preview"
+    );
+
+
+const previewContent =
+    document.getElementById(
+        "previewContent"
+    );
+
+
+/* =========================================
+   GAME DATA
+========================================= */
+
+let vocabulary = [];
+
+let usableVocabulary = [];
+
+let vocabularyListName =
+    "Vocabulary List";
+
+let vocabularyLanguage =
+    "";
+
+
+/* =========================================
+   GET FIREBASE SET ID FROM URL
+========================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const setId =
+    params.get("id") ||
+    params.get("set");
+
+
+/* =========================================
+   LOAD VOCABULARY DIRECTLY FROM FIREBASE
+========================================= */
+
+async function loadVocabularySet() {
+
+    if (!setId) {
+
+        showError(
+            "No vocabulary set was selected. QuizWord must be opened from the Vocabulary Arcade Library."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        console.log(
+            "QUIZWORD: Loading set:",
+            setId
+        );
+
+
+        const reference =
+            doc(
+                db,
+                "vocabSets",
+                setId
+            );
+
+
+        const snapshot =
+            await getDoc(
+                reference
+            );
+
+
+        if (!snapshot.exists()) {
+
+            throw new Error(
+                "Vocabulary set not found."
+            );
+
+        }
+
+
+        const data =
+            snapshot.data();
+
+
+        console.log(
+            "QUIZWORD: Firebase data:",
+            data
+        );
+
+
+        /* =================================
+           LIST INFORMATION
+        ================================= */
+
+        vocabularyListName =
+            data.title ||
+            "Vocabulary List";
+
+
+        vocabularyLanguage =
+            data.language ||
+            "";
+
+
+        /* =================================
+           CURRENT FORMAT
+        ================================= */
+
+        if (
+            Array.isArray(
+                data.items
+            )
+        ) {
+
+            vocabulary =
+                data.items;
+
+        }
+
+
+        /* =================================
+           LEGACY ARRAY FORMAT
+        ================================= */
+
+        else if (
+            Array.isArray(
+                data.terms
+            )
+        ) {
+
+            vocabulary =
+                data.terms;
+
+        }
+
+
+        /* =================================
+           LEGACY JSON STRING
+        ================================= */
+
+        else if (
+            typeof data.terms ===
+            "string"
+        ) {
+
+            try {
+
+                vocabulary =
+                    JSON.parse(
+                        data.terms
+                    );
+
+            }
+
+            catch(error) {
+
+                vocabulary = [];
+
+            }
+
+        }
+
+
+        /* =================================
+           NORMALIZE ITEMS
+        ================================= */
+
+        vocabulary =
+            vocabulary
+
+                .filter(
+                    item =>
+
+                        item &&
+
+                        item.word &&
+
+                        (
+                            item.definition ||
+
+                            item.meaning
+                        )
+                )
+
+                .map(
+                    item => ({
+
+                        word:
+                            String(
+                                item.word
+                            ).trim(),
+
+                        definition:
+                            String(
+                                item.definition ||
+
+                                item.meaning ||
+
+                                ""
+                            ).trim()
+
+                    })
+                )
+
+                .filter(
+                    item =>
+
+                        item.word &&
+
+                        item.definition
+                );
+
+
+        if (
+            vocabulary.length < 4
+        ) {
+
+            throw new Error(
+                "This vocabulary list needs at least four valid vocabulary items."
+            );
+
+        }
+
+
+        /* =================================
+           UNIQUE DEFINITIONS
+        ================================= */
+
+        usableVocabulary =
+            getUniqueDefinitionItems(
+                vocabulary
+            );
+
+
+        if (
+            usableVocabulary.length < 4
+        ) {
+
+            throw new Error(
+                "This vocabulary list does not contain enough unique definitions to create multiple-choice questions."
+            );
+
+        }
+
+
+        console.log(
+            "QUIZWORD: Vocabulary loaded:",
+            vocabulary
+        );
+
+
+        console.log(
+            "QUIZWORD: Unique vocabulary:",
+            usableVocabulary
+        );
+
+
+        /* =================================
+           UPDATE SOURCE DISPLAY
+        ================================= */
+
+        sourceInfo.innerHTML = `
+
+            <div class="source-title">
+
+                ${escapeHtml(
+                    vocabularyListName
+                )}
+
+            </div>
+
+            <div class="source-detail">
+
+                ${
+                    vocabularyLanguage
+                        ? "Language: " +
+                          escapeHtml(
+                              vocabularyLanguage
+                          ) +
+                          "<br>"
+                        : ""
+                }
+
+                ${vocabulary.length}
+                vocabulary entries
+
+                <br>
+
+                ${usableVocabulary.length}
+                entries available for QuizWord
+
+            </div>
+
+        `;
+
+
+        showStatus(
+            "Vocabulary loaded successfully.",
+            false
+        );
+
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "QUIZWORD: Error loading vocabulary:",
+            error
+        );
+
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   UNIQUE DEFINITION FILTER
+========================================= */
+
+function getUniqueDefinitionItems(
+    items
+) {
+
+    const counts =
+        new Map();
+
+
+    items.forEach(
+        item => {
+
+            const key =
+                item.definition
+                    .trim()
+                    .toLowerCase();
+
+
+            counts.set(
+                key,
+
+                (
+                    counts.get(key) ||
+                    0
+                ) + 1
+            );
+
+        }
+    );
+
+
+    return items.filter(
+        item => {
+
+            const key =
+                item.definition
+                    .trim()
+                    .toLowerCase();
+
+
+            return (
+                counts.get(key) ===
+                1
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   CREATE QUESTIONS
+========================================= */
+
+function createQuestions() {
+
+    const available =
+        [...usableVocabulary];
+
+
+    shuffleArray(
+        available
+    );
+
+
+    /*
+     * Maximum of 20 questions.
+     */
+
+    const selectedQuestions =
+        available.slice(
+            0,
+            Math.min(
+                20,
+                available.length
+            )
+        );
+
+
+    const questions = [];
+
+
+    selectedQuestions.forEach(
+        correctItem => {
+
+            /*
+             * Find three distractors.
+             */
+
+            const distractors =
+                available.filter(
+                    item =>
+
+                        item.word !==
+                        correctItem.word
+
+                        &&
+
+                        item.definition
+                            .trim()
+                            .toLowerCase()
+
+                        !==
+
+                        correctItem.definition
+                            .trim()
+                            .toLowerCase()
+                );
+
+
+            shuffleArray(
+                distractors
+            );
+
+
+            const selectedDistractors =
+                distractors.slice(
+                    0,
+                    3
+                );
+
+
+            if (
+                selectedDistractors.length <
+                3
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+             * Four total definitions.
+             */
+
+            const choices = [
+
+                {
+                    definition:
+                        correctItem.definition,
+
+                    correct:
+                        true
+
+                },
+
+                {
+                    definition:
+                        selectedDistractors[0]
+                            .definition,
+
+                    correct:
+                        false
+
+                },
+
+                {
+                    definition:
+                        selectedDistractors[1]
+                            .definition,
+
+                    correct:
+                        false
+
+                },
+
+                {
+                    definition:
+                        selectedDistractors[2]
+                            .definition,
+
+                    correct:
+                        false
+
+                }
+
+            ];
+
+
+            /*
+             * Final duplicate check.
+             */
+
+            const definitionKeys =
+                choices.map(
+                    choice =>
+
+                        choice.definition
+                            .trim()
+                            .toLowerCase()
+                );
+
+
+            if (
+                new Set(
+                    definitionKeys
+                ).size !== 4
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+             * Randomize answer position.
+             */
+
+            shuffleArray(
+                choices
+            );
+
+
+            /*
+             * Assign A-D AFTER shuffling.
+             */
+
+            choices.forEach(
+                (choice, index) => {
+
+                    choice.label =
+                        String.fromCharCode(
+                            65 + index
+                        );
+
+                }
+            );
+
+
+            const correctChoice =
+                choices.find(
+                    choice =>
+                        choice.correct
+                );
+
+
+            questions.push({
+
+                word:
+                    correctItem.word,
+
+                choices,
+
+                correctAnswer:
+                    correctChoice.label
+
+            });
+
+        }
+    );
+
+
+    /*
+     * Require at least four questions.
+     */
+
+    if (
+        questions.length < 4
+    ) {
+
+        throw new Error(
+            "QuizWord could not create enough valid questions from this vocabulary list."
+        );
+
+    }
+
+
+    return questions;
+
+}
+
+
+/* =========================================
+   GENERATE QUIZ DATA
+========================================= */
+
+function buildQuizData() {
+
+    const quizName =
+        quizNameInput.value.trim() ||
+        "Vocabulary Quiz";
+
+
+    const classUnit =
+        classUnitInput.value.trim();
+
+
+    const questions =
+        createQuestions();
+
+
+    return {
+
+        quizName,
+
+        classUnit,
+
+        sourceTitle:
+            vocabularyListName,
+
+        language:
+            vocabularyLanguage,
+
+        questions
+
+    };
+
+}
+
+
+/* =========================================
+   GENERATE AND DOWNLOAD
+========================================= */
+
+async function generateQuiz() {
+
+    try {
+
+        generateButton.disabled =
+            true;
+
+
+        showStatus(
+            "Generating quiz...",
+            false
+        );
+
+
+        const quizData =
+            buildQuizData();
+
+
+        const format =
+            document.querySelector(
+                'input[name="format"]:checked'
+            ).value;
+
+
+        if (
+            format === "txt"
+        ) {
+
+            downloadTxt(
+                quizData
+            );
+
+        }
+
+        else {
+
+            await downloadQti(
+                quizData
+            );
+
+        }
+
+
+        showStatus(
+            "Quiz created successfully.",
+            false
+        );
+
+    }
+
+    catch(error) {
+
+        console.error(
+            error
+        );
+
+
+        showError(
+            error.message
+        );
+
+    }
+
+    finally {
+
+        generateButton.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================
+   BUILD TXT
+========================================= */
+
+function buildTxt(
+    quizData
+) {
+
+    let text = "";
+
+
+    text +=
+        quizData.quizName.toUpperCase() +
+        "\n";
+
+
+    if (
+        quizData.classUnit
+    ) {
+
+        text +=
+            quizData.classUnit +
+            "\n";
+
+    }
+
+
+    text +=
+        "Vocabulary Source: " +
+        quizData.sourceTitle +
+        "\n";
+
+
+    if (
+        quizData.language
+    ) {
+
+        text +=
+            "Language: " +
+            quizData.language +
+            "\n";
+
+    }
+
+
+    text +=
+        "\n";
+
+
+    text +=
+        "Name: ______________________________\n";
+
+
+    text +=
+        "Date: _______________________________\n";
+
+
+    text +=
+        "\n";
+
+
+    text +=
+        "Directions: Choose the best definition for each term.\n";
+
+
+    text +=
+        "\n";
+
+
+    quizData.questions.forEach(
+        (question, index) => {
+
+            text +=
+                `${index + 1}. ${question.word}\n`;
+
+
+            text +=
+                "\n";
+
+
+            question.choices.forEach(
+                choice => {
+
+                    text +=
+                        `   ${choice.label}. ${choice.definition}\n`;
+
+                }
+            );
+
+
+            text +=
+                "\n";
+
+        }
+    );
+
+
+    text +=
+        "ANSWER KEY\n";
+
+
+    text +=
+        "==========\n";
+
+
+    text +=
+        "\n";
+
+
+    quizData.questions.forEach(
+        (question, index) => {
+
+            text +=
+                `${index + 1}. ${question.correctAnswer}\n`;
+
+        }
+    );
+
+
+    return text;
+
+}
+
+
+/* =========================================
+   DOWNLOAD TXT
+========================================= */
+
+function downloadTxt(
+    quizData
+) {
+
+    const text =
+        buildTxt(
+            quizData
+        );
+
+
+    const blob =
+        new Blob(
+            [text],
+            {
+                type:
+                    "text/plain;charset=utf-8"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        makeFilename(
+            quizData.quizName
+        ) +
+        ".txt";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+
+/* =========================================
+   DOWNLOAD QTI
+========================================= */
+
+async function downloadQti(
+    quizData
+) {
+
+    if (
+        typeof JSZip ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "The QTI export library could not be loaded."
+        );
+
+    }
+
+
+    const zip =
+        new JSZip();
+
+
+    const assessmentIdent =
+        "quizword_" +
+        Date.now();
+
+
+    const manifest =
+        buildQtiManifest(
+            quizData,
+            assessmentIdent
+        );
+
+
+    const assessment =
+        buildQtiAssessment(
+            quizData,
+            assessmentIdent
+        );
+
+
+    zip.file(
+        "imsmanifest.xml",
+        manifest
+    );
+
+
+    zip.file(
+        "quiz.xml",
+        assessment
+    );
+
+
+    const blob =
+        await zip.generateAsync(
+            {
+                type: "blob"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        makeFilename(
+            quizData.quizName
+        ) +
+        "_Canvas_QTI.zip";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+
+/* =========================================
+   QTI MANIFEST
+========================================= */
+
+function buildQtiManifest(
+    quizData,
+    assessmentIdent
+) {
+
+    const title =
+        xmlEscape(
+            quizData.quizName
+        );
+
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+
+<manifest
+    xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+    xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_v1p2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    identifier="MANIFEST_${assessmentIdent}"
+    xsi:schemaLocation="
+        http://www.imsglobal.org/xsd/imscp_v1p1
+        http://www.imsglobal.org/xsd/imscp_v1p1.xsd
+        http://www.imsglobal.org/xsd/imsmd_v1p2
+        http://www.imsglobal.org/xsd/imsmd_v1p2p1.xsd">
+
+    <organizations
+        default="ORG_${assessmentIdent}">
+
+        <organization
+            identifier="ORG_${assessmentIdent}">
+
+            <item
+                identifier="ITEM_${assessmentIdent}"
+                identifierref="RES_${assessmentIdent}">
+
+                <title>
+                    ${title}
+                </title>
+
+            </item>
+
+        </organization>
+
+    </organizations>
+
+    <resources>
+
+        <resource
+            identifier="RES_${assessmentIdent}"
+            type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment"
+            href="quiz.xml">
+
+            <file
+                href="quiz.xml"
+            />
+
+        </resource>
+
+    </resources>
+
+</manifest>`;
+
+}
+
+
+/* =========================================
+   QTI ASSESSMENT
+========================================= */
+
+function buildQtiAssessment(
+    quizData,
+    assessmentIdent
+) {
+
+    const title =
+        xmlEscape(
+            quizData.quizName
+        );
+
+
+    let items = "";
+
+
+    quizData.questions.forEach(
+        (question, index) => {
+
+            const itemIdent =
+                `${assessmentIdent}_q${index + 1}`;
+
+
+            const term =
+                xmlEscape(
+                    question.word
+                );
+
+
+            let responseLabels = "";
+
+
+            question.choices.forEach(
+                choice => {
+
+                    responseLabels += `
+
+                        <response_label
+                            ident="choice_${choice.label}">
+
+                            <material>
+
+                                <mattext
+                                    texttype="text/plain">
+
+                                    ${xmlEscape(
+                                        choice.definition
+                                    )}
+
+                                </mattext>
+
+                            </material>
+
+                        </response_label>
+
+                    `;
+
+                }
+            );
+
+
+            let correctResponse = "";
+
+
+            correctResponse = `
+
+                <respcondition
+                    continue="No">
+
+                    <conditionvar>
+
+                        <varequal
+                            respident="response1">
+
+                            choice_${question.correctAnswer}
+
+                        </varequal>
+
+                    </conditionvar>
+
+                    <setvar
+                        action="Set"
+                        varname="SCORE"
+                        value="100">
+                    </setvar>
+
+                </respcondition>
+
+            `;
+
+
+            items += `
+
+                <item
+                    ident="${itemIdent}"
+                    title="${term}">
+
+                    <presentation>
+
+                        <material>
+
+                            <mattext
+                                texttype="text/plain">
+
+                                ${term}
+
+                            </mattext>
+
+                        </material>
+
+
+                        <response_lid
+                            ident="response1"
+                            rcardinality="Single">
+
+                            <render_choice>
+
+                                ${responseLabels}
+
+                            </render_choice>
+
+                        </response_lid>
+
+                    </presentation>
+
+
+                    <resprocessing>
+
+                        <outcomes>
+
+                            <decvar
+                                varname="SCORE"
+                                vartype="Integer"
+                                minvalue="0"
+                                maxvalue="100"
+                                defaultvalue="0"
+                            />
+
+                        </outcomes>
+
+
+                        ${correctResponse}
+
+                    </resprocessing>
+
+                </item>
+
+            `;
+
+        }
+    );
+
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+
+<questestinterop
+    xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.imsglobal.org/xsd/ims_qtiasiv1p2
+        http://www.imsglobal.org/xsd/ims_qtiasiv1p2.xsd">
+
+    <assessment
+        ident="${assessmentIdent}"
+        title="${title}">
+
+        <qticomment>
+            Generated by QuizWord.
+        </qticomment>
+
+
+        <section
+            ident="${assessmentIdent}_section">
+
+            ${items}
+
+        </section>
+
+    </assessment>
+
+</questestinterop>`;
+
+}
+
+
+/* =========================================
+   PREVIEW
+========================================= */
+
+previewButton.addEventListener(
+    "click",
+    () => {
+
+        try {
+
+            const quizData =
+                buildQuizData();
+
+
+            previewContent.textContent =
+                buildTxt(
+                    quizData
+                );
+
+
+            previewBox.style.display =
+                "block";
+
+
+            previewBox.scrollIntoView({
+
+                behavior:
+                    "smooth"
+
+            });
+
+
+            showStatus(
+                "Preview generated.",
+                false
+            );
+
+        }
+
+        catch(error) {
+
+            console.error(
+                error
+            );
+
+
+            showError(
+                error.message
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   GENERATE BUTTON
+========================================= */
+
+generateButton.addEventListener(
+    "click",
+    generateQuiz
+);
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+function showStatus(
+    message,
+    isError
+) {
+
+    statusBox.textContent =
+        message;
+
+
+    statusBox.className =
+        isError
+            ? "error"
+            : "success";
+
+}
+
+
+/* =========================================
+   ERROR DISPLAY
+========================================= */
+
+function showError(
+    message
+) {
+
+    sourceInfo.innerHTML = `
+
+        <strong>
+            Unable to load vocabulary.
+        </strong>
+
+        <br><br>
+
+        ${escapeHtml(
+            message
+        )}
+
+    `;
+
+
+    showStatus(
+        message,
+        true
+    );
+
+}
+
+
+/* =========================================
+   SHUFFLE
+========================================= */
+
+function shuffleArray(
+    array
+) {
+
+    for (
+        let i =
+            array.length - 1;
+
+        i > 0;
+
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            array[i],
+            array[j]
+        ] =
+
+        [
+            array[j],
+            array[i]
+        ];
+
+    }
+
+
+    return array;
+
+}
+
+
+/* =========================================
+   XML ESCAPE
+========================================= */
+
+function xmlEscape(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&apos;"
+        );
+
+}
+
+
+/* =========================================
+   FILENAME
+========================================= */
+
+function makeFilename(
+    value
+) {
+
+    return String(value)
+
+        .trim()
+
+        .replace(
+            /[^a-z0-9]+/gi,
+            "_"
+        )
+
+        .replace(
+            /^_+|_+$/g,
+            ""
+        )
+
+        .substring(
+            0,
+            80
+        )
+
+        || "QuizWord";
+
+}
+
+
+/* =========================================
+   HTML ESCAPE
+========================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadVocabularySet();
+
+
+</script>
+
+
+</body>
+
+</html>
