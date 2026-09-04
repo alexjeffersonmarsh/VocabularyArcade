@@ -3,105 +3,153 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Vocabulary Arcade Library</title>
+    <title>Vocabulary Arcade Library</title>
 
-<link rel="stylesheet" href="library.css">
+    <link
+        rel="stylesheet"
+        href="library.css"
+    >
+
+    <!-- =====================================================
+         SORTWORD ADDITIONAL STYLING
+         ===================================================== -->
+
+    <style>
+
+        /* SortWord card button */
+
+        .sortButton {
+            background: #E59B20 !important;
+            color: white !important;
+        }
+
+        .sortButton:hover {
+            background: #C98510 !important;
+        }
+
+
+        /* SortWord modal button */
+
+        .modalSort {
+            background: #E59B20 !important;
+            color: white !important;
+        }
+
+        .modalSort:hover {
+            background: #C98510 !important;
+        }
+
+
+        /* Slightly wider modal area when more games are present */
+
+        .modalGames {
+            grid-template-columns:
+                repeat(auto-fit, minmax(130px, 1fr));
+        }
+
+    </style>
 
 </head>
 
 
 <body>
 
+
 <div class="container">
 
 
-<!-- =====================================
-     HEADER
-====================================== -->
+    <!-- =====================================
+         HEADER
+    ====================================== -->
 
-<div class="header">
+    <div class="header">
 
-    <h1>Vocabulary Arcade</h1>
+        <h1>
+            Vocabulary Arcade
+        </h1>
 
-    <p>
-        Choose a vocabulary set and pick your game.
-    </p>
-
-</div>
-
-
-<!-- =====================================
-     SEARCH / FILTERS
-====================================== -->
-
-<div class="controls">
-
-    <div class="searchControls">
-
-        <input
-            id="search"
-            type="text"
-            placeholder="Search vocabulary lists..."
-        >
-
-        <a
-            class="createKitsButton"
-            href="https://alexjeffersonmarsh.github.io/VocabularyArcade/setup.html"
-        >
-            ➕ Create Kits
-        </a>
+        <p>
+            Choose a vocabulary set and pick your game.
+        </p>
 
     </div>
 
-    <select id="languageFilter">
 
-        <option value="all">
-            All Languages
-        </option>
+    <!-- =====================================
+         SEARCH / FILTERS
+    ====================================== -->
 
-    </select>
+    <div class="controls">
 
-    <select id="recentSelect">
+        <div class="searchControls">
 
-        <option value="all">
-            Most Recent Additions
-        </option>
+            <input
+                id="search"
+                type="text"
+                placeholder="Search vocabulary lists..."
+            >
 
-    </select>
+            <a
+                class="createKitsButton"
+                href="https://alexjeffersonmarsh.github.io/VocabularyArcade/setup.html"
+            >
+                ➕ Create Kits
+            </a>
 
-</div>
-
-<!-- =====================================
-     RESULTS COUNT
-====================================== -->
-
-<div
-    class="stats"
-    id="stats"
->
-
-    Connecting to vocabulary library...
-
-</div>
+        </div>
 
 
-<!-- =====================================
-     RESULTS
-====================================== -->
+        <select id="languageFilter">
 
-<div id="results">
+            <option value="all">
+                All Languages
+            </option>
 
-    <div class="loading">
+        </select>
 
-        Loading vocabulary library...
+
+        <select id="recentSelect">
+
+            <option value="all">
+                Most Recent Additions
+            </option>
+
+        </select>
 
     </div>
 
-</div>
+
+    <!-- =====================================
+         RESULTS COUNT
+    ====================================== -->
+
+    <div
+        class="stats"
+        id="stats"
+    >
+        Connecting to vocabulary library...
+    </div>
+
+
+    <!-- =====================================
+         RESULTS
+    ====================================== -->
+
+    <div id="results">
+
+        <div class="loading">
+            Loading vocabulary library...
+        </div>
+
+    </div>
+
 
 </div>
 
@@ -117,9 +165,11 @@
 
     <div class="gameModal">
 
+
         <h2 id="modalTitle">
             Choose Your Game
         </h2>
+
 
         <p>
             How would you like to practice this vocabulary?
@@ -129,85 +179,101 @@
         <div class="modalGames">
 
 
-            <!-- GEMWORDS -->
+            <!-- =================================
+                 GEMWORDS
+            ================================== -->
 
             <button
                 id="modalGemButton"
                 class="modalGameButton modalGem"
+                type="button"
             >
 
                 💎<br>
-
                 GemWords
 
             </button>
 
 
-            <!-- BUBBLEWORD -->
+            <!-- =================================
+                 BUBBLEWORD
+            ================================== -->
 
             <button
                 id="modalBubbleButton"
                 class="modalGameButton modalBubble"
+                type="button"
             >
 
                 🫧<br>
-
                 BubbleWord
 
             </button>
 
-                         <!-- CHOICEWORD -->
+
+            <!-- =================================
+                 CHOICEWORD
+            ================================== -->
 
             <button
                 id="modalChoiceButton"
                 class="modalGameButton modalChoice"
+                type="button"
             >
 
-             🧠<br>
-                 
-              ChoiceWord
+                🧠<br>
+                ChoiceWord
 
             </button>
 
-            <!-- MATCHWORD -->
+
+            <!-- =================================
+                 MATCHWORD
+            ================================== -->
 
             <button
                 id="modalMatchButton"
                 class="modalGameButton modalMatch"
+                type="button"
             >
 
                 🎯<br>
-
                 MatchWord
 
             </button>
 
 
-            <!-- FLASHWORD -->
+            <!-- =================================
+                 FLASHWORD
+            ================================== -->
 
             <button
                 id="modalFlashButton"
                 class="modalGameButton modalFlash"
+                type="button"
             >
 
                 🃏<br>
-
                 FlashWord
 
             </button>
 
-                         <!-- QUIZWORD -->
+
+            <!-- =================================
+                 SORTWORD
+            ================================== -->
 
             <button
-                id="modalQuizButton"
-                class="modalGameButton modalQuiz"
+                id="modalSortButton"
+                class="modalGameButton modalSort"
+                type="button"
             >
 
-                🃏<br>
-
-                QuizWord
+                🗂️<br>
+                SortWord
 
             </button>
+
 
         </div>
 
@@ -215,11 +281,13 @@
         <button
             id="closeModal"
             class="closeModal"
+            type="button"
         >
 
             Cancel
 
         </button>
+
 
     </div>
 
@@ -232,21 +300,25 @@
 
 <script type="module">
 
-import { initializeApp }
 
-from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+/* =========================================
+   FIREBASE IMPORTS
+========================================= */
 
 import {
-
-    getFirestore,
-
-    collection,
-
-    getDocs
-
+    initializeApp
 }
+from
+    "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from
+    "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 
 /* =========================================
@@ -282,6 +354,7 @@ const firebaseConfig = {
 
 let db;
 
+
 try {
 
     const app =
@@ -290,7 +363,10 @@ try {
         );
 
     db =
-        getFirestore(app);
+        getFirestore(
+            app
+        );
+
 
     console.log(
         "Firebase initialized successfully."
@@ -305,10 +381,12 @@ catch (error) {
         error
     );
 
+
     document.getElementById(
         "stats"
     ).textContent =
         "Firebase connection failed.";
+
 
     document.getElementById(
         "results"
@@ -338,20 +416,26 @@ catch (error) {
 const GEMWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/gemword.html";
 
+
 const BUBBLEWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/bubbleword.html";
+
 
 const CHOICEWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/choiceword.html";
 
+
 const MATCHWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/matchword.html";
+
 
 const FLASHWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/flashcard.html";
 
-     const QUIZWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/quizword.html";
+
+const SORTWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/sortword.html";
+
 
 /* =========================================
    DATA
@@ -371,6 +455,7 @@ async function loadLibrary() {
     if (!db) {
         return;
     }
+
 
     try {
 
@@ -397,28 +482,31 @@ async function loadLibrary() {
         allLists = [];
 
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(
+            docSnapshot => {
 
-            const data =
-                doc.data();
-
-
-            console.log(
-                "Vocabulary set:",
-                doc.id,
-                data
-            );
+                const data =
+                    docSnapshot.data();
 
 
-            allLists.push({
+                console.log(
+                    "Vocabulary set:",
+                    docSnapshot.id,
+                    data
+                );
 
-                id: doc.id,
 
-                ...data
+                allLists.push({
 
-            });
+                    id:
+                        docSnapshot.id,
 
-        });
+                    ...data
+
+                });
+
+            }
+        );
 
 
         /*
@@ -427,8 +515,7 @@ async function loadLibrary() {
 
         allLists.sort(
             (a, b) =>
-                getTimestamp(b.createdAt)
-                -
+                getTimestamp(b.createdAt) -
                 getTimestamp(a.createdAt)
         );
 
@@ -441,7 +528,7 @@ async function loadLibrary() {
 
     }
 
-    catch(error) {
+    catch (error) {
 
         console.error(
             "Firestore error:",
@@ -467,7 +554,11 @@ async function loadLibrary() {
 
                 <br><br>
 
-                <strong>Firebase error:</strong><br>
+                <strong>
+                    Firebase error:
+                </strong>
+
+                <br>
 
                 ${escapeHtml(error.message)}
 
@@ -501,8 +592,7 @@ function getTimestamp(timestamp) {
      */
 
     if (
-        typeof timestamp === "object"
-        &&
+        typeof timestamp === "object" &&
         typeof timestamp.seconds === "number"
     ) {
 
@@ -515,7 +605,9 @@ function getTimestamp(timestamp) {
      * JavaScript Date
      */
 
-    if (timestamp instanceof Date) {
+    if (
+        timestamp instanceof Date
+    ) {
 
         return timestamp.getTime();
 
@@ -527,7 +619,9 @@ function getTimestamp(timestamp) {
      */
 
     const parsed =
-        new Date(timestamp).getTime();
+        new Date(
+            timestamp
+        ).getTime();
 
 
     return isNaN(parsed)
@@ -544,7 +638,9 @@ function getTimestamp(timestamp) {
 function formatDate(timestamp) {
 
     const value =
-        getTimestamp(timestamp);
+        getTimestamp(
+            timestamp
+        );
 
 
     if (!value) {
@@ -572,7 +668,9 @@ function formatDate(timestamp) {
 function isNewList(timestamp) {
 
     const created =
-        getTimestamp(timestamp);
+        getTimestamp(
+            timestamp
+        );
 
 
     if (!created) {
@@ -587,13 +685,17 @@ function isNewList(timestamp) {
 
 
     const sevenDays =
-        7 * 24 * 60 * 60 * 1000;
+        7 *
+        24 *
+        60 *
+        60 *
+        1000;
 
 
     return (
-        Date.now() - milliseconds
-        <= sevenDays
-    );
+        Date.now() -
+        milliseconds
+    ) <= sevenDays;
 
 }
 
@@ -624,12 +726,10 @@ function populateLanguageFilter() {
         ...new Set(
 
             allLists
-
                 .map(
                     list =>
                         list.language
                 )
-
                 .filter(Boolean)
 
         )
@@ -637,26 +737,29 @@ function populateLanguageFilter() {
     ].sort();
 
 
-    languages.forEach(language => {
+    languages.forEach(
+        language => {
 
-        const option =
-            document.createElement(
-                "option"
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                language;
+
+
+            option.textContent =
+                language;
+
+
+            filter.appendChild(
+                option
             );
 
-
-        option.value =
-            language;
-
-        option.textContent =
-            language;
-
-
-        filter.appendChild(
-            option
-        );
-
-    });
+        }
+    );
 
 }
 
@@ -687,29 +790,34 @@ function populateRecentDropdown() {
      */
 
     allLists
-        .slice(0, 10)
-        .forEach(list => {
+        .slice(
+            0,
+            10
+        )
+        .forEach(
+            list => {
 
-            const option =
-                document.createElement(
-                    "option"
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    list.id;
+
+
+                option.textContent =
+                    list.title ||
+                    "Untitled List";
+
+
+                dropdown.appendChild(
+                    option
                 );
 
-
-            option.value =
-                list.id;
-
-
-            option.textContent =
-                list.title ||
-                "Untitled List";
-
-
-            dropdown.appendChild(
-                option
-            );
-
-        });
+            }
+        );
 
 }
 
@@ -722,7 +830,9 @@ function renderLists() {
 
     const search =
         document
-            .getElementById("search")
+            .getElementById(
+                "search"
+            )
             .value
             .trim()
             .toLowerCase();
@@ -745,48 +855,50 @@ function renderLists() {
 
 
     const filtered =
-        allLists.filter(list => {
+        allLists.filter(
+            list => {
+
+                const searchableText = `
+
+                    ${list.title || ""}
+
+                    ${list.language || ""}
+
+                    ${list.description || ""}
+
+                `.toLowerCase();
 
 
-            const searchableText = `
-
-                ${list.title || ""}
-
-                ${list.language || ""}
-
-                ${list.description || ""}
-
-            `.toLowerCase();
+                const searchMatch =
+                    searchableText.includes(
+                        search
+                    );
 
 
-            const searchMatch =
-                searchableText.includes(
-                    search
+                const languageMatch =
+                    selectedLanguage === "all"
+                    ||
+                    list.language ===
+                        selectedLanguage;
+
+
+                const recentMatch =
+                    selectedRecent === "all"
+                    ||
+                    list.id ===
+                        selectedRecent;
+
+
+                return (
+                    searchMatch
+                    &&
+                    languageMatch
+                    &&
+                    recentMatch
                 );
 
-
-            const languageMatch =
-                selectedLanguage === "all"
-                ||
-                list.language ===
-                    selectedLanguage;
-
-
-            const recentMatch =
-                selectedRecent === "all"
-                ||
-                list.id === selectedRecent;
-
-
-            return (
-                searchMatch
-                &&
-                languageMatch
-                &&
-                recentMatch
-            );
-
-        });
+            }
+        );
 
 
     document.getElementById(
@@ -802,10 +914,13 @@ function renderLists() {
         );
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
-    if (filtered.length === 0) {
+    if (
+        filtered.length === 0
+    ) {
 
         container.innerHTML = `
 
@@ -822,182 +937,209 @@ function renderLists() {
     }
 
 
-    filtered.forEach(list => {
+    filtered.forEach(
+        list => {
 
-        const createdDate =
-            formatDate(
-                list.createdAt
+            const createdDate =
+                formatDate(
+                    list.createdAt
+                );
+
+
+            const isNew =
+                isNewList(
+                    list.createdAt
+                );
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "card";
+
+
+            /*
+             * Make the entire card clickable.
+             */
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    openGameChooser(
+                        list
+                    );
+
+                }
             );
 
 
-        const isNew =
-            isNewList(
-                list.createdAt
-            );
+            const title =
+                escapeHtml(
+                    list.title ||
+                    "Untitled List"
+                );
 
 
-        const card =
-            document.createElement(
-                "div"
-            );
+            const language =
+                escapeHtml(
+                    list.language ||
+                    "Unknown Language"
+                );
 
 
-        card.className =
-            "card";
+            card.innerHTML = `
+
+                <div class="cardInfo">
 
 
-        /*
-         * Make the entire card clickable.
-         */
+                    <div class="title">
 
-        card.addEventListener(
-            "click",
-            () => {
+                        ${title}
 
-                openGameChooser(list);
+                        ${
+                            isNew
+                                ? `
 
-            }
-        );
+                                    <span class="newBadge">
+                                        New
+                                    </span>
 
+                                  `
+                                : ""
+                        }
 
-        const title =
-            escapeHtml(
-                list.title ||
-                "Untitled List"
-            );
+                    </div>
 
 
-        const language =
-            escapeHtml(
-                list.language ||
-                "Unknown Language"
-            );
+                    <div class="language">
+
+                        ${language}
+
+                    </div>
 
 
-        card.innerHTML = `
+                    <div class="meta">
 
-            <div class="cardInfo">
+                        ${list.itemCount || 0}
+                        words
 
-                <div class="title">
+                        ${
+                            createdDate
+                                ? " • Added " +
+                                  createdDate
+                                : ""
+                        }
 
-                    ${title}
+                    </div>
 
-                    ${
-                        isNew
-                            ? `
-                                <span class="newBadge">
-                                    New
-                                </span>
-                              `
-                            : ""
-                    }
 
                 </div>
 
 
-                <div class="language">
+                <div class="gameButtons">
 
-                    ${language}
+
+                    <!-- GEMWORDS -->
+
+                    <a
+                        class="playButton gemButton"
+                        href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        💎 GemWords
+                    </a>
+
+
+                    <!-- BUBBLEWORD -->
+
+                    <a
+                        class="playButton bubbleButton"
+                        href="${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        🫧 BubbleWord
+                    </a>
+
+
+                    <!-- CHOICEWORD -->
+
+                    <a
+                        class="playButton choiceButton"
+                        href="${CHOICEWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        🧠 ChoiceWord
+                    </a>
+
+
+                    <!-- MATCHWORD -->
+
+                    <a
+                        class="playButton matchButton"
+                        href="${MATCHWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        🎯 MatchWord
+                    </a>
+
+
+                    <!-- FLASHWORD -->
+
+                    <a
+                        class="playButton flashButton"
+                        href="${FLASHWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        🃏 FlashWord
+                    </a>
+
+
+                    <!-- SORTWORD -->
+
+                    <a
+                        class="playButton sortButton"
+                        href="${SORTWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+                        🗂️ SortWord
+                    </a>
+
 
                 </div>
 
-
-                <div class="meta">
-
-                    ${list.itemCount || 0}
-                    words
-
-                    ${
-                        createdDate
-                            ? " • Added " +
-                              createdDate
-                            : ""
-                    }
-
-                </div>
-
-            </div>
+            `;
 
 
-            <div class="gameButtons">
+            /*
+             * Prevent game buttons from
+             * opening the game chooser.
+             */
 
+            card
+                .querySelectorAll(
+                    ".playButton"
+                )
+                .forEach(
+                    button => {
 
-                <a
-                    class="playButton gemButton"
-                    href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
-                >
-                    💎 GemWords
-                </a>
+                        button.addEventListener(
+                            "click",
+                            event => {
 
+                                event.stopPropagation();
 
-                <a
-                    class="playButton bubbleButton"
-                    href="${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}"
-                >
-                    🫧 BubbleWord
-                </a>
-
-                <a
-                    class="playButton choiceButton"
-                    href="${CHOICEWORD_URL}?id=${encodeURIComponent(list.id)}"
-                >
-                    🫧 ChoiceWord
-                </a>
-
-
-                <a
-                    class="playButton matchButton"
-                    href="${MATCHWORD_URL}?id=${encodeURIComponent(list.id)}"
-                >
-                    🎯 MatchWord
-                </a>
-
-
-                <a
-                    class="playButton flashButton"
-                    href="${FLASHWORD_URL}?id=${encodeURIComponent(list.id)}"
-                >
-                    🃏 FlashWord
-                </a>
-
-<a
-    class="playButton quizButton"
-    href="${QUIZWORD_URL}?id=${encodeURIComponent(list.id)}"
->
-    📝 QuizWord
-</a>
-
-            </div>
-
-        `;
-
-
-        /*
-         * Prevent game buttons from
-         * opening the game chooser.
-         */
-
-        card
-            .querySelectorAll(".playButton")
-            .forEach(button => {
-
-                button.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
+                            }
+                        );
 
                     }
                 );
 
-            });
 
+            container.appendChild(
+                card
+            );
 
-        container.appendChild(
-            card
-        );
-
-    });
+        }
+    );
 
 }
 
@@ -1006,9 +1148,12 @@ function renderLists() {
    GAME CHOOSER
 ========================================= */
 
-function openGameChooser(list) {
+function openGameChooser(
+    list
+) {
 
-    selectedList = list;
+    selectedList =
+        list;
 
 
     document.getElementById(
@@ -1034,7 +1179,9 @@ function openGameChooser(list) {
 
 function closeGameChooser() {
 
-    selectedList = null;
+    selectedList =
+        null;
+
 
     document.getElementById(
         "gameModal"
@@ -1057,13 +1204,20 @@ document
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${GEMWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${GEMWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
@@ -1081,16 +1235,24 @@ document
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${BUBBLEWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${BUBBLEWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
+
 
 /* =========================================
    CHOICEWORD BUTTON
@@ -1104,16 +1266,24 @@ document
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${CHOICEWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${CHOICEWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
+
 
 /* =========================================
    MATCHWORD BUTTON
@@ -1127,13 +1297,20 @@ document
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${MATCHWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${MATCHWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
@@ -1151,39 +1328,55 @@ document
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${FLASHWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${FLASHWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
 
-     /* =========================================
-   QUIZWORD BUTTON
+
+/* =========================================
+   SORTWORD BUTTON
 ========================================= */
 
 document
     .getElementById(
-        "modalQuizButton"
+        "modalSortButton"
     )
     .addEventListener(
         "click",
         () => {
 
-            if (!selectedList) {
+            if (
+                !selectedList
+            ) {
                 return;
             }
 
 
             window.location.href =
-                `${QUIZWORD_URL}?id=${encodeURIComponent(selectedList.id)}`;
+
+                `${SORTWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
 
         }
     );
+
 
 /* =========================================
    CLOSE BUTTON
@@ -1228,7 +1421,9 @@ document
    ESCAPE HTML
 ========================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     return String(value)
 
@@ -1265,7 +1460,9 @@ function escapeHtml(value) {
 ========================================= */
 
 document
-    .getElementById("search")
+    .getElementById(
+        "search"
+    )
     .addEventListener(
         "input",
         renderLists
@@ -1273,7 +1470,9 @@ document
 
 
 document
-    .getElementById("languageFilter")
+    .getElementById(
+        "languageFilter"
+    )
     .addEventListener(
         "change",
         renderLists
@@ -1281,7 +1480,9 @@ document
 
 
 document
-    .getElementById("recentSelect")
+    .getElementById(
+        "recentSelect"
+    )
     .addEventListener(
         "change",
         renderLists
@@ -1294,7 +1495,9 @@ document
 
 loadLibrary();
 
+
 </script>
+
 
 </body>
 
