@@ -17,13 +17,16 @@
         href="library.css"
     >
 
+
     <!-- =====================================================
-         SORTWORD ADDITIONAL STYLING
+         ADDITIONAL GAME BUTTON STYLING
          ===================================================== -->
 
     <style>
 
-        /* SortWord card button */
+        /* =================================================
+           SORTWORD
+        ================================================= */
 
         .sortButton {
             background: #E59B20 !important;
@@ -35,7 +38,43 @@
         }
 
 
-        /* SortWord modal button */
+        /* =================================================
+           QUIZWORD
+        ================================================= */
+
+        .quizButton {
+            background: #2F343B !important;
+            color: white !important;
+        }
+
+        .quizButton:hover {
+            background: #24282D !important;
+        }
+
+
+        /* =================================================
+           MODAL GAME BUTTONS
+           
+           Four columns across.
+           Seven games = 4 buttons on row 1
+           and 3 buttons on row 2.
+        ================================================= */
+
+        .modalGames {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 15px;
+
+            width: 100%;
+        }
+
+
+        /* =================================================
+           SORTWORD MODAL BUTTON
+        ================================================= */
 
         .modalSort {
             background: #E59B20 !important;
@@ -47,11 +86,40 @@
         }
 
 
-        /* Slightly wider modal area when more games are present */
+        /* =================================================
+           QUIZWORD MODAL BUTTON
+        ================================================= */
 
-        .modalGames {
-            grid-template-columns:
-                repeat(auto-fit, minmax(130px, 1fr));
+        .modalQuiz {
+            background: #2F343B !important;
+            color: white !important;
+        }
+
+        .modalQuiz:hover {
+            background: #24282D !important;
+        }
+
+
+        /* =================================================
+           MOBILE
+        ================================================= */
+
+        @media (max-width: 800px) {
+
+            .modalGames {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .modalGames {
+                grid-template-columns: 1fr;
+            }
+
         }
 
     </style>
@@ -96,6 +164,7 @@
                 placeholder="Search vocabulary lists..."
             >
 
+
             <a
                 class="createKitsButton"
                 href="https://alexjeffersonmarsh.github.io/VocabularyArcade/setup.html"
@@ -106,7 +175,9 @@
         </div>
 
 
-        <select id="languageFilter">
+        <select
+            id="languageFilter"
+        >
 
             <option value="all">
                 All Languages
@@ -115,7 +186,9 @@
         </select>
 
 
-        <select id="recentSelect">
+        <select
+            id="recentSelect"
+        >
 
             <option value="all">
                 Most Recent Additions
@@ -162,6 +235,7 @@
     id="gameModal"
     class="modalOverlay"
 >
+
 
     <div class="gameModal">
 
@@ -275,6 +349,22 @@
             </button>
 
 
+            <!-- =================================
+                 QUIZWORD
+            ================================== -->
+
+            <button
+                id="modalQuizButton"
+                class="modalGameButton modalQuiz"
+                type="button"
+            >
+
+                📝<br>
+                QuizWord
+
+            </button>
+
+
         </div>
 
 
@@ -290,6 +380,7 @@
 
 
     </div>
+
 
 </div>
 
@@ -362,6 +453,7 @@ try {
             firebaseConfig
         );
 
+
     db =
         getFirestore(
             app
@@ -400,7 +492,9 @@ catch (error) {
 
             <br><br>
 
-            ${escapeHtml(error.message)}
+            ${escapeHtml(
+                error.message
+            )}
 
         </div>
 
@@ -437,6 +531,10 @@ const SORTWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/sortword.html";
 
 
+const QUIZWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/quizword.html";
+
+
 /* =========================================
    DATA
 ========================================= */
@@ -453,7 +551,9 @@ let selectedList = null;
 async function loadLibrary() {
 
     if (!db) {
+
         return;
+
     }
 
 
@@ -515,8 +615,13 @@ async function loadLibrary() {
 
         allLists.sort(
             (a, b) =>
-                getTimestamp(b.createdAt) -
-                getTimestamp(a.createdAt)
+                getTimestamp(
+                    b.createdAt
+                )
+                -
+                getTimestamp(
+                    a.createdAt
+                )
         );
 
 
@@ -560,7 +665,9 @@ async function loadLibrary() {
 
                 <br>
 
-                ${escapeHtml(error.message)}
+                ${escapeHtml(
+                    error.message
+                )}
 
                 <br><br>
 
@@ -580,10 +687,16 @@ async function loadLibrary() {
    TIMESTAMP
 ========================================= */
 
-function getTimestamp(timestamp) {
+function getTimestamp(
+    timestamp
+) {
 
-    if (!timestamp) {
+    if (
+        !timestamp
+    ) {
+
         return 0;
+
     }
 
 
@@ -592,7 +705,8 @@ function getTimestamp(timestamp) {
      */
 
     if (
-        typeof timestamp === "object" &&
+        typeof timestamp === "object"
+        &&
         typeof timestamp.seconds === "number"
     ) {
 
@@ -624,7 +738,9 @@ function getTimestamp(timestamp) {
         ).getTime();
 
 
-    return isNaN(parsed)
+    return isNaN(
+        parsed
+    )
         ? 0
         : parsed;
 
@@ -635,7 +751,9 @@ function getTimestamp(timestamp) {
    FORMAT DATE
 ========================================= */
 
-function formatDate(timestamp) {
+function formatDate(
+    timestamp
+) {
 
     const value =
         getTimestamp(
@@ -643,14 +761,20 @@ function formatDate(timestamp) {
         );
 
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return "";
+
     }
 
 
     const milliseconds =
         value < 10000000000
+
             ? value * 1000
+
             : value;
 
 
@@ -665,7 +789,9 @@ function formatDate(timestamp) {
    NEW LIST CHECK
 ========================================= */
 
-function isNewList(timestamp) {
+function isNewList(
+    timestamp
+) {
 
     const created =
         getTimestamp(
@@ -673,14 +799,20 @@ function isNewList(timestamp) {
         );
 
 
-    if (!created) {
+    if (
+        !created
+    ) {
+
         return false;
+
     }
 
 
     const milliseconds =
         created < 10000000000
+
             ? created * 1000
+
             : created;
 
 
@@ -693,8 +825,10 @@ function isNewList(timestamp) {
 
 
     return (
+
         Date.now() -
         milliseconds
+
     ) <= sevenDays;
 
 }
@@ -890,11 +1024,13 @@ function renderLists() {
 
 
                 return (
+
                     searchMatch
                     &&
                     languageMatch
                     &&
                     recentMatch
+
                 );
 
             }
@@ -1050,7 +1186,9 @@ function renderLists() {
                         class="playButton gemButton"
                         href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         💎 GemWords
+
                     </a>
 
 
@@ -1060,7 +1198,9 @@ function renderLists() {
                         class="playButton bubbleButton"
                         href="${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         🫧 BubbleWord
+
                     </a>
 
 
@@ -1070,7 +1210,9 @@ function renderLists() {
                         class="playButton choiceButton"
                         href="${CHOICEWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         🧠 ChoiceWord
+
                     </a>
 
 
@@ -1080,7 +1222,9 @@ function renderLists() {
                         class="playButton matchButton"
                         href="${MATCHWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         🎯 MatchWord
+
                     </a>
 
 
@@ -1090,7 +1234,9 @@ function renderLists() {
                         class="playButton flashButton"
                         href="${FLASHWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         🃏 FlashWord
+
                     </a>
 
 
@@ -1100,7 +1246,21 @@ function renderLists() {
                         class="playButton sortButton"
                         href="${SORTWORD_URL}?id=${encodeURIComponent(list.id)}"
                     >
+
                         🗂️ SortWord
+
+                    </a>
+
+
+                    <!-- QUIZWORD -->
+
+                    <a
+                        class="playButton quizButton"
+                        href="${QUIZWORD_URL}?id=${encodeURIComponent(list.id)}"
+                    >
+
+                        📝 QuizWord
+
                     </a>
 
 
@@ -1207,7 +1367,9 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
@@ -1238,7 +1400,9 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
@@ -1269,7 +1433,9 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
@@ -1300,7 +1466,9 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
@@ -1331,7 +1499,9 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
@@ -1362,13 +1532,48 @@ document
             if (
                 !selectedList
             ) {
+
                 return;
+
             }
 
 
             window.location.href =
 
                 `${SORTWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
+
+        }
+    );
+
+
+/* =========================================
+   QUIZWORD BUTTON
+========================================= */
+
+document
+    .getElementById(
+        "modalQuizButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                !selectedList
+            ) {
+
+                return;
+
+            }
+
+
+            window.location.href =
+
+                `${QUIZWORD_URL}?id=${
                     encodeURIComponent(
                         selectedList.id
                     )
@@ -1425,7 +1630,9 @@ function escapeHtml(
     value
 ) {
 
-    return String(value)
+    return String(
+        value
+    )
 
         .replace(
             /&/g,
