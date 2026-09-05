@@ -26,11 +26,11 @@
 
         html,
         body {
-            margin: 0;
-            padding: 0;
-
             width: 100%;
             height: 100%;
+
+            margin: 0;
+            padding: 0;
 
             overflow: hidden;
         }
@@ -49,14 +49,14 @@
                 radial-gradient(
                     circle at top,
                     #334155 0%,
-                    #111827 52%,
+                    #111827 55%,
                     #020617 100%
                 );
         }
 
 
         /* =====================================================
-           APPLICATION
+           APP
         ===================================================== */
 
         #app {
@@ -75,25 +75,29 @@
 
         #header {
 
+            flex-shrink: 0;
+
             width: 100%;
 
             display: flex;
+
             align-items: center;
             justify-content: space-between;
 
             gap: 20px;
 
-            padding: 12px 18px;
+            padding:
+                12px 18px;
 
             background:
-                rgba(15, 23, 42, 0.96);
+                rgba(15, 23, 42, 0.97);
 
             border-bottom:
                 2px solid
                 rgba(255, 255, 255, 0.10);
 
             box-shadow:
-                0 4px 15px
+                0 4px 16px
                 rgba(0, 0, 0, 0.35);
 
             z-index: 50;
@@ -102,10 +106,10 @@
 
         #titleArea {
 
+            min-width: 0;
+
             display: flex;
             flex-direction: column;
-
-            min-width: 0;
         }
 
 
@@ -137,7 +141,9 @@
             font-size: 14px;
 
             white-space: nowrap;
+
             overflow: hidden;
+
             text-overflow: ellipsis;
         }
 
@@ -151,7 +157,6 @@
             display: flex;
 
             align-items: center;
-
             justify-content: flex-end;
 
             gap: 8px;
@@ -164,16 +169,17 @@
 
             min-width: 74px;
 
-            padding: 7px 10px;
+            padding:
+                7px 10px;
+
+            border-radius: 9px;
 
             background:
                 rgba(255, 255, 255, 0.07);
 
             border:
                 1px solid
-                rgba(255, 255, 255, 0.11);
-
-            border-radius: 9px;
+                rgba(255, 255, 255, 0.10);
 
             text-align: center;
         }
@@ -204,20 +210,20 @@
         #timerBox.warning {
 
             background:
-                rgba(245, 158, 11, 0.18);
+                rgba(245, 158, 11, 0.20);
 
             border-color:
-                rgba(245, 158, 11, 0.5);
+                rgba(245, 158, 11, 0.55);
         }
 
 
         #timerBox.danger {
 
             background:
-                rgba(239, 68, 68, 0.22);
+                rgba(239, 68, 68, 0.23);
 
             border-color:
-                rgba(239, 68, 68, 0.7);
+                rgba(239, 68, 68, 0.70);
         }
 
 
@@ -231,10 +237,9 @@
 
             flex: 1;
 
-            width: 100%;
-            height: 100%;
-
             min-height: 0;
+
+            width: 100%;
 
             overflow: hidden;
         }
@@ -248,23 +253,26 @@
 
             position: absolute;
 
-            top: 14px;
+            top: 12px;
+
             left: 50%;
 
             transform:
                 translateX(-50%);
 
-            width: min(
-                90%,
-                850px
-            );
+            width:
+                min(
+                    90%,
+                    850px
+                );
 
-            padding: 9px 15px;
+            padding:
+                9px 15px;
 
             border-radius: 11px;
 
             background:
-                rgba(15, 23, 42, 0.70);
+                rgba(15, 23, 42, 0.74);
 
             border:
                 1px solid
@@ -276,7 +284,7 @@
 
             font-size: 14px;
 
-            z-index: 5;
+            z-index: 10;
         }
 
 
@@ -288,11 +296,12 @@
 
             position: absolute;
 
-            top: 67px;
+            top: 61px;
+
             left: 18px;
             right: 18px;
 
-            bottom: 155px;
+            bottom: 157px;
 
             display: grid;
 
@@ -304,57 +313,135 @@
         }
 
 
+        /* =====================================================
+           CATEGORY COLUMN
+        ===================================================== */
+
         .categoryColumn {
 
             position: relative;
 
             min-width: 0;
 
-            border:
-                3px dashed
-                rgba(255, 255, 255, 0.22);
+            overflow-y: auto;
+
+            overflow-x: hidden;
 
             border-radius: 16px;
 
+            border:
+                3px solid
+                rgba(255, 255, 255, 0.32);
+
+            box-shadow:
+                0 8px 20px
+                rgba(0, 0, 0, 0.22),
+
+                inset 0 0 22px
+                rgba(0, 0, 0, 0.15);
+
+            transition:
+                transform 0.12s ease,
+                border-color 0.12s ease,
+                filter 0.12s ease;
+        }
+
+
+        /* =====================================================
+           CATEGORY COLORS
+           Inspired by Library game buttons
+           ===================================================== */
+
+        .categoryColor0 {
+
             background:
                 linear-gradient(
                     180deg,
-                    rgba(255, 255, 255, 0.08),
-                    rgba(255, 255, 255, 0.025)
+                    rgba(20, 120, 188, 0.92),
+                    rgba(13, 76, 120, 0.88)
                 );
-
-            box-shadow:
-                inset
-                0 0 20px
-                rgba(0, 0, 0, 0.20),
-
-                0 7px 18px
-                rgba(0, 0, 0, 0.18);
-
-            transition:
-                background 0.15s ease,
-                border-color 0.15s ease,
-                transform 0.15s ease;
         }
 
+
+        .categoryColor1 {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(26, 154, 95, 0.92),
+                    rgba(18, 101, 63, 0.88)
+                );
+        }
+
+
+        .categoryColor2 {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(116, 55, 209, 0.92),
+                    rgba(75, 34, 137, 0.88)
+                );
+        }
+
+
+        .categoryColor3 {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(224, 26, 116, 0.92),
+                    rgba(145, 15, 73, 0.88)
+                );
+        }
+
+
+        .categoryColor4 {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(229, 155, 32, 0.94),
+                    rgba(151, 96, 13, 0.88)
+                );
+        }
+
+
+        /* =====================================================
+           DROP HIGHLIGHT
+        ===================================================== */
 
         .categoryColumn.dragOver {
 
-            border-color: #facc15;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(250, 204, 21, 0.20),
-                    rgba(250, 204, 21, 0.06)
-                );
-
             transform:
-                scale(1.012);
+                scale(1.015);
+
+            border-color:
+                #ffffff;
+
+            filter:
+                brightness(1.15);
+
+            box-shadow:
+                0 0 0 4px
+                rgba(255, 255, 255, 0.20),
+
+                0 10px 30px
+                rgba(0, 0, 0, 0.35);
         }
 
 
+        /* =====================================================
+           CATEGORY HEADER
+        ===================================================== */
+
         .categoryHeader {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 4;
 
             min-height: 60px;
 
@@ -363,17 +450,18 @@
             align-items: center;
             justify-content: center;
 
-            padding: 9px;
+            padding:
+                9px 12px;
 
             background:
-                rgba(15, 23, 42, 0.72);
-
-            border-radius:
-                12px 12px 0 0;
+                rgba(15, 23, 42, 0.66);
 
             border-bottom:
                 1px solid
-                rgba(255, 255, 255, 0.11);
+                rgba(255, 255, 255, 0.18);
+
+            border-radius:
+                12px 12px 0 0;
 
             text-align: center;
 
@@ -386,46 +474,94 @@
 
             font-weight: 900;
 
+            text-shadow:
+                0 2px 4px
+                rgba(0, 0, 0, 0.35);
+
             word-break: break-word;
         }
 
+
+        /* =====================================================
+           CATEGORY CONTENT
+        ===================================================== */
+
+        .categoryContent {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: flex-start;
+
+            padding:
+                12px 8px 45px;
+        }
+
+
+        /* =====================================================
+           CATEGORY HINT
+        ===================================================== */
 
         .categoryHint {
 
             position: absolute;
 
-            left: 12px;
-            right: 12px;
+            left: 10px;
+            right: 10px;
 
-            bottom: 18px;
+            bottom: 13px;
 
             text-align: center;
 
-            font-size: 12px;
-
             color:
-                rgba(255, 255, 255, 0.26);
+                rgba(255, 255, 255, 0.42);
+
+            font-size: 11px;
 
             pointer-events: none;
+
+            z-index: 2;
         }
 
 
         /* =====================================================
-           SORTED WORDS
+           SORTED OVALS
+           
+           EXACT SAME BASIC SIZE AS DRAGGABLE OVAL
         ===================================================== */
 
         .sortedWord {
 
-            display: inline-flex;
+            width:
+                min(
+                    220px,
+                    calc(
+                        100% - 16px
+                    )
+                );
+
+            min-width: 170px;
+
+            height: 58px;
+
+            min-height: 58px;
+
+            flex:
+                0 0 58px;
+
+            display: flex;
 
             align-items: center;
             justify-content: center;
 
-            margin: 5px;
+            margin:
+                6px 0;
 
-            min-height: 38px;
-
-            padding: 7px 13px;
+            padding:
+                8px 15px;
 
             border-radius: 999px;
 
@@ -436,15 +572,23 @@
                     #dbeafe
                 );
 
+            border:
+                3px solid
+                rgba(255, 255, 255, 0.98);
+
             color: #0f172a;
 
-            font-size: 13px;
+            font-size: 14px;
 
-            font-weight: 800;
+            font-weight: 900;
+
+            text-align: center;
 
             box-shadow:
-                0 4px 9px
-                rgba(0, 0, 0, 0.20);
+                0 5px 12px
+                rgba(0, 0, 0, 0.30);
+
+            word-break: break-word;
 
             animation:
                 sortedPop 0.18s ease-out;
@@ -458,7 +602,7 @@
                 opacity: 0;
 
                 transform:
-                    scale(0.7);
+                    scale(0.90);
             }
 
             to {
@@ -468,11 +612,12 @@
                 transform:
                     scale(1);
             }
+
         }
 
 
         /* =====================================================
-           BOTTOM WORD DOCK
+           WORD DOCK
         ===================================================== */
 
         #wordDock {
@@ -493,15 +638,15 @@
             background:
                 linear-gradient(
                     180deg,
-                    rgba(2, 6, 23, 0.08),
-                    rgba(2, 6, 23, 0.95)
+                    rgba(2, 6, 23, 0.10),
+                    rgba(2, 6, 23, 0.96)
                 );
 
             border-top:
                 2px solid
                 rgba(255, 255, 255, 0.08);
 
-            z-index: 20;
+            z-index: 100;
 
             pointer-events: none;
         }
@@ -511,11 +656,11 @@
 
             position: absolute;
 
-            top: 8px;
-
-            font-size: 11px;
+            top: 7px;
 
             color: #94a3b8;
+
+            font-size: 11px;
 
             text-transform: uppercase;
 
@@ -524,11 +669,10 @@
 
 
         /* =====================================================
-           WORD CARD
+           DRAGGABLE WORD
 
-           IMPORTANT:
-           The card is fixed to the viewport.
-           This prevents it from disappearing while dragging.
+           FIXED SIZE.
+           NO SCALE TRANSFORM DURING DRAG.
         ===================================================== */
 
         #wordCard {
@@ -536,20 +680,20 @@
             position: fixed;
 
             left: 50%;
+
             bottom: 38px;
 
-            transform:
-                translateX(-50%);
+            width: 220px;
 
-            min-width: 170px;
+            min-width: 220px;
 
-            max-width:
-                min(
-                    70vw,
-                    560px
-                );
+            max-width: 220px;
 
-            min-height: 60px;
+            height: 58px;
+
+            min-height: 58px;
+
+            max-height: 58px;
 
             display: flex;
 
@@ -557,7 +701,7 @@
             justify-content: center;
 
             padding:
-                12px 28px;
+                8px 15px;
 
             border-radius: 999px;
 
@@ -576,42 +720,32 @@
 
             font-size:
                 clamp(
-                    18px,
-                    2.8vw,
-                    27px
+                    16px,
+                    2.3vw,
+                    22px
                 );
 
             font-weight: 900;
 
             text-align: center;
 
+            cursor: grab;
+
             user-select: none;
 
             touch-action: none;
 
-            cursor: grab;
+            overflow: hidden;
+
+            word-break: break-word;
 
             box-shadow:
-                0 10px 28px
-                rgba(0, 0, 0, 0.42);
+                0 10px 26px
+                rgba(0, 0, 0, 0.45);
 
             z-index: 1000;
 
             pointer-events: auto;
-
-            white-space: normal;
-
-            transition:
-                box-shadow 0.12s ease,
-                transform 0.12s ease;
-        }
-
-
-        #wordCard:hover {
-
-            box-shadow:
-                0 13px 32px
-                rgba(0, 0, 0, 0.50);
         }
 
 
@@ -619,13 +753,19 @@
 
             cursor: grabbing;
 
-            box-shadow:
-                0 20px 42px
-                rgba(0, 0, 0, 0.58);
+            /*
+               IMPORTANT:
+               No scaling here.
+               The oval remains exactly
+               the same size.
+            */
 
-            transform:
-                translate(-50%, -50%)
-                scale(1.06);
+            box-shadow:
+                0 16px 38px
+                rgba(0, 0, 0, 0.58),
+
+                0 0 0 4px
+                rgba(255, 255, 255, 0.18);
         }
 
 
@@ -644,7 +784,8 @@
             position: fixed;
 
             left: 50%;
-            top: 53%;
+
+            top: 50%;
 
             transform:
                 translate(
@@ -666,7 +807,7 @@
 
             pointer-events: none;
 
-            z-index: 1100;
+            z-index: 1500;
 
             transition:
                 opacity 0.18s ease,
@@ -690,7 +831,7 @@
         #feedback.correct {
 
             background:
-                rgba(22, 163, 74, 0.96);
+                rgba(22, 163, 74, 0.97);
 
             color: white;
         }
@@ -699,14 +840,14 @@
         #feedback.incorrect {
 
             background:
-                rgba(220, 38, 38, 0.96);
+                rgba(220, 38, 38, 0.97);
 
             color: white;
         }
 
 
         /* =====================================================
-           LOADING / ERROR
+           STATUS SCREEN
         ===================================================== */
 
         #statusScreen {
@@ -723,9 +864,9 @@
             padding: 25px;
 
             background:
-                rgba(2, 6, 23, 0.95);
+                rgba(2, 6, 23, 0.96);
 
-            z-index: 2000;
+            z-index: 3000;
         }
 
 
@@ -754,7 +895,7 @@
 
             box-shadow:
                 0 20px 55px
-                rgba(0, 0, 0, 0.48);
+                rgba(0, 0, 0, 0.50);
 
             text-align: center;
         }
@@ -762,7 +903,8 @@
 
         #statusTitle {
 
-            margin: 0 0 12px;
+            margin:
+                0 0 12px;
 
             font-size: 28px;
 
@@ -800,9 +942,9 @@
             padding: 25px;
 
             background:
-                rgba(2, 6, 23, 0.93);
+                rgba(2, 6, 23, 0.94);
 
-            z-index: 3000;
+            z-index: 4000;
         }
 
 
@@ -820,8 +962,7 @@
                     720px
                 );
 
-            padding:
-                32px;
+            padding: 32px;
 
             border-radius: 22px;
 
@@ -838,7 +979,7 @@
 
             box-shadow:
                 0 25px 70px
-                rgba(0, 0, 0, 0.52);
+                rgba(0, 0, 0, 0.55);
 
             text-align: center;
         }
@@ -992,9 +1133,11 @@
 
         #libraryButton {
 
-            background: white;
+            background:
+                white;
 
-            color: #111827;
+            color:
+                #111827;
         }
 
 
@@ -1010,10 +1153,10 @@
 
                 align-items: flex-start;
 
-                gap: 9px;
+                gap: 8px;
 
                 padding:
-                    10px 12px;
+                    9px 12px;
             }
 
 
@@ -1040,18 +1183,9 @@
             }
 
 
-            #gameArea {
-
-                height:
-                    calc(
-                        100vh - 126px
-                    );
-            }
-
-
             #instructions {
 
-                top: 9px;
+                top: 8px;
 
                 font-size: 12px;
             }
@@ -1059,20 +1193,20 @@
 
             #categoryArea {
 
-                top: 56px;
+                top: 53px;
 
                 left: 9px;
                 right: 9px;
 
-                bottom: 138px;
+                bottom: 142px;
 
-                gap: 7px;
+                gap: 8px;
             }
 
 
             .categoryHeader {
 
-                min-height: 51px;
+                min-height: 52px;
 
                 font-size: 13px;
             }
@@ -1080,22 +1214,13 @@
 
             #wordDock {
 
-                height: 128px;
+                height: 132px;
             }
 
 
             #wordCard {
 
-                bottom: 32px;
-
-                max-width: 84vw;
-
-                min-height: 55px;
-
-                padding:
-                    10px 21px;
-
-                font-size: 20px;
+                bottom: 34px;
             }
 
 
@@ -1112,12 +1237,6 @@
 
 
         @media (max-width: 520px) {
-
-            body {
-
-                overflow: hidden;
-            }
-
 
             #hud {
 
@@ -1149,17 +1268,31 @@
                 display: flex;
 
                 overflow-x: auto;
-
-                padding-bottom: 4px;
             }
 
 
             .categoryColumn {
 
                 flex:
-                    1 0 145px;
+                    1 0 155px;
 
-                min-width: 145px;
+                min-width: 155px;
+            }
+
+
+            #wordCard {
+
+                width: 210px;
+
+                min-width: 210px;
+
+                max-width: 210px;
+
+                height: 58px;
+
+                min-height: 58px;
+
+                max-height: 58px;
             }
 
 
@@ -1303,23 +1436,13 @@
 
 
         <div id="instructions">
-
             Drag each word into the category where it belongs.
-
         </div>
 
-
-        <!-- =============================================
-             CATEGORY COLUMNS
-        ============================================== -->
 
         <div id="categoryArea">
         </div>
 
-
-        <!-- =============================================
-             FEEDBACK
-        ============================================== -->
 
         <div id="feedback">
         </div>
@@ -1333,8 +1456,6 @@
 
 <!-- =====================================================
      WORD DOCK
-     Kept outside the game area because the word card
-     uses fixed positioning while dragging.
 ===================================================== -->
 
 <div id="wordDock">
@@ -1355,7 +1476,7 @@
 
 
 <!-- =====================================================
-     LOADING / ERROR SCREEN
+     STATUS SCREEN
 ===================================================== -->
 
 <div id="statusScreen">
@@ -1499,14 +1620,14 @@
 
 
 <!-- =====================================================
-     FIREBASE / GAME JAVASCRIPT
+     FIREBASE / GAME
 ===================================================== -->
 
 <script type="module">
 
 
 /* =====================================================
-   FIREBASE
+   FIREBASE IMPORTS
 ===================================================== */
 
 import {
@@ -1725,35 +1846,56 @@ const libraryButton =
 
 
 /* =====================================================
-   GAME STATE
+   STATE
 ===================================================== */
 
-let sourceVocabulary = [];
+let sourceVocabulary =
+    [];
 
-let roundVocabulary = [];
 
-let categories = [];
+let roundVocabulary =
+    [];
 
-let currentIndex = 0;
 
-let score = 0;
+let categories =
+    [];
 
-let correctCount = 0;
 
-let incorrectCount = 0;
+let currentIndex =
+    0;
 
-let streak = 0;
 
-let bestStreak = 0;
+let score =
+    0;
+
+
+let correctCount =
+    0;
+
+
+let incorrectCount =
+    0;
+
+
+let streak =
+    0;
+
+
+let bestStreak =
+    0;
+
 
 let timeLeft =
     ROUND_TIME;
 
+
 let timerInterval =
     null;
 
+
 let gameIsRunning =
     false;
+
 
 let currentWord =
     null;
@@ -1767,7 +1909,7 @@ let isDragging =
     false;
 
 
-let pointerId =
+let activePointerId =
     null;
 
 
@@ -1777,10 +1919,6 @@ let dragOffsetX =
 
 let dragOffsetY =
     0;
-
-
-let returnAnimationTimer =
-    null;
 
 
 /* =====================================================
@@ -1862,7 +2000,7 @@ function shuffle(
 
 
 /* =====================================================
-   LOAD FIREBASE SET
+   LOAD VOCABULARY SET
 ===================================================== */
 
 async function loadVocabularySet(
@@ -2032,11 +2170,7 @@ function validateVocabulary(
 
 
     /*
-       Build category list.
-
-       Comparison is case-insensitive,
-       while the original display text
-       is preserved.
+       Get unique categories.
     */
 
     const categoryMap =
@@ -2098,9 +2232,7 @@ function validateVocabulary(
 
 
     /*
-       Reject duplicate words.
-
-       This keeps every word unambiguous.
+       Every word must be unique.
     */
 
     const wordMap =
@@ -2154,7 +2286,7 @@ function validateVocabulary(
 
 
 /* =====================================================
-   STATUS
+   SHOW STATUS
 ===================================================== */
 
 function showStatus(
@@ -2189,7 +2321,7 @@ function hideStatus() {
 
 
 /* =====================================================
-   CREATE CATEGORIES
+   CREATE CATEGORY COLUMNS
 ===================================================== */
 
 function createCategories(
@@ -2215,7 +2347,10 @@ function createCategories(
 
 
     categories.forEach(
-        category => {
+        (
+            category,
+            index
+        ) => {
 
             const column =
                 document.createElement(
@@ -2224,7 +2359,8 @@ function createCategories(
 
 
             column.className =
-                "categoryColumn";
+                "categoryColumn " +
+                `categoryColor${index}`;
 
 
             column.dataset.category =
@@ -2247,6 +2383,16 @@ function createCategories(
                 category;
 
 
+            const content =
+                document.createElement(
+                    "div"
+                );
+
+
+            content.className =
+                "categoryContent";
+
+
             const hint =
                 document.createElement(
                     "div"
@@ -2263,6 +2409,11 @@ function createCategories(
 
             column.appendChild(
                 header
+            );
+
+
+            column.appendChild(
+                content
             );
 
 
@@ -2287,131 +2438,23 @@ function createCategories(
 
 function buildRound() {
 
-    let shuffled =
+    const shuffled =
         shuffle(
             sourceVocabulary
         );
 
 
-    shuffled =
+    roundVocabulary =
         shuffled.slice(
             0,
             MAX_WORDS
-        );
-
-
-    /*
-       Make sure every category is
-       represented whenever possible.
-    */
-
-    const required =
-        [];
-
-    const used =
-        new Set();
-
-
-    categories.forEach(
-        category => {
-
-            const match =
-                shuffled.find(
-                    item =>
-                        normalizeText(
-                            item.category
-                        ) ===
-                        normalizeText(
-                            category
-                        )
-                );
-
-
-            if (
-                match
-            ) {
-
-                const key =
-                    normalizeText(
-                        match.word
-                    );
-
-
-                if (
-                    !used.has(
-                        key
-                    )
-                ) {
-
-                    required.push(
-                        match
-                    );
-
-                    used.add(
-                        key
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-
-    for (
-        const item of shuffled
-    ) {
-
-        if (
-            required.length >=
-            MAX_WORDS
-        ) {
-
-            break;
-
-        }
-
-
-        const key =
-            normalizeText(
-                item.word
-            );
-
-
-        if (
-            used.has(
-                key
-            )
-        ) {
-
-            continue;
-
-        }
-
-
-        required.push(
-            item
-        );
-
-
-        used.add(
-            key
-        );
-
-    }
-
-
-    roundVocabulary =
-        shuffle(
-            required
         );
 
 }
 
 
 /* =====================================================
-   HUD
+   UPDATE HUD
 ===================================================== */
 
 function updateHUD() {
@@ -2485,15 +2528,10 @@ function updateHUD() {
 
 
 /* =====================================================
-   RESET WORD TO BOTTOM
+   RESET WORD TO DOCK
 ===================================================== */
 
 function resetWordCard() {
-
-    clearTimeout(
-        returnAnimationTimer
-    );
-
 
     wordCard.classList.remove(
         "dragging"
@@ -2514,6 +2552,30 @@ function resetWordCard() {
 
     wordCard.style.transform =
         "translateX(-50%)";
+
+
+    wordCard.style.width =
+        "220px";
+
+
+    wordCard.style.minWidth =
+        "220px";
+
+
+    wordCard.style.maxWidth =
+        "220px";
+
+
+    wordCard.style.height =
+        "58px";
+
+
+    wordCard.style.minHeight =
+        "58px";
+
+
+    wordCard.style.maxHeight =
+        "58px";
 
 }
 
@@ -2555,6 +2617,7 @@ function showCurrentWord() {
 
     resetWordCard();
 
+
     updateHUD();
 
 }
@@ -2586,7 +2649,7 @@ wordCard.addEventListener(
             true;
 
 
-        pointerId =
+        activePointerId =
             event.pointerId;
 
 
@@ -2598,11 +2661,6 @@ wordCard.addEventListener(
         const rect =
             wordCard.getBoundingClientRect();
 
-
-        /*
-           Store the difference between the
-           pointer and the center of the oval.
-        */
 
         const centerX =
             rect.left +
@@ -2625,20 +2683,44 @@ wordCard.addEventListener(
 
 
         /*
-           Switch to explicit viewport
-           positioning for dragging.
+           Switch from dock positioning
+           to viewport positioning.
         */
 
         wordCard.style.bottom =
             "";
 
 
+        wordCard.style.left =
+            `${centerX}px`;
+
+
         wordCard.style.top =
             `${centerY}px`;
 
 
-        wordCard.style.left =
-            `${centerX}px`;
+        wordCard.style.width =
+            "220px";
+
+
+        wordCard.style.minWidth =
+            "220px";
+
+
+        wordCard.style.maxWidth =
+            "220px";
+
+
+        wordCard.style.height =
+            "58px";
+
+
+        wordCard.style.minHeight =
+            "58px";
+
+
+        wordCard.style.maxHeight =
+            "58px";
 
 
         wordCard.style.transform =
@@ -2669,7 +2751,8 @@ wordCard.addEventListener(
 
         if (
             !isDragging ||
-            event.pointerId !== pointerId
+            event.pointerId !==
+                activePointerId
         ) {
 
             return;
@@ -2691,24 +2774,26 @@ wordCard.addEventListener(
 
 
         /*
-           Keep the oval fully visible.
+           Fixed dimensions.
+           Do not readjust the card width
+           while moving.
         */
 
-        const rect =
-            wordCard.getBoundingClientRect();
-
-
         const halfWidth =
-            rect.width / 2;
+            110;
 
 
         const halfHeight =
-            rect.height / 2;
+            29;
 
 
         const padding =
             8;
 
+
+        /*
+           Keep the oval entirely visible.
+        */
 
         centerX =
             Math.max(
@@ -2746,6 +2831,30 @@ wordCard.addEventListener(
             "";
 
 
+        wordCard.style.width =
+            "220px";
+
+
+        wordCard.style.minWidth =
+            "220px";
+
+
+        wordCard.style.maxWidth =
+            "220px";
+
+
+        wordCard.style.height =
+            "58px";
+
+
+        wordCard.style.minHeight =
+            "58px";
+
+
+        wordCard.style.maxHeight =
+            "58px";
+
+
         wordCard.style.transform =
             "translate(-50%, -50%)";
 
@@ -2769,7 +2878,8 @@ wordCard.addEventListener(
 
         if (
             !isDragging ||
-            event.pointerId !== pointerId
+            event.pointerId !==
+                activePointerId
         ) {
 
             return;
@@ -2795,7 +2905,8 @@ wordCard.addEventListener(
     event => {
 
         if (
-            event.pointerId !== pointerId
+            event.pointerId !==
+                activePointerId
         ) {
 
             return;
@@ -2840,7 +2951,7 @@ function finishDrag() {
         false;
 
 
-    pointerId =
+    activePointerId =
         null;
 
 
@@ -2904,7 +3015,7 @@ function getDropTarget(
 
 
 /* =====================================================
-   HIGHLIGHT DROP ZONE
+   HIGHLIGHT DROP TARGET
 ===================================================== */
 
 function highlightDropZone(
@@ -3027,11 +3138,6 @@ function handleCorrectDrop(
         );
 
 
-    /*
-       Base points = 100.
-       Each streak level adds 10.
-    */
-
     const points =
         100 +
         (
@@ -3045,8 +3151,15 @@ function handleCorrectDrop(
 
 
     /*
-       Add word to the target column.
+       Put a matching oval INSIDE
+       the category column.
     */
+
+    const content =
+        targetColumn.querySelector(
+            ".categoryContent"
+        );
+
 
     const sortedWord =
         document.createElement(
@@ -3062,7 +3175,7 @@ function handleCorrectDrop(
         currentWord.word;
 
 
-    targetColumn.appendChild(
+    content.appendChild(
         sortedWord
     );
 
@@ -3073,12 +3186,19 @@ function handleCorrectDrop(
     );
 
 
+    /*
+       Hide the draggable card only
+       after the correctly placed copy
+       has been created.
+    */
+
     wordCard.classList.add(
         "hidden"
     );
 
 
     currentIndex++;
+
 
     updateHUD();
 
@@ -3095,7 +3215,7 @@ function handleCorrectDrop(
             }
 
         },
-        300
+        350
     );
 
 }
@@ -3139,20 +3259,34 @@ function handleIncorrectDrop() {
 
 function returnWordToDock() {
 
-    clearTimeout(
-        returnAnimationTimer
-    );
-
-
     wordCard.classList.remove(
         "dragging"
     );
 
 
-    /*
-       Briefly keep it visible,
-       then put it back at bottom center.
-    */
+    wordCard.style.width =
+        "220px";
+
+
+    wordCard.style.minWidth =
+        "220px";
+
+
+    wordCard.style.maxWidth =
+        "220px";
+
+
+    wordCard.style.height =
+        "58px";
+
+
+    wordCard.style.minHeight =
+        "58px";
+
+
+    wordCard.style.maxHeight =
+        "58px";
+
 
     wordCard.style.left =
         "50%";
@@ -3168,21 +3302,6 @@ function returnWordToDock() {
 
     wordCard.style.transform =
         "translateX(-50%)";
-
-
-    returnAnimationTimer =
-        setTimeout(
-            () => {
-
-                wordCard.style.left =
-                    "50%";
-
-                wordCard.style.bottom =
-                    "38px";
-
-            },
-            20
-        );
 
 }
 
@@ -3351,7 +3470,7 @@ function endGame(
 
 
     /*
-       Finish all words:
+       Completion bonus:
        10 points per remaining second.
     */
 
@@ -3361,7 +3480,8 @@ function endGame(
     ) {
 
         completionBonus =
-            timeLeft * 10;
+            timeLeft *
+            10;
 
 
         score +=
