@@ -1,892 +1,1193 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SortWord</title>
+    <meta charset="UTF-8">
 
-<style>
-/* =========================================================
-   SORTWORD
-   Self-contained HTML / CSS / JavaScript
-   ========================================================= */
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-* {
-    box-sizing: border-box;
-}
+    <title>SortWord | Vocabulary Arcade</title>
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-}
 
-body {
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    <style>
 
-    background:
-        radial-gradient(circle at top, #334155 0%, #111827 48%, #020617 100%);
+        /* =====================================================
+           RESET
+        ===================================================== */
 
-    color: white;
-    overflow: hidden;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-/* =========================================================
-   MAIN APPLICATION
-   ========================================================= */
 
-#app {
-    width: 100%;
-    height: 100vh;
+        html,
+        body {
+            margin: 0;
+            padding: 0;
 
-    display: flex;
-    flex-direction: column;
-}
+            width: 100%;
+            height: 100%;
 
-/* =========================================================
-   HEADER / HUD
-   ========================================================= */
+            overflow: hidden;
+        }
 
-#header {
-    width: 100%;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+        body {
 
-    padding: 14px 20px;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
-    background: rgba(15, 23, 42, 0.94);
+            color: white;
 
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background:
+                radial-gradient(
+                    circle at top,
+                    #334155 0%,
+                    #111827 52%,
+                    #020617 100%
+                );
+        }
 
-    box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.35);
 
-    z-index: 20;
-}
+        /* =====================================================
+           APPLICATION
+        ===================================================== */
 
-#titleArea {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
+        #app {
 
-#gameTitle {
-    margin: 0;
+            width: 100%;
+            height: 100vh;
 
-    font-size: clamp(22px, 3vw, 34px);
-    font-weight: 800;
+            display: flex;
+            flex-direction: column;
+        }
 
-    letter-spacing: 1px;
-}
 
-#listName {
-    font-size: 14px;
-    color: #cbd5e1;
-    max-width: 45vw;
+        /* =====================================================
+           HEADER
+        ===================================================== */
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+        #header {
 
-#hud {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+            width: 100%;
 
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-.hudBox {
-    min-width: 78px;
+            gap: 20px;
 
-    padding: 8px 12px;
+            padding: 12px 18px;
 
-    border-radius: 10px;
+            background:
+                rgba(15, 23, 42, 0.96);
 
-    background: rgba(255, 255, 255, 0.08);
+            border-bottom:
+                2px solid
+                rgba(255, 255, 255, 0.10);
 
-    border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow:
+                0 4px 15px
+                rgba(0, 0, 0, 0.35);
 
-    text-align: center;
-}
+            z-index: 50;
+        }
 
-.hudLabel {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
 
-    color: #94a3b8;
-}
+        #titleArea {
 
-.hudValue {
-    margin-top: 2px;
+            display: flex;
+            flex-direction: column;
 
-    font-size: 20px;
-    font-weight: 800;
+            min-width: 0;
+        }
 
-    color: white;
-}
 
-#timerBox.warning {
-    background: rgba(245, 158, 11, 0.20);
-    border-color: rgba(245, 158, 11, 0.55);
-}
+        #gameTitle {
 
-#timerBox.danger {
-    background: rgba(239, 68, 68, 0.24);
-    border-color: rgba(239, 68, 68, 0.7);
-}
+            margin: 0;
 
-#timerValue {
-    transition: color 0.2s ease;
-}
+            font-size:
+                clamp(
+                    24px,
+                    3vw,
+                    34px
+                );
 
-/* =========================================================
-   GAME AREA
-   ========================================================= */
+            font-weight: 900;
 
-#gameArea {
-    position: relative;
+            letter-spacing: 1px;
+        }
 
-    flex: 1;
 
-    width: 100%;
-    height: 100%;
+        #listName {
 
-    min-height: 0;
+            margin-top: 3px;
 
-    overflow: hidden;
-}
+            max-width: 45vw;
 
-/* =========================================================
-   INSTRUCTION
-   ========================================================= */
+            color: #cbd5e1;
 
-#instructions {
-    position: absolute;
+            font-size: 14px;
 
-    left: 50%;
-    top: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-    transform: translateX(-50%);
 
-    width: min(90%, 850px);
+        /* =====================================================
+           HUD
+        ===================================================== */
 
-    padding: 10px 16px;
+        #hud {
 
-    border-radius: 12px;
+            display: flex;
 
-    background: rgba(15, 23, 42, 0.72);
+            align-items: center;
 
-    border: 1px solid rgba(255, 255, 255, 0.10);
+            justify-content: flex-end;
 
-    color: #e2e8f0;
+            gap: 8px;
 
-    text-align: center;
+            flex-wrap: wrap;
+        }
 
-    font-size: 15px;
 
-    z-index: 5;
+        .hudBox {
 
-    backdrop-filter: blur(5px);
-}
+            min-width: 74px;
 
-/* =========================================================
-   CATEGORY AREA
-   ========================================================= */
+            padding: 7px 10px;
 
-#categoryArea {
-    position: absolute;
+            background:
+                rgba(255, 255, 255, 0.07);
 
-    left: 20px;
-    right: 20px;
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.11);
 
-    top: 78px;
-    bottom: 150px;
+            border-radius: 9px;
 
-    display: grid;
+            text-align: center;
+        }
 
-    gap: 14px;
 
-    align-items: stretch;
+        .hudLabel {
 
-    z-index: 2;
-}
+            font-size: 10px;
 
-.categoryColumn {
-    position: relative;
+            color: #94a3b8;
 
-    min-width: 0;
+            text-transform: uppercase;
 
-    border-radius: 16px;
+            letter-spacing: 0.7px;
+        }
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.09),
-            rgba(255, 255, 255, 0.035)
-        );
 
-    border: 3px dashed rgba(255, 255, 255, 0.24);
+        .hudValue {
 
-    box-shadow:
-        inset 0 0 20px rgba(0, 0, 0, 0.25),
-        0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-top: 2px;
 
-    transition:
-        border-color 0.15s ease,
-        background 0.15s ease,
-        transform 0.15s ease;
-}
+            font-size: 19px;
 
-.categoryColumn.dragOver {
-    border-color: #facc15;
+            font-weight: 900;
+        }
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(250, 204, 21, 0.18),
-            rgba(250, 204, 21, 0.05)
-        );
 
-    transform: scale(1.015);
-}
+        #timerBox.warning {
 
-.categoryHeader {
-    min-height: 62px;
+            background:
+                rgba(245, 158, 11, 0.18);
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            border-color:
+                rgba(245, 158, 11, 0.5);
+        }
 
-    padding: 10px;
 
-    border-radius: 12px 12px 0 0;
+        #timerBox.danger {
 
-    background: rgba(15, 23, 42, 0.72);
+            background:
+                rgba(239, 68, 68, 0.22);
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            border-color:
+                rgba(239, 68, 68, 0.7);
+        }
 
-    text-align: center;
 
-    font-size: clamp(15px, 2vw, 23px);
+        /* =====================================================
+           GAME AREA
+        ===================================================== */
 
-    font-weight: 800;
+        #gameArea {
 
-    color: white;
+            position: relative;
 
-    word-break: break-word;
-}
+            flex: 1;
 
-.categoryHint {
-    position: absolute;
+            width: 100%;
+            height: 100%;
 
-    left: 15px;
-    right: 15px;
+            min-height: 0;
 
-    bottom: 18px;
+            overflow: hidden;
+        }
 
-    text-align: center;
 
-    color: rgba(255, 255, 255, 0.32);
+        /* =====================================================
+           INSTRUCTIONS
+        ===================================================== */
 
-    font-size: 13px;
+        #instructions {
 
-    pointer-events: none;
-}
+            position: absolute;
 
-/* =========================================================
-   DROPPED WORDS
-   ========================================================= */
+            top: 14px;
+            left: 50%;
 
-.sortedWord {
-    display: inline-flex;
+            transform:
+                translateX(-50%);
 
-    align-items: center;
-    justify-content: center;
+            width: min(
+                90%,
+                850px
+            );
 
-    margin: 6px;
+            padding: 9px 15px;
 
-    min-height: 40px;
+            border-radius: 11px;
 
-    padding: 8px 14px;
+            background:
+                rgba(15, 23, 42, 0.70);
 
-    border-radius: 999px;
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.10);
 
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff,
-            #dbeafe
-        );
+            color: #e2e8f0;
 
-    color: #0f172a;
+            text-align: center;
 
-    font-size: 14px;
+            font-size: 14px;
 
-    font-weight: 700;
+            z-index: 5;
+        }
 
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.22);
 
-    animation:
-        popIn 0.18s ease-out;
-}
+        /* =====================================================
+           CATEGORY AREA
+        ===================================================== */
 
-@keyframes popIn {
-    from {
-        transform: scale(0.75);
-        opacity: 0;
-    }
+        #categoryArea {
 
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+            position: absolute;
 
-/* =========================================================
-   WORD DOCK
-   ========================================================= */
+            top: 67px;
+            left: 18px;
+            right: 18px;
 
-#wordDock {
-    position: absolute;
+            bottom: 155px;
 
-    left: 0;
-    right: 0;
-    bottom: 0;
+            display: grid;
 
-    height: 145px;
+            gap: 13px;
 
-    display: flex;
+            align-items: stretch;
 
-    align-items: center;
-    justify-content: center;
+            z-index: 2;
+        }
 
-    padding: 18px;
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(2, 6, 23, 0.15),
-            rgba(2, 6, 23, 0.92)
-        );
+        .categoryColumn {
 
-    border-top: 2px solid rgba(255, 255, 255, 0.08);
+            position: relative;
 
-    z-index: 10;
-}
+            min-width: 0;
 
-#wordDockLabel {
-    position: absolute;
+            border:
+                3px dashed
+                rgba(255, 255, 255, 0.22);
 
-    top: 7px;
+            border-radius: 16px;
 
-    font-size: 11px;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.025)
+                );
 
-    text-transform: uppercase;
+            box-shadow:
+                inset
+                0 0 20px
+                rgba(0, 0, 0, 0.20),
 
-    letter-spacing: 1px;
+                0 7px 18px
+                rgba(0, 0, 0, 0.18);
 
-    color: #94a3b8;
-}
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease,
+                transform 0.15s ease;
+        }
 
-#wordCard {
-    position: absolute;
 
-    left: 50%;
-    top: 50%;
+        .categoryColumn.dragOver {
 
-    transform: translate(-50%, -50%);
+            border-color: #facc15;
 
-    display: flex;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(250, 204, 21, 0.20),
+                    rgba(250, 204, 21, 0.06)
+                );
 
-    align-items: center;
-    justify-content: center;
+            transform:
+                scale(1.012);
+        }
 
-    min-width: 160px;
 
-    max-width: min(70vw, 550px);
+        .categoryHeader {
 
-    min-height: 58px;
+            min-height: 60px;
 
-    padding: 12px 28px;
+            display: flex;
 
-    border-radius: 999px;
+            align-items: center;
+            justify-content: center;
 
-    background:
-        linear-gradient(
-            135deg,
-            #f8fafc,
-            #cbd5e1
-        );
+            padding: 9px;
 
-    border: 4px solid #ffffff;
+            background:
+                rgba(15, 23, 42, 0.72);
 
-    color: #0f172a;
+            border-radius:
+                12px 12px 0 0;
 
-    font-size: clamp(18px, 3vw, 27px);
+            border-bottom:
+                1px solid
+                rgba(255, 255, 255, 0.11);
 
-    font-weight: 900;
+            text-align: center;
 
-    text-align: center;
+            font-size:
+                clamp(
+                    15px,
+                    2vw,
+                    22px
+                );
 
-    cursor: grab;
+            font-weight: 900;
 
-    user-select: none;
+            word-break: break-word;
+        }
 
-    touch-action: none;
 
-    box-shadow:
-        0 10px 24px rgba(0, 0, 0, 0.38);
+        .categoryHint {
 
-    z-index: 50;
+            position: absolute;
 
-    transition:
-        box-shadow 0.15s ease,
-        transform 0.15s ease;
-}
+            left: 12px;
+            right: 12px;
 
-#wordCard:hover {
-    box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.48);
-}
+            bottom: 18px;
 
-#wordCard.dragging {
-    cursor: grabbing;
+            text-align: center;
 
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.55);
+            font-size: 12px;
 
-    transform:
-        translate(-50%, -50%)
-        scale(1.05);
-}
+            color:
+                rgba(255, 255, 255, 0.26);
 
-#wordCard.hidden {
-    display: none;
-}
+            pointer-events: none;
+        }
 
-/* =========================================================
-   FEEDBACK
-   ========================================================= */
 
-#feedback {
-    position: absolute;
+        /* =====================================================
+           SORTED WORDS
+        ===================================================== */
 
-    left: 50%;
-    top: 58%;
+        .sortedWord {
 
-    transform:
-        translate(-50%, -50%)
-        scale(0.8);
+            display: inline-flex;
 
-    padding: 12px 22px;
+            align-items: center;
+            justify-content: center;
 
-    border-radius: 999px;
+            margin: 5px;
 
-    font-size: 22px;
+            min-height: 38px;
 
-    font-weight: 900;
+            padding: 7px 13px;
 
-    pointer-events: none;
+            border-radius: 999px;
 
-    opacity: 0;
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #dbeafe
+                );
 
-    z-index: 100;
+            color: #0f172a;
 
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-}
+            font-size: 13px;
 
-#feedback.show {
-    opacity: 1;
+            font-weight: 800;
 
-    transform:
-        translate(-50%, -50%)
-        scale(1);
-}
+            box-shadow:
+                0 4px 9px
+                rgba(0, 0, 0, 0.20);
 
-#feedback.correct {
-    background: rgba(22, 163, 74, 0.95);
-    color: white;
-}
+            animation:
+                sortedPop 0.18s ease-out;
+        }
 
-#feedback.incorrect {
-    background: rgba(220, 38, 38, 0.95);
-    color: white;
-}
 
-/* =========================================================
-   LOADING / ERROR SCREEN
-   ========================================================= */
+        @keyframes sortedPop {
 
-#statusScreen {
-    position: absolute;
+            from {
 
-    inset: 0;
+                opacity: 0;
 
-    display: flex;
+                transform:
+                    scale(0.7);
+            }
 
-    align-items: center;
-    justify-content: center;
+            to {
 
-    padding: 30px;
+                opacity: 1;
 
-    background:
-        rgba(2, 6, 23, 0.94);
+                transform:
+                    scale(1);
+            }
+        }
 
-    z-index: 200;
-}
 
-#statusBox {
-    width: min(90%, 650px);
+        /* =====================================================
+           BOTTOM WORD DOCK
+        ===================================================== */
 
-    padding: 32px;
+        #wordDock {
 
-    border-radius: 18px;
+            position: fixed;
 
-    background:
-        linear-gradient(
-            180deg,
-            #1e293b,
-            #0f172a
-        );
+            left: 0;
+            right: 0;
+            bottom: 0;
 
-    border: 1px solid rgba(255, 255, 255, 0.12);
+            height: 145px;
 
-    box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.45);
+            display: flex;
 
-    text-align: center;
-}
+            align-items: center;
+            justify-content: center;
 
-#statusTitle {
-    margin: 0 0 12px;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(2, 6, 23, 0.08),
+                    rgba(2, 6, 23, 0.95)
+                );
 
-    font-size: 28px;
+            border-top:
+                2px solid
+                rgba(255, 255, 255, 0.08);
 
-    font-weight: 900;
-}
+            z-index: 20;
 
-#statusMessage {
-    margin: 0;
+            pointer-events: none;
+        }
 
-    color: #cbd5e1;
 
-    font-size: 16px;
+        #wordDockLabel {
 
-    line-height: 1.6;
-}
+            position: absolute;
 
-/* =========================================================
-   GAME OVER
-   ========================================================= */
+            top: 8px;
 
-#gameOver {
-    position: absolute;
+            font-size: 11px;
 
-    inset: 0;
+            color: #94a3b8;
 
-    display: none;
+            text-transform: uppercase;
 
-    align-items: center;
-    justify-content: center;
+            letter-spacing: 1px;
+        }
 
-    padding: 25px;
 
-    background:
-        rgba(2, 6, 23, 0.92);
+        /* =====================================================
+           WORD CARD
 
-    z-index: 300;
-}
+           IMPORTANT:
+           The card is fixed to the viewport.
+           This prevents it from disappearing while dragging.
+        ===================================================== */
 
-#gameOver.show {
-    display: flex;
-}
+        #wordCard {
 
-#gameOverBox {
-    width: min(92%, 700px);
+            position: fixed;
 
-    padding: 34px;
+            left: 50%;
+            bottom: 38px;
 
-    border-radius: 22px;
+            transform:
+                translateX(-50%);
 
-    background:
-        linear-gradient(
-            180deg,
-            #1e293b,
-            #0f172a
-        );
+            min-width: 170px;
 
-    border: 2px solid rgba(255, 255, 255, 0.12);
+            max-width:
+                min(
+                    70vw,
+                    560px
+                );
 
-    box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.5);
+            min-height: 60px;
 
-    text-align: center;
-}
+            display: flex;
 
-#gameOverTitle {
-    margin: 0;
+            align-items: center;
+            justify-content: center;
 
-    font-size: clamp(34px, 6vw, 55px);
+            padding:
+                12px 28px;
 
-    font-weight: 900;
-}
+            border-radius: 999px;
 
-#gameOverList {
-    margin: 10px 0 25px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #dbeafe
+                );
 
-    color: #cbd5e1;
+            border:
+                4px solid
+                #ffffff;
 
-    font-size: 17px;
-}
+            color: #0f172a;
 
-#resultsGrid {
-    display: grid;
+            font-size:
+                clamp(
+                    18px,
+                    2.8vw,
+                    27px
+                );
 
-    grid-template-columns:
-        repeat(4, 1fr);
+            font-weight: 900;
 
-    gap: 12px;
+            text-align: center;
 
-    margin-bottom: 25px;
-}
+            user-select: none;
 
-.resultBox {
-    padding: 14px;
+            touch-action: none;
 
-    border-radius: 12px;
+            cursor: grab;
 
-    background: rgba(255, 255, 255, 0.07);
+            box-shadow:
+                0 10px 28px
+                rgba(0, 0, 0, 0.42);
 
-    border: 1px solid rgba(255, 255, 255, 0.10);
-}
+            z-index: 1000;
 
-.resultLabel {
-    font-size: 11px;
+            pointer-events: auto;
 
-    color: #94a3b8;
+            white-space: normal;
 
-    text-transform: uppercase;
+            transition:
+                box-shadow 0.12s ease,
+                transform 0.12s ease;
+        }
 
-    letter-spacing: 0.8px;
-}
 
-.resultValue {
-    margin-top: 5px;
+        #wordCard:hover {
 
-    font-size: 27px;
+            box-shadow:
+                0 13px 32px
+                rgba(0, 0, 0, 0.50);
+        }
 
-    font-weight: 900;
-}
 
-#gameOverMessage {
-    margin-bottom: 25px;
+        #wordCard.dragging {
 
-    color: #e2e8f0;
+            cursor: grabbing;
 
-    font-size: 16px;
-}
+            box-shadow:
+                0 20px 42px
+                rgba(0, 0, 0, 0.58);
 
-#buttonRow {
-    display: flex;
+            transform:
+                translate(-50%, -50%)
+                scale(1.06);
+        }
 
-    justify-content: center;
 
-    gap: 12px;
+        #wordCard.hidden {
 
-    flex-wrap: wrap;
-}
+            display: none;
+        }
 
-.actionButton {
-    min-width: 145px;
 
-    padding: 13px 22px;
+        /* =====================================================
+           FEEDBACK
+        ===================================================== */
 
-    border: none;
+        #feedback {
 
-    border-radius: 10px;
+            position: fixed;
 
-    font-size: 16px;
+            left: 50%;
+            top: 53%;
 
-    font-weight: 800;
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(0.8);
 
-    cursor: pointer;
+            padding:
+                11px 22px;
 
-    transition:
-        transform 0.15s ease,
-        filter 0.15s ease;
-}
+            border-radius: 999px;
 
-.actionButton:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.08);
-}
+            font-size: 21px;
 
-#playAgainButton {
-    background: #2563eb;
+            font-weight: 900;
 
-    color: white;
-}
+            opacity: 0;
 
-#libraryButton {
-    background: white;
+            pointer-events: none;
 
-    color: #111827;
-}
+            z-index: 1100;
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+            transition:
+                opacity 0.18s ease,
+                transform 0.18s ease;
+        }
 
-@media (max-width: 800px) {
 
-    body {
-        overflow: auto;
-    }
+        #feedback.show {
 
-    #app {
-        min-height: 100vh;
-        height: auto;
-    }
+            opacity: 1;
 
-    #header {
-        align-items: flex-start;
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(1);
+        }
 
-        flex-direction: column;
 
-        gap: 10px;
-    }
+        #feedback.correct {
 
-    #listName {
-        max-width: 90vw;
-    }
+            background:
+                rgba(22, 163, 74, 0.96);
 
-    #hud {
-        width: 100%;
+            color: white;
+        }
 
-        justify-content: space-between;
-    }
 
-    .hudBox {
-        flex: 1;
+        #feedback.incorrect {
 
-        min-width: 0;
-    }
+            background:
+                rgba(220, 38, 38, 0.96);
 
-    #gameArea {
-        height: calc(100vh - 137px);
+            color: white;
+        }
 
-        min-height: 600px;
-    }
 
-    #instructions {
-        top: 10px;
+        /* =====================================================
+           LOADING / ERROR
+        ===================================================== */
 
-        font-size: 13px;
-    }
+        #statusScreen {
 
-    #categoryArea {
-        left: 10px;
-        right: 10px;
+            position: fixed;
 
-        top: 65px;
-        bottom: 145px;
+            inset: 0;
 
-        gap: 8px;
-    }
+            display: flex;
 
-    .categoryHeader {
-        min-height: 54px;
+            align-items: center;
+            justify-content: center;
 
-        font-size: 13px;
-    }
+            padding: 25px;
 
-    .categoryHint {
-        display: none;
-    }
+            background:
+                rgba(2, 6, 23, 0.95);
 
-    #wordDock {
-        height: 135px;
-    }
+            z-index: 2000;
+        }
 
-    #wordCard {
-        max-width: 85vw;
 
-        font-size: 20px;
+        #statusBox {
 
-        padding: 11px 22px;
-    }
+            width:
+                min(
+                    90%,
+                    650px
+                );
 
-    #resultsGrid {
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
-}
+            padding: 32px;
 
-@media (max-width: 500px) {
+            border-radius: 18px;
 
-    #hud {
-        gap: 5px;
-    }
+            background:
+                linear-gradient(
+                    180deg,
+                    #1e293b,
+                    #0f172a
+                );
 
-    .hudBox {
-        padding: 6px;
-    }
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.12);
 
-    .hudValue {
-        font-size: 17px;
-    }
+            box-shadow:
+                0 20px 55px
+                rgba(0, 0, 0, 0.48);
 
-    .hudLabel {
-        font-size: 9px;
-    }
+            text-align: center;
+        }
 
-    #categoryArea {
-        display: flex;
 
-        flex-direction: row;
+        #statusTitle {
 
-        overflow-x: auto;
+            margin: 0 0 12px;
 
-        padding-bottom: 5px;
-    }
+            font-size: 28px;
 
-    .categoryColumn {
-        flex: 1 0 150px;
+            font-weight: 900;
+        }
 
-        min-width: 150px;
-    }
 
-    #gameOverBox {
-        padding: 25px 18px;
-    }
-}
-</style>
+        #statusMessage {
+
+            margin: 0;
+
+            color: #cbd5e1;
+
+            font-size: 16px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           GAME OVER
+        ===================================================== */
+
+        #gameOver {
+
+            position: fixed;
+
+            inset: 0;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+
+            background:
+                rgba(2, 6, 23, 0.93);
+
+            z-index: 3000;
+        }
+
+
+        #gameOver.show {
+
+            display: flex;
+        }
+
+
+        #gameOverBox {
+
+            width:
+                min(
+                    92%,
+                    720px
+                );
+
+            padding:
+                32px;
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #1e293b,
+                    #0f172a
+                );
+
+            border:
+                2px solid
+                rgba(255, 255, 255, 0.11);
+
+            box-shadow:
+                0 25px 70px
+                rgba(0, 0, 0, 0.52);
+
+            text-align: center;
+        }
+
+
+        #gameOverTitle {
+
+            margin: 0;
+
+            font-size:
+                clamp(
+                    34px,
+                    6vw,
+                    54px
+                );
+
+            font-weight: 900;
+        }
+
+
+        #gameOverList {
+
+            margin:
+                10px 0 24px;
+
+            color: #cbd5e1;
+
+            font-size: 17px;
+        }
+
+
+        #resultsGrid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    1fr
+                );
+
+            gap: 11px;
+
+            margin-bottom: 23px;
+        }
+
+
+        .resultBox {
+
+            padding: 13px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(255, 255, 255, 0.07);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.09);
+        }
+
+
+        .resultLabel {
+
+            color: #94a3b8;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.7px;
+        }
+
+
+        .resultValue {
+
+            margin-top: 5px;
+
+            font-size: 27px;
+
+            font-weight: 900;
+        }
+
+
+        #gameOverMessage {
+
+            margin-bottom: 24px;
+
+            color: #e2e8f0;
+
+            font-size: 16px;
+
+            line-height: 1.5;
+        }
+
+
+        #buttonRow {
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .actionButton {
+
+            min-width: 145px;
+
+            padding:
+                13px 22px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                filter 0.15s ease;
+        }
+
+
+        .actionButton:hover {
+
+            transform:
+                translateY(-2px);
+
+            filter:
+                brightness(1.08);
+        }
+
+
+        #playAgainButton {
+
+            background:
+                #2563eb;
+
+            color: white;
+        }
+
+
+        #libraryButton {
+
+            background: white;
+
+            color: #111827;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            #header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 9px;
+
+                padding:
+                    10px 12px;
+            }
+
+
+            #listName {
+
+                max-width: 85vw;
+            }
+
+
+            #hud {
+
+                width: 100%;
+
+                justify-content:
+                    space-between;
+            }
+
+
+            .hudBox {
+
+                flex: 1;
+
+                min-width: 0;
+            }
+
+
+            #gameArea {
+
+                height:
+                    calc(
+                        100vh - 126px
+                    );
+            }
+
+
+            #instructions {
+
+                top: 9px;
+
+                font-size: 12px;
+            }
+
+
+            #categoryArea {
+
+                top: 56px;
+
+                left: 9px;
+                right: 9px;
+
+                bottom: 138px;
+
+                gap: 7px;
+            }
+
+
+            .categoryHeader {
+
+                min-height: 51px;
+
+                font-size: 13px;
+            }
+
+
+            #wordDock {
+
+                height: 128px;
+            }
+
+
+            #wordCard {
+
+                bottom: 32px;
+
+                max-width: 84vw;
+
+                min-height: 55px;
+
+                padding:
+                    10px 21px;
+
+                font-size: 20px;
+            }
+
+
+            #resultsGrid {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+            }
+
+        }
+
+
+        @media (max-width: 520px) {
+
+            body {
+
+                overflow: hidden;
+            }
+
+
+            #hud {
+
+                gap: 4px;
+            }
+
+
+            .hudBox {
+
+                padding:
+                    6px 4px;
+            }
+
+
+            .hudLabel {
+
+                font-size: 8px;
+            }
+
+
+            .hudValue {
+
+                font-size: 16px;
+            }
+
+
+            #categoryArea {
+
+                display: flex;
+
+                overflow-x: auto;
+
+                padding-bottom: 4px;
+            }
+
+
+            .categoryColumn {
+
+                flex:
+                    1 0 145px;
+
+                min-width: 145px;
+            }
+
+
+            #gameOverBox {
+
+                padding:
+                    24px 16px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
+
 <div id="app">
+
 
     <!-- =====================================================
          HEADER
-         ===================================================== -->
+    ===================================================== -->
 
     <header id="header">
+
 
         <div id="titleArea">
 
@@ -894,15 +1195,19 @@ body {
                 SortWord
             </h1>
 
+
             <div id="listName">
                 Loading vocabulary...
             </div>
 
         </div>
 
+
         <div id="hud">
 
+
             <div class="hudBox">
+
                 <div class="hudLabel">
                     Score
                 </div>
@@ -913,9 +1218,12 @@ body {
                 >
                     0
                 </div>
+
             </div>
 
+
             <div class="hudBox">
+
                 <div class="hudLabel">
                     Accuracy
                 </div>
@@ -926,9 +1234,12 @@ body {
                 >
                     100%
                 </div>
+
             </div>
 
+
             <div class="hudBox">
+
                 <div class="hudLabel">
                     Streak
                 </div>
@@ -939,12 +1250,15 @@ body {
                 >
                     0
                 </div>
+
             </div>
+
 
             <div
                 class="hudBox"
                 id="timerBox"
             >
+
                 <div class="hudLabel">
                     Time
                 </div>
@@ -955,9 +1269,12 @@ body {
                 >
                     60
                 </div>
+
             </div>
 
+
             <div class="hudBox">
+
                 <div class="hudLabel">
                     Words
                 </div>
@@ -968,203 +1285,235 @@ body {
                 >
                     0/0
                 </div>
+
             </div>
 
+
         </div>
+
 
     </header>
 
 
     <!-- =====================================================
          GAME AREA
-         ===================================================== -->
+    ===================================================== -->
 
     <main id="gameArea">
 
+
         <div id="instructions">
+
             Drag each word into the category where it belongs.
+
         </div>
 
+
+        <!-- =============================================
+             CATEGORY COLUMNS
+        ============================================== -->
 
         <div id="categoryArea">
-            <!-- Categories generated here -->
         </div>
 
+
+        <!-- =============================================
+             FEEDBACK
+        ============================================== -->
 
         <div id="feedback">
         </div>
 
 
-        <!-- =================================================
-             WORD DOCK
-             ================================================= -->
-
-        <div id="wordDock">
-
-            <div id="wordDockLabel">
-                Drag this word
-            </div>
-
-            <div
-                id="wordCard"
-                tabindex="0"
-            >
-                Loading...
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             LOADING / ERROR STATUS
-             ================================================= -->
-
-        <div id="statusScreen">
-
-            <div id="statusBox">
-
-                <h2 id="statusTitle">
-                    Loading SortWord
-                </h2>
-
-                <p id="statusMessage">
-                    Loading your vocabulary set...
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             GAME OVER
-             ================================================= -->
-
-        <div id="gameOver">
-
-            <div id="gameOverBox">
-
-                <h2 id="gameOverTitle">
-                    Round Complete!
-                </h2>
-
-                <div id="gameOverList">
-                    Vocabulary Set
-                </div>
-
-
-                <div id="resultsGrid">
-
-                    <div class="resultBox">
-
-                        <div class="resultLabel">
-                            Score
-                        </div>
-
-                        <div
-                            class="resultValue"
-                            id="finalScore"
-                        >
-                            0
-                        </div>
-
-                    </div>
-
-
-                    <div class="resultBox">
-
-                        <div class="resultLabel">
-                            Accuracy
-                        </div>
-
-                        <div
-                            class="resultValue"
-                            id="finalAccuracy"
-                        >
-                            0%
-                        </div>
-
-                    </div>
-
-
-                    <div class="resultBox">
-
-                        <div class="resultLabel">
-                            Correct
-                        </div>
-
-                        <div
-                            class="resultValue"
-                            id="finalCorrect"
-                        >
-                            0
-                        </div>
-
-                    </div>
-
-
-                    <div class="resultBox">
-
-                        <div class="resultLabel">
-                            Best Streak
-                        </div>
-
-                        <div
-                            class="resultValue"
-                            id="finalStreak"
-                        >
-                            0
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div id="gameOverMessage">
-                </div>
-
-
-                <div id="buttonRow">
-
-                    <button
-                        type="button"
-                        class="actionButton"
-                        id="playAgainButton"
-                    >
-                        PLAY AGAIN
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="actionButton"
-                        id="libraryButton"
-                    >
-                        LIBRARY
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
     </main>
+
 
 </div>
 
 
-<!-- =========================================================
-     FIREBASE + GAME CODE
-     ========================================================= -->
+<!-- =====================================================
+     WORD DOCK
+     Kept outside the game area because the word card
+     uses fixed positioning while dragging.
+===================================================== -->
+
+<div id="wordDock">
+
+    <div id="wordDockLabel">
+        Drag this word
+    </div>
+
+
+    <div
+        id="wordCard"
+        tabindex="0"
+    >
+        Loading...
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     LOADING / ERROR SCREEN
+===================================================== -->
+
+<div id="statusScreen">
+
+    <div id="statusBox">
+
+        <h2 id="statusTitle">
+            Loading SortWord
+        </h2>
+
+
+        <p id="statusMessage">
+            Loading your vocabulary set...
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     GAME OVER
+===================================================== -->
+
+<div id="gameOver">
+
+    <div id="gameOverBox">
+
+
+        <h2 id="gameOverTitle">
+            Round Complete!
+        </h2>
+
+
+        <div id="gameOverList">
+            Vocabulary Set
+        </div>
+
+
+        <div id="resultsGrid">
+
+
+            <div class="resultBox">
+
+                <div class="resultLabel">
+                    Score
+                </div>
+
+                <div
+                    class="resultValue"
+                    id="finalScore"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="resultBox">
+
+                <div class="resultLabel">
+                    Accuracy
+                </div>
+
+                <div
+                    class="resultValue"
+                    id="finalAccuracy"
+                >
+                    0%
+                </div>
+
+            </div>
+
+
+            <div class="resultBox">
+
+                <div class="resultLabel">
+                    Correct
+                </div>
+
+                <div
+                    class="resultValue"
+                    id="finalCorrect"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="resultBox">
+
+                <div class="resultLabel">
+                    Best Streak
+                </div>
+
+                <div
+                    class="resultValue"
+                    id="finalStreak"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div id="gameOverMessage">
+        </div>
+
+
+        <div id="buttonRow">
+
+
+            <button
+                type="button"
+                class="actionButton"
+                id="playAgainButton"
+            >
+                PLAY AGAIN
+            </button>
+
+
+            <button
+                type="button"
+                class="actionButton"
+                id="libraryButton"
+            >
+                LIBRARY
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FIREBASE / GAME JAVASCRIPT
+===================================================== -->
 
 <script type="module">
+
+
+/* =====================================================
+   FIREBASE
+===================================================== */
 
 import {
     initializeApp
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
 import {
@@ -1172,13 +1521,13 @@ import {
     doc,
     getDoc
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-/* =========================================================
+/* =====================================================
    FIREBASE CONFIG
-   Same Firebase project used by Vocabulary Arcade.
-   ========================================================= */
+===================================================== */
 
 const firebaseConfig = {
 
@@ -1203,119 +1552,187 @@ const firebaseConfig = {
 };
 
 
-/* =========================================================
-   FIREBASE INITIALIZATION
-   ========================================================= */
-
 const app =
-    initializeApp(firebaseConfig);
+    initializeApp(
+        firebaseConfig
+    );
+
 
 const db =
-    getFirestore(app);
+    getFirestore(
+        app
+    );
 
 
-/* =========================================================
+/* =====================================================
    CONSTANTS
-   ========================================================= */
+===================================================== */
 
 const COLLECTION_NAME =
     "vocabSets";
 
+
 const MAX_CATEGORIES =
     5;
+
 
 const MIN_CATEGORIES =
     2;
 
+
 const MAX_WORDS =
     20;
+
 
 const ROUND_TIME =
     60;
 
 
-/* =========================================================
+/* =====================================================
    DOM REFERENCES
-   ========================================================= */
+===================================================== */
 
 const listNameEl =
-    document.getElementById("listName");
+    document.getElementById(
+        "listName"
+    );
+
 
 const scoreValue =
-    document.getElementById("scoreValue");
+    document.getElementById(
+        "scoreValue"
+    );
+
 
 const accuracyValue =
-    document.getElementById("accuracyValue");
+    document.getElementById(
+        "accuracyValue"
+    );
+
 
 const streakValue =
-    document.getElementById("streakValue");
+    document.getElementById(
+        "streakValue"
+    );
+
 
 const timerValue =
-    document.getElementById("timerValue");
+    document.getElementById(
+        "timerValue"
+    );
+
 
 const timerBox =
-    document.getElementById("timerBox");
+    document.getElementById(
+        "timerBox"
+    );
+
 
 const wordsValue =
-    document.getElementById("wordsValue");
+    document.getElementById(
+        "wordsValue"
+    );
+
 
 const categoryArea =
-    document.getElementById("categoryArea");
+    document.getElementById(
+        "categoryArea"
+    );
+
 
 const wordCard =
-    document.getElementById("wordCard");
+    document.getElementById(
+        "wordCard"
+    );
+
 
 const feedback =
-    document.getElementById("feedback");
+    document.getElementById(
+        "feedback"
+    );
+
 
 const statusScreen =
-    document.getElementById("statusScreen");
+    document.getElementById(
+        "statusScreen"
+    );
+
 
 const statusTitle =
-    document.getElementById("statusTitle");
+    document.getElementById(
+        "statusTitle"
+    );
+
 
 const statusMessage =
-    document.getElementById("statusMessage");
+    document.getElementById(
+        "statusMessage"
+    );
+
 
 const gameOver =
-    document.getElementById("gameOver");
+    document.getElementById(
+        "gameOver"
+    );
+
 
 const gameOverList =
-    document.getElementById("gameOverList");
+    document.getElementById(
+        "gameOverList"
+    );
+
 
 const finalScore =
-    document.getElementById("finalScore");
+    document.getElementById(
+        "finalScore"
+    );
+
 
 const finalAccuracy =
-    document.getElementById("finalAccuracy");
+    document.getElementById(
+        "finalAccuracy"
+    );
+
 
 const finalCorrect =
-    document.getElementById("finalCorrect");
+    document.getElementById(
+        "finalCorrect"
+    );
+
 
 const finalStreak =
-    document.getElementById("finalStreak");
+    document.getElementById(
+        "finalStreak"
+    );
+
 
 const gameOverMessage =
-    document.getElementById("gameOverMessage");
+    document.getElementById(
+        "gameOverMessage"
+    );
+
 
 const playAgainButton =
-    document.getElementById("playAgainButton");
+    document.getElementById(
+        "playAgainButton"
+    );
+
 
 const libraryButton =
-    document.getElementById("libraryButton");
+    document.getElementById(
+        "libraryButton"
+    );
 
 
-/* =========================================================
+/* =====================================================
    GAME STATE
-   ========================================================= */
+===================================================== */
 
 let sourceVocabulary = [];
 
 let roundVocabulary = [];
 
 let categories = [];
-
-let categoryMap = new Map();
 
 let currentIndex = 0;
 
@@ -1329,57 +1746,90 @@ let streak = 0;
 
 let bestStreak = 0;
 
-let timeLeft = ROUND_TIME;
+let timeLeft =
+    ROUND_TIME;
 
-let timerInterval = null;
+let timerInterval =
+    null;
 
-let gameIsRunning = false;
+let gameIsRunning =
+    false;
 
-let currentWord = null;
-
-let isDragging = false;
-
-let dragOffsetX = 0;
-
-let dragOffsetY = 0;
+let currentWord =
+    null;
 
 
-/* =========================================================
-   GET SET ID
-   ========================================================= */
+/* =====================================================
+   DRAG STATE
+===================================================== */
+
+let isDragging =
+    false;
+
+
+let pointerId =
+    null;
+
+
+let dragOffsetX =
+    0;
+
+
+let dragOffsetY =
+    0;
+
+
+let returnAnimationTimer =
+    null;
+
+
+/* =====================================================
+   URL
+===================================================== */
 
 const params =
     new URLSearchParams(
         window.location.search
     );
 
+
 const setId =
     params.get("id") ||
     params.get("set");
 
 
-/* =========================================================
-   HELPER: NORMALIZE TEXT
-   ========================================================= */
+/* =====================================================
+   NORMALIZE TEXT
+===================================================== */
 
-function normalizeText(value) {
+function normalizeText(
+    value
+) {
 
-    return String(value || "")
+    return String(
+        value || ""
+    )
         .trim()
-        .replace(/\s+/g, " ")
+        .replace(
+            /\s+/g,
+            " "
+        )
         .toLowerCase();
 
 }
 
 
-/* =========================================================
-   HELPER: SHUFFLE
-   ========================================================= */
+/* =====================================================
+   SHUFFLE
+===================================================== */
 
-function shuffle(array) {
+function shuffle(
+    array
+) {
 
     const copy =
         [...array];
+
 
     for (
         let i = copy.length - 1;
@@ -1389,40 +1839,53 @@ function shuffle(array) {
 
         const j =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
+
 
         [
             copy[i],
             copy[j]
-        ] = [
+        ] =
+        [
             copy[j],
             copy[i]
         ];
 
     }
 
+
     return copy;
+
 }
 
 
-/* =========================================================
-   FIREBASE LOAD
-   ========================================================= */
+/* =====================================================
+   LOAD FIREBASE SET
+===================================================== */
 
-async function loadVocabularySet(id) {
+async function loadVocabularySet(
+    id
+) {
 
-    const ref =
+    const reference =
         doc(
             db,
             COLLECTION_NAME,
             id
         );
 
-    const snapshot =
-        await getDoc(ref);
 
-    if (!snapshot.exists()) {
+    const snapshot =
+        await getDoc(
+            reference
+        );
+
+
+    if (
+        !snapshot.exists()
+    ) {
 
         throw new Error(
             "Vocabulary set not found."
@@ -1430,25 +1893,23 @@ async function loadVocabularySet(id) {
 
     }
 
+
     const data =
         snapshot.data();
 
 
-    let items = [];
+    let items =
+        [];
 
 
     /*
-       Current Vocabulary Arcade format:
-       items: [
-           {
-               word: "...",
-               definition: "..."
-           }
-       ]
+       Current format.
     */
 
     if (
-        Array.isArray(data.items)
+        Array.isArray(
+            data.items
+        )
     ) {
 
         items =
@@ -1458,13 +1919,13 @@ async function loadVocabularySet(id) {
 
 
     /*
-       Legacy format:
-       terms may be an array
-       or JSON string.
+       Legacy format.
     */
 
     else if (
-        Array.isArray(data.terms)
+        Array.isArray(
+            data.terms
+        )
     ) {
 
         items =
@@ -1472,8 +1933,10 @@ async function loadVocabularySet(id) {
 
     }
 
+
     else if (
-        typeof data.terms === "string"
+        typeof data.terms ===
+        "string"
     ) {
 
         try {
@@ -1484,7 +1947,8 @@ async function loadVocabularySet(id) {
                 );
 
         }
-        catch (error) {
+
+        catch {
 
             throw new Error(
                 "The vocabulary list contains invalid data."
@@ -1501,57 +1965,58 @@ async function loadVocabularySet(id) {
             data.title ||
             "Vocabulary Set",
 
-        items:
-            items
+        items
 
     };
 
 }
 
 
-/* =========================================================
+/* =====================================================
    VALIDATE VOCABULARY
-   ========================================================= */
+===================================================== */
 
-function validateVocabulary(items) {
+function validateVocabulary(
+    items
+) {
 
     if (
-        !Array.isArray(items)
+        !Array.isArray(
+            items
+        )
     ) {
 
         throw new Error(
-            "The vocabulary data is not in a usable format."
+            "The vocabulary data is not usable."
         );
 
     }
 
 
-    /*
-       Keep only entries containing
-       both a word and a category.
-    */
-
     const cleaned =
         items
-            .map(item => ({
+            .map(
+                item => ({
 
-                word:
-                    String(
-                        item?.word ||
-                        ""
-                    ).trim(),
+                    word:
+                        String(
+                            item?.word ||
+                            ""
+                        ).trim(),
 
-                category:
-                    String(
-                        item?.definition ||
-                        item?.meaning ||
-                        ""
-                    ).trim()
+                    category:
+                        String(
+                            item?.definition ||
+                            item?.meaning ||
+                            ""
+                        ).trim()
 
-            }))
-            .filter(item =>
-                item.word &&
-                item.category
+                })
+            )
+            .filter(
+                item =>
+                    item.word &&
+                    item.category
             );
 
 
@@ -1567,68 +2032,75 @@ function validateVocabulary(items) {
 
 
     /*
-       Build unique categories.
-       Categories are compared case-insensitively.
+       Build category list.
+
+       Comparison is case-insensitive,
+       while the original display text
+       is preserved.
     */
 
-    const categoryEntries =
+    const categoryMap =
         new Map();
 
 
-    cleaned.forEach(item => {
+    cleaned.forEach(
+        item => {
 
-        const key =
-            normalizeText(
-                item.category
-            );
+            const key =
+                normalizeText(
+                    item.category
+                );
 
-        if (
-            !categoryEntries.has(key)
-        ) {
 
-            categoryEntries.set(
-                key,
-                item.category
-            );
+            if (
+                !categoryMap.has(
+                    key
+                )
+            ) {
+
+                categoryMap.set(
+                    key,
+                    item.category
+                );
+
+            }
 
         }
+    );
 
-    });
 
-
-    const uniqueCategories =
-        [...categoryEntries.entries()];
+    const categoryEntries =
+        [...categoryMap.entries()];
 
 
     if (
-        uniqueCategories.length <
+        categoryEntries.length <
         MIN_CATEGORIES
     ) {
 
         throw new Error(
-            "SortWord needs at least two different categories. Your vocabulary list currently has only one."
+            "SortWord needs at least two different categories."
         );
 
     }
 
 
     if (
-        uniqueCategories.length >
+        categoryEntries.length >
         MAX_CATEGORIES
     ) {
 
         throw new Error(
-            `This vocabulary set has ${uniqueCategories.length} different categories. SortWord supports no more than five categories.`
+            `This vocabulary set contains ${categoryEntries.length} different categories. SortWord supports no more than five categories.`
         );
 
     }
 
 
     /*
-       Check for duplicate words.
+       Reject duplicate words.
 
-       A word appearing twice creates ambiguity
-       during sorting, so we reject duplicates.
+       This keeps every word unambiguous.
     */
 
     const wordMap =
@@ -1644,21 +2116,15 @@ function validateVocabulary(items) {
                 item.word
             );
 
-        const categoryKey =
-            normalizeText(
-                item.category
-            );
-
 
         if (
-            wordMap.has(key)
+            wordMap.has(
+                key
+            )
         ) {
 
-            const existing =
-                wordMap.get(key);
-
             throw new Error(
-                `The word "${item.word}" appears more than once in this vocabulary set. Remove the duplicate before using SortWord.`
+                `The word "${item.word}" appears more than once. Remove the duplicate before using SortWord.`
             );
 
         }
@@ -1666,7 +2132,9 @@ function validateVocabulary(items) {
 
         wordMap.set(
             key,
-            categoryKey
+            normalizeText(
+                item.category
+            )
         );
 
     }
@@ -1678,16 +2146,16 @@ function validateVocabulary(items) {
             cleaned,
 
         categories:
-            uniqueCategories
+            categoryEntries
 
     };
 
 }
 
 
-/* =========================================================
-   SHOW STATUS
-   ========================================================= */
+/* =====================================================
+   STATUS
+===================================================== */
 
 function showStatus(
     title,
@@ -1697,8 +2165,10 @@ function showStatus(
     statusTitle.textContent =
         title;
 
+
     statusMessage.textContent =
         message;
+
 
     statusScreen.style.display =
         "flex";
@@ -1706,9 +2176,9 @@ function showStatus(
 }
 
 
-/* =========================================================
+/* =====================================================
    HIDE STATUS
-   ========================================================= */
+===================================================== */
 
 function hideStatus() {
 
@@ -1718,9 +2188,9 @@ function hideStatus() {
 }
 
 
-/* =========================================================
-   CREATE CATEGORY COLUMNS
-   ========================================================= */
+/* =====================================================
+   CREATE CATEGORIES
+===================================================== */
 
 function createCategories(
     categoryEntries
@@ -1729,19 +2199,19 @@ function createCategories(
     categoryArea.innerHTML =
         "";
 
+
     categories =
         categoryEntries.map(
-            entry => entry[1]
-        );
-
-    categoryMap =
-        new Map(
-            categoryEntries
+            entry =>
+                entry[1]
         );
 
 
     categoryArea.style.gridTemplateColumns =
-        `repeat(${categories.length}, minmax(0, 1fr))`;
+        `repeat(
+            ${categories.length},
+            minmax(0, 1fr)
+        )`;
 
 
     categories.forEach(
@@ -1751,6 +2221,7 @@ function createCategories(
                 document.createElement(
                     "div"
                 );
+
 
             column.className =
                 "categoryColumn";
@@ -1767,8 +2238,10 @@ function createCategories(
                     "div"
                 );
 
+
             header.className =
                 "categoryHeader";
+
 
             header.textContent =
                 category;
@@ -1779,8 +2252,10 @@ function createCategories(
                     "div"
                 );
 
+
             hint.className =
                 "categoryHint";
+
 
             hint.textContent =
                 "Drop words here";
@@ -1790,44 +2265,9 @@ function createCategories(
                 header
             );
 
+
             column.appendChild(
                 hint
-            );
-
-
-            /*
-               Pointer events used instead
-               of HTML5 drag/drop so the game
-               works on touch devices too.
-            */
-
-            column.addEventListener(
-                "pointerenter",
-                () => {
-
-                    if (
-                        isDragging
-                    ) {
-
-                        column.classList.add(
-                            "dragOver"
-                        );
-
-                    }
-
-                }
-            );
-
-
-            column.addEventListener(
-                "pointerleave",
-                () => {
-
-                    column.classList.remove(
-                        "dragOver"
-                    );
-
-                }
             );
 
 
@@ -1841,19 +2281,17 @@ function createCategories(
 }
 
 
-/* =========================================================
+/* =====================================================
    BUILD ROUND
-   ========================================================= */
+===================================================== */
 
-function buildRound(items) {
+function buildRound() {
 
     let shuffled =
-        shuffle(items);
+        shuffle(
+            sourceVocabulary
+        );
 
-
-    /*
-       Use no more than 20 words.
-    */
 
     shuffled =
         shuffled.slice(
@@ -1863,16 +2301,14 @@ function buildRound(items) {
 
 
     /*
-       Try to make sure every category
-       is represented in the round when
-       possible.
-
-       First select one item per category.
+       Make sure every category is
+       represented whenever possible.
     */
 
-    const requiredItems = [];
+    const required =
+        [];
 
-    const usedKeys =
+    const used =
         new Set();
 
 
@@ -1891,22 +2327,27 @@ function buildRound(items) {
                 );
 
 
-            if (match) {
+            if (
+                match
+            ) {
 
                 const key =
                     normalizeText(
                         match.word
                     );
 
+
                 if (
-                    !usedKeys.has(key)
+                    !used.has(
+                        key
+                    )
                 ) {
 
-                    requiredItems.push(
+                    required.push(
                         match
                     );
 
-                    usedKeys.add(
+                    used.add(
                         key
                     );
 
@@ -1918,22 +2359,19 @@ function buildRound(items) {
     );
 
 
-    /*
-       Fill the rest of the round.
-    */
-
     for (
         const item of shuffled
     ) {
 
         if (
-            requiredItems.length >=
+            required.length >=
             MAX_WORDS
         ) {
 
             break;
 
         }
+
 
         const key =
             normalizeText(
@@ -1942,7 +2380,9 @@ function buildRound(items) {
 
 
         if (
-            usedKeys.has(key)
+            used.has(
+                key
+            )
         ) {
 
             continue;
@@ -1950,11 +2390,12 @@ function buildRound(items) {
         }
 
 
-        requiredItems.push(
+        required.push(
             item
         );
 
-        usedKeys.add(
+
+        used.add(
             key
         );
 
@@ -1963,26 +2404,29 @@ function buildRound(items) {
 
     roundVocabulary =
         shuffle(
-            requiredItems
+            required
         );
 
 }
 
 
-/* =========================================================
-   UPDATE HUD
-   ========================================================= */
+/* =====================================================
+   HUD
+===================================================== */
 
 function updateHUD() {
 
     scoreValue.textContent =
         score;
 
+
     streakValue.textContent =
         streak;
 
+
     timerValue.textContent =
         timeLeft;
+
 
     wordsValue.textContent =
         `${currentIndex}/${roundVocabulary.length}`;
@@ -2000,7 +2444,8 @@ function updateHUD() {
                 (
                     correctCount /
                     totalAnswered
-                ) * 100
+                ) *
+                100
             )
 
             : 100;
@@ -2009,10 +2454,6 @@ function updateHUD() {
     accuracyValue.textContent =
         `${accuracy}%`;
 
-
-    /*
-       Timer styling.
-    */
 
     timerBox.classList.remove(
         "warning",
@@ -2043,9 +2484,43 @@ function updateHUD() {
 }
 
 
-/* =========================================================
+/* =====================================================
+   RESET WORD TO BOTTOM
+===================================================== */
+
+function resetWordCard() {
+
+    clearTimeout(
+        returnAnimationTimer
+    );
+
+
+    wordCard.classList.remove(
+        "dragging"
+    );
+
+
+    wordCard.style.left =
+        "50%";
+
+
+    wordCard.style.top =
+        "";
+
+
+    wordCard.style.bottom =
+        "38px";
+
+
+    wordCard.style.transform =
+        "translateX(-50%)";
+
+}
+
+
+/* =====================================================
    SHOW CURRENT WORD
-   ========================================================= */
+===================================================== */
 
 function showCurrentWord() {
 
@@ -2078,164 +2553,16 @@ function showCurrentWord() {
     );
 
 
-    /*
-       Reset the card to the bottom center.
-    */
-
     resetWordCard();
-
 
     updateHUD();
 
 }
 
 
-/* =========================================================
-   RESET WORD CARD POSITION
-   ========================================================= */
-
-function resetWordCard() {
-
-    wordCard.style.left =
-        "50%";
-
-    wordCard.style.top =
-        "50%";
-
-    wordCard.style.transform =
-        "translate(-50%, -50%)";
-
-
-    wordCard.classList.remove(
-        "dragging"
-    );
-
-}
-
-
-/* =========================================================
-   GET GAME AREA RECT
-   ========================================================= */
-
-function getGameAreaRect() {
-
-    return document
-        .getElementById(
-            "gameArea"
-        )
-        .getBoundingClientRect();
-
-}
-
-
-/* =========================================================
-   CLAMP CARD TO DOCK
-   ========================================================= */
-
-function clampWordCard(
-    left,
-    top
-) {
-
-    const gameRect =
-        getGameAreaRect();
-
-
-    const cardRect =
-        wordCard.getBoundingClientRect();
-
-
-    const cardWidth =
-        cardRect.width;
-
-    const cardHeight =
-        cardRect.height;
-
-
-    const halfWidth =
-        cardWidth / 2;
-
-    const halfHeight =
-        cardHeight / 2;
-
-
-    const minLeft =
-        halfWidth + 8;
-
-    const maxLeft =
-        gameRect.width -
-        halfWidth -
-        8;
-
-
-    const minTop =
-        gameRect.height -
-        145 +
-        halfHeight +
-        8;
-
-    const maxTop =
-        gameRect.height -
-        halfHeight -
-        8;
-
-
-    return {
-
-        left:
-            Math.max(
-                minLeft,
-                Math.min(
-                    maxLeft,
-                    left
-                )
-            ),
-
-        top:
-            Math.max(
-                minTop,
-                Math.min(
-                    maxTop,
-                    top
-                )
-            )
-
-    };
-
-}
-
-
-/* =========================================================
-   CONVERT POINTER TO GAME COORDINATES
-   ========================================================= */
-
-function pointerToGame(
-    clientX,
-    clientY
-) {
-
-    const gameRect =
-        getGameAreaRect();
-
-
-    return {
-
-        x:
-            clientX -
-            gameRect.left,
-
-        y:
-            clientY -
-            gameRect.top
-
-    };
-
-}
-
-
-/* =========================================================
+/* =====================================================
    POINTER DOWN
-   ========================================================= */
+===================================================== */
 
 wordCard.addEventListener(
     "pointerdown",
@@ -2243,7 +2570,8 @@ wordCard.addEventListener(
 
         if (
             !gameIsRunning ||
-            !currentWord
+            !currentWord ||
+            isDragging
         ) {
 
             return;
@@ -2258,8 +2586,12 @@ wordCard.addEventListener(
             true;
 
 
-        wordCard.classList.add(
-            "dragging"
+        pointerId =
+            event.pointerId;
+
+
+        wordCard.setPointerCapture(
+            event.pointerId
         );
 
 
@@ -2267,39 +2599,77 @@ wordCard.addEventListener(
             wordCard.getBoundingClientRect();
 
 
+        /*
+           Store the difference between the
+           pointer and the center of the oval.
+        */
+
+        const centerX =
+            rect.left +
+            rect.width / 2;
+
+
+        const centerY =
+            rect.top +
+            rect.height / 2;
+
+
         dragOffsetX =
             event.clientX -
-            (
-                rect.left +
-                rect.width / 2
-            );
+            centerX;
+
 
         dragOffsetY =
             event.clientY -
-            (
-                rect.top +
-                rect.height / 2
-            );
+            centerY;
 
 
-        wordCard.setPointerCapture(
-            event.pointerId
+        /*
+           Switch to explicit viewport
+           positioning for dragging.
+        */
+
+        wordCard.style.bottom =
+            "";
+
+
+        wordCard.style.top =
+            `${centerY}px`;
+
+
+        wordCard.style.left =
+            `${centerX}px`;
+
+
+        wordCard.style.transform =
+            "translate(-50%, -50%)";
+
+
+        wordCard.classList.add(
+            "dragging"
+        );
+
+
+        highlightDropZone(
+            centerX,
+            centerY
         );
 
     }
 );
 
 
-/* =========================================================
+/* =====================================================
    POINTER MOVE
-   ========================================================= */
+===================================================== */
 
 wordCard.addEventListener(
     "pointermove",
     event => {
 
         if (
-            !isDragging
+            !isDragging ||
+            event.pointerId !== pointerId
         ) {
 
             return;
@@ -2310,102 +2680,96 @@ wordCard.addEventListener(
         event.preventDefault();
 
 
-        const position =
-            pointerToGame(
-                event.clientX -
-                    dragOffsetX,
+        let centerX =
+            event.clientX -
+            dragOffsetX;
 
-                event.clientY -
-                    dragOffsetY
+
+        let centerY =
+            event.clientY -
+            dragOffsetY;
+
+
+        /*
+           Keep the oval fully visible.
+        */
+
+        const rect =
+            wordCard.getBoundingClientRect();
+
+
+        const halfWidth =
+            rect.width / 2;
+
+
+        const halfHeight =
+            rect.height / 2;
+
+
+        const padding =
+            8;
+
+
+        centerX =
+            Math.max(
+                halfWidth + padding,
+                Math.min(
+                    window.innerWidth -
+                        halfWidth -
+                        padding,
+                    centerX
+                )
             );
 
 
-        const clamped =
-            clampWordCard(
-                position.x,
-                position.y
+        centerY =
+            Math.max(
+                halfHeight + padding,
+                Math.min(
+                    window.innerHeight -
+                        halfHeight -
+                        padding,
+                    centerY
+                )
             );
 
 
         wordCard.style.left =
-            `${clamped.left}px`;
+            `${centerX}px`;
+
 
         wordCard.style.top =
-            `${clamped.top}px`;
+            `${centerY}px`;
+
+
+        wordCard.style.bottom =
+            "";
+
 
         wordCard.style.transform =
             "translate(-50%, -50%)";
 
 
-        /*
-           Highlight category currently
-           underneath the word.
-        */
-
-        highlightDropZone();
+        highlightDropZone(
+            centerX,
+            centerY
+        );
 
     }
 );
 
 
-/* =========================================================
-   HIGHLIGHT DROP ZONE
-   ========================================================= */
-
-function highlightDropZone() {
-
-    const cardRect =
-        wordCard.getBoundingClientRect();
-
-
-    const cardCenterX =
-        cardRect.left +
-        cardRect.width / 2;
-
-    const cardCenterY =
-        cardRect.top +
-        cardRect.height / 2;
-
-
-    document
-        .querySelectorAll(
-            ".categoryColumn"
-        )
-        .forEach(
-            column => {
-
-                const rect =
-                    column.getBoundingClientRect();
-
-
-                const inside =
-                    cardCenterX >= rect.left &&
-                    cardCenterX <= rect.right &&
-                    cardCenterY >= rect.top &&
-                    cardCenterY <= rect.bottom;
-
-
-                column.classList.toggle(
-                    "dragOver",
-                    inside
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
+/* =====================================================
    POINTER UP
-   ========================================================= */
+===================================================== */
 
 wordCard.addEventListener(
     "pointerup",
     event => {
 
         if (
-            !isDragging
+            !isDragging ||
+            event.pointerId !== pointerId
         ) {
 
             return;
@@ -2416,117 +2780,164 @@ wordCard.addEventListener(
         event.preventDefault();
 
 
-        isDragging =
-            false;
-
-
-        wordCard.classList.remove(
-            "dragging"
-        );
-
-
-        clearDropHighlights();
-
-
-        const targetColumn =
-            getDropTarget();
-
-
-        if (
-            targetColumn
-        ) {
-
-            handleDrop(
-                targetColumn
-            );
-
-        }
-
-        else {
-
-            resetWordCard();
-
-        }
+        finishDrag();
 
     }
 );
 
 
-/* =========================================================
+/* =====================================================
    POINTER CANCEL
-   ========================================================= */
+===================================================== */
 
 wordCard.addEventListener(
     "pointercancel",
-    () => {
+    event => {
 
-        isDragging =
-            false;
+        if (
+            event.pointerId !== pointerId
+        ) {
 
-        wordCard.classList.remove(
-            "dragging"
-        );
+            return;
 
-        clearDropHighlights();
+        }
 
-        resetWordCard();
+
+        finishDrag();
 
     }
 );
 
 
-/* =========================================================
-   FIND DROP TARGET
-   ========================================================= */
+/* =====================================================
+   FINISH DRAG
+===================================================== */
 
-function getDropTarget() {
+function finishDrag() {
 
-    const cardRect =
+    const rect =
         wordCard.getBoundingClientRect();
 
 
     const centerX =
-        cardRect.left +
-        cardRect.width / 2;
+        rect.left +
+        rect.width / 2;
+
 
     const centerY =
-        cardRect.top +
-        cardRect.height / 2;
+        rect.top +
+        rect.height / 2;
 
 
-    const columns =
-        [
-            ...document.querySelectorAll(
-                ".categoryColumn"
-            )
-        ];
+    const target =
+        getDropTarget(
+            centerX,
+            centerY
+        );
 
 
-    return (
-        columns.find(
-            column => {
-
-                const rect =
-                    column.getBoundingClientRect();
+    isDragging =
+        false;
 
 
-                return (
-                    centerX >= rect.left &&
-                    centerX <= rect.right &&
-                    centerY >= rect.top &&
-                    centerY <= rect.bottom
-                );
+    pointerId =
+        null;
 
-            }
-        ) || null
+
+    wordCard.classList.remove(
+        "dragging"
+    );
+
+
+    clearDropHighlights();
+
+
+    if (
+        target
+    ) {
+
+        handleDrop(
+            target
+        );
+
+    }
+
+    else {
+
+        returnWordToDock();
+
+    }
+
+}
+
+
+/* =====================================================
+   FIND DROP TARGET
+===================================================== */
+
+function getDropTarget(
+    x,
+    y
+) {
+
+    const element =
+        document.elementFromPoint(
+            x,
+            y
+        );
+
+
+    if (
+        !element
+    ) {
+
+        return null;
+
+    }
+
+
+    return element.closest(
+        ".categoryColumn"
     );
 
 }
 
 
-/* =========================================================
-   CLEAR DROP HIGHLIGHTS
-   ========================================================= */
+/* =====================================================
+   HIGHLIGHT DROP ZONE
+===================================================== */
+
+function highlightDropZone(
+    x,
+    y
+) {
+
+    clearDropHighlights();
+
+
+    const target =
+        getDropTarget(
+            x,
+            y
+        );
+
+
+    if (
+        target
+    ) {
+
+        target.classList.add(
+            "dragOver"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CLEAR HIGHLIGHTS
+===================================================== */
 
 function clearDropHighlights() {
 
@@ -2547,9 +2958,9 @@ function clearDropHighlights() {
 }
 
 
-/* =========================================================
+/* =====================================================
    HANDLE DROP
-   ========================================================= */
+===================================================== */
 
 function handleDrop(
     targetColumn
@@ -2568,6 +2979,7 @@ function handleDrop(
         normalizeText(
             targetColumn.dataset.category
         );
+
 
     const correctCategory =
         normalizeText(
@@ -2595,9 +3007,9 @@ function handleDrop(
 }
 
 
-/* =========================================================
+/* =====================================================
    CORRECT DROP
-   ========================================================= */
+===================================================== */
 
 function handleCorrectDrop(
     targetColumn
@@ -2607,6 +3019,7 @@ function handleCorrectDrop(
 
     streak++;
 
+
     bestStreak =
         Math.max(
             bestStreak,
@@ -2615,19 +3028,16 @@ function handleCorrectDrop(
 
 
     /*
-       Base points.
+       Base points = 100.
+       Each streak level adds 10.
     */
 
-    let points =
-        100;
-
-
-    /*
-       Small streak bonus.
-    */
-
-    points +=
-        (streak - 1) * 10;
+    const points =
+        100 +
+        (
+            (streak - 1) *
+            10
+        );
 
 
     score +=
@@ -2635,8 +3045,7 @@ function handleCorrectDrop(
 
 
     /*
-       Create a small copy of the
-       word in the category.
+       Add word to the target column.
     */
 
     const sortedWord =
@@ -2644,8 +3053,10 @@ function handleCorrectDrop(
             "div"
         );
 
+
     sortedWord.className =
         "sortedWord";
+
 
     sortedWord.textContent =
         currentWord.word;
@@ -2662,8 +3073,12 @@ function handleCorrectDrop(
     );
 
 
-    currentIndex++;
+    wordCard.classList.add(
+        "hidden"
+    );
 
+
+    currentIndex++;
 
     updateHUD();
 
@@ -2680,15 +3095,15 @@ function handleCorrectDrop(
             }
 
         },
-        350
+        300
     );
 
 }
 
 
-/* =========================================================
+/* =====================================================
    INCORRECT DROP
-   ========================================================= */
+===================================================== */
 
 function handleIncorrectDrop() {
 
@@ -2713,33 +3128,70 @@ function handleIncorrectDrop() {
     updateHUD();
 
 
-    /*
-       Put word back at the bottom.
-    */
-
-    setTimeout(
-        () => {
-
-            if (
-                gameIsRunning
-            ) {
-
-                resetWordCard();
-
-            }
-
-        },
-        250
-    );
+    returnWordToDock();
 
 }
 
 
-/* =========================================================
-   FEEDBACK
-   ========================================================= */
+/* =====================================================
+   RETURN WORD TO DOCK
+===================================================== */
 
-let feedbackTimeout =
+function returnWordToDock() {
+
+    clearTimeout(
+        returnAnimationTimer
+    );
+
+
+    wordCard.classList.remove(
+        "dragging"
+    );
+
+
+    /*
+       Briefly keep it visible,
+       then put it back at bottom center.
+    */
+
+    wordCard.style.left =
+        "50%";
+
+
+    wordCard.style.top =
+        "";
+
+
+    wordCard.style.bottom =
+        "38px";
+
+
+    wordCard.style.transform =
+        "translateX(-50%)";
+
+
+    returnAnimationTimer =
+        setTimeout(
+            () => {
+
+                wordCard.style.left =
+                    "50%";
+
+                wordCard.style.bottom =
+                    "38px";
+
+            },
+            20
+        );
+
+}
+
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+let feedbackTimer =
     null;
 
 
@@ -2751,10 +3203,15 @@ function showFeedback(
     feedback.textContent =
         message;
 
+
     feedback.classList.remove(
         "correct",
-        "incorrect"
+        "incorrect",
+        "show"
     );
+
+
+    void feedback.offsetWidth;
 
 
     feedback.classList.add(
@@ -2764,27 +3221,17 @@ function showFeedback(
     );
 
 
-    /*
-       Force animation restart.
-    */
-
-    feedback.classList.remove(
-        "show"
-    );
-
-    void feedback.offsetWidth;
-
     feedback.classList.add(
         "show"
     );
 
 
     clearTimeout(
-        feedbackTimeout
+        feedbackTimer
     );
 
 
-    feedbackTimeout =
+    feedbackTimer =
         setTimeout(
             () => {
 
@@ -2799,9 +3246,9 @@ function showFeedback(
 }
 
 
-/* =========================================================
-   START TIMER
-   ========================================================= */
+/* =====================================================
+   TIMER
+===================================================== */
 
 function startTimer() {
 
@@ -2846,9 +3293,9 @@ function startTimer() {
 }
 
 
-/* =========================================================
+/* =====================================================
    END GAME
-   ========================================================= */
+===================================================== */
 
 function endGame(
     message
@@ -2872,12 +3319,12 @@ function endGame(
     );
 
 
+    clearDropHighlights();
+
+
     wordCard.classList.add(
         "hidden"
     );
-
-
-    clearDropHighlights();
 
 
     const totalAnswered =
@@ -2892,22 +3339,21 @@ function endGame(
                 (
                     correctCount /
                     totalAnswered
-                ) * 100
+                ) *
+                100
             )
 
             : 100;
 
 
-    /*
-       Completion bonus.
-
-       Finish all words and add
-       10 points per second remaining.
-    */
-
     let completionBonus =
         0;
 
+
+    /*
+       Finish all words:
+       10 points per remaining second.
+    */
 
     if (
         currentIndex >=
@@ -2916,6 +3362,7 @@ function endGame(
 
         completionBonus =
             timeLeft * 10;
+
 
         score +=
             completionBonus;
@@ -2926,11 +3373,14 @@ function endGame(
     finalScore.textContent =
         score;
 
+
     finalAccuracy.textContent =
         `${accuracy}%`;
 
+
     finalCorrect.textContent =
         correctCount;
+
 
     finalStreak.textContent =
         bestStreak;
@@ -2964,9 +3414,9 @@ function endGame(
 }
 
 
-/* =========================================================
-   START NEW ROUND
-   ========================================================= */
+/* =====================================================
+   START GAME
+===================================================== */
 
 function startGame() {
 
@@ -2993,13 +3443,15 @@ function startGame() {
     currentWord =
         null;
 
+
     gameIsRunning =
         true;
 
 
-    /*
-       Remove previously sorted words.
-    */
+    gameOver.classList.remove(
+        "show"
+    );
+
 
     categoryArea
         .querySelectorAll(
@@ -3011,44 +3463,26 @@ function startGame() {
         );
 
 
-    buildRound(
-        sourceVocabulary
-    );
-
-
-    if (
-        roundVocabulary.length === 0
-    ) {
-
-        showStatus(
-            "No Words Available",
-            "This vocabulary set does not contain any usable words."
-        );
-
-        return;
-
-    }
+    buildRound();
 
 
     updateHUD();
 
-    hideStatus();
 
-    gameOver.classList.remove(
-        "show"
-    );
+    hideStatus();
 
 
     showCurrentWord();
+
 
     startTimer();
 
 }
 
 
-/* =========================================================
+/* =====================================================
    PLAY AGAIN
-   ========================================================= */
+===================================================== */
 
 playAgainButton.addEventListener(
     "click",
@@ -3060,9 +3494,9 @@ playAgainButton.addEventListener(
 );
 
 
-/* =========================================================
-   LIBRARY BUTTON
-   ========================================================= */
+/* =====================================================
+   LIBRARY
+===================================================== */
 
 libraryButton.addEventListener(
     "click",
@@ -3075,9 +3509,9 @@ libraryButton.addEventListener(
 );
 
 
-/* =========================================================
-   STARTUP
-   ========================================================= */
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 async function initializeGame() {
 
@@ -3086,8 +3520,11 @@ async function initializeGame() {
     ) {
 
         showStatus(
+
             "No Vocabulary Set Selected",
+
             "SortWord must be opened from the Vocabulary Arcade Library with a vocabulary set ID."
+
         );
 
         return;
@@ -3098,8 +3535,11 @@ async function initializeGame() {
     try {
 
         showStatus(
+
             "Loading SortWord",
+
             "Loading your vocabulary set from Firebase..."
+
         );
 
 
@@ -3132,7 +3572,9 @@ async function initializeGame() {
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
         console.error(
             "SORTWORD ERROR:",
@@ -3141,9 +3583,12 @@ async function initializeGame() {
 
 
         showStatus(
+
             "Unable to Start SortWord",
+
             error.message ||
             "There was a problem loading this vocabulary set."
+
         );
 
     }
@@ -3151,13 +3596,16 @@ async function initializeGame() {
 }
 
 
-/* =========================================================
-   BEGIN
-   ========================================================= */
+/* =====================================================
+   START
+===================================================== */
 
 initializeGame();
 
+
 </script>
 
+
 </body>
+
 </html>
