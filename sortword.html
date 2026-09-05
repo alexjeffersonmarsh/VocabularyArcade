@@ -1625,9 +1625,8 @@
 
 <script type="module">
 
-
 /* =====================================================
-   FIREBASE IMPORTS
+   FIREBASE
 ===================================================== */
 
 import {
@@ -1692,18 +1691,14 @@ const db =
 const COLLECTION_NAME =
     "vocabSets";
 
-
 const MAX_CATEGORIES =
     5;
-
 
 const MIN_CATEGORIES =
     2;
 
-
 const MAX_WORDS =
     20;
-
 
 const ROUND_TIME =
     60;
@@ -1718,126 +1713,105 @@ const listNameEl =
         "listName"
     );
 
-
 const scoreValue =
     document.getElementById(
         "scoreValue"
     );
-
 
 const accuracyValue =
     document.getElementById(
         "accuracyValue"
     );
 
-
 const streakValue =
     document.getElementById(
         "streakValue"
     );
-
 
 const timerValue =
     document.getElementById(
         "timerValue"
     );
 
-
 const timerBox =
     document.getElementById(
         "timerBox"
     );
-
 
 const wordsValue =
     document.getElementById(
         "wordsValue"
     );
 
-
 const categoryArea =
     document.getElementById(
         "categoryArea"
     );
-
 
 const wordCard =
     document.getElementById(
         "wordCard"
     );
 
-
 const feedback =
     document.getElementById(
         "feedback"
     );
-
 
 const statusScreen =
     document.getElementById(
         "statusScreen"
     );
 
-
 const statusTitle =
     document.getElementById(
         "statusTitle"
     );
-
 
 const statusMessage =
     document.getElementById(
         "statusMessage"
     );
 
-
 const gameOver =
     document.getElementById(
         "gameOver"
     );
-
 
 const gameOverList =
     document.getElementById(
         "gameOverList"
     );
 
-
 const finalScore =
     document.getElementById(
         "finalScore"
     );
-
 
 const finalAccuracy =
     document.getElementById(
         "finalAccuracy"
     );
 
-
 const finalCorrect =
     document.getElementById(
         "finalCorrect"
     );
-
 
 const finalStreak =
     document.getElementById(
         "finalStreak"
     );
 
-
 const gameOverMessage =
     document.getElementById(
         "gameOverMessage"
     );
 
-
 const playAgainButton =
     document.getElementById(
         "playAgainButton"
     );
-
 
 const libraryButton =
     document.getElementById(
@@ -1846,56 +1820,44 @@ const libraryButton =
 
 
 /* =====================================================
-   STATE
+   GAME STATE
 ===================================================== */
 
 let sourceVocabulary =
     [];
 
-
 let roundVocabulary =
     [];
-
 
 let categories =
     [];
 
-
 let currentIndex =
     0;
-
 
 let score =
     0;
 
-
 let correctCount =
     0;
-
 
 let incorrectCount =
     0;
 
-
 let streak =
     0;
-
 
 let bestStreak =
     0;
 
-
 let timeLeft =
     ROUND_TIME;
-
 
 let timerInterval =
     null;
 
-
 let gameIsRunning =
     false;
-
 
 let currentWord =
     null;
@@ -1908,14 +1870,11 @@ let currentWord =
 let isDragging =
     false;
 
-
 let activePointerId =
     null;
 
-
 let dragOffsetX =
     0;
-
 
 let dragOffsetY =
     0;
@@ -1929,7 +1888,6 @@ const params =
     new URLSearchParams(
         window.location.search
     );
-
 
 const setId =
     params.get("id") ||
@@ -2170,7 +2128,7 @@ function validateVocabulary(
 
 
     /*
-       Get unique categories.
+       Create unique categories.
     */
 
     const categoryMap =
@@ -2232,7 +2190,7 @@ function validateVocabulary(
 
 
     /*
-       Every word must be unique.
+       Make sure each word appears only once.
     */
 
     const wordMap =
@@ -2438,14 +2396,10 @@ function createCategories(
 
 function buildRound() {
 
-    const shuffled =
+    roundVocabulary =
         shuffle(
             sourceVocabulary
-        );
-
-
-    roundVocabulary =
-        shuffled.slice(
+        ).slice(
             0,
             MAX_WORDS
         );
@@ -2528,7 +2482,7 @@ function updateHUD() {
 
 
 /* =====================================================
-   RESET WORD TO DOCK
+   RESET WORD CARD
 ===================================================== */
 
 function resetWordCard() {
@@ -2538,44 +2492,41 @@ function resetWordCard() {
     );
 
 
-    wordCard.style.left =
-        "50%";
-
-
-    wordCard.style.top =
-        "";
-
-
-    wordCard.style.bottom =
-        "38px";
-
-
-    wordCard.style.transform =
-        "translateX(-50%)";
-
+    /*
+       Always return the card to
+       exactly the same dimensions.
+    */
 
     wordCard.style.width =
         "220px";
 
-
     wordCard.style.minWidth =
         "220px";
-
 
     wordCard.style.maxWidth =
         "220px";
 
-
     wordCard.style.height =
         "58px";
-
 
     wordCard.style.minHeight =
         "58px";
 
-
     wordCard.style.maxHeight =
         "58px";
+
+
+    wordCard.style.left =
+        "50%";
+
+    wordCard.style.top =
+        "";
+
+    wordCard.style.bottom =
+        "38px";
+
+    wordCard.style.transform =
+        "translateX(-50%)";
 
 }
 
@@ -2624,6 +2575,117 @@ function showCurrentWord() {
 
 
 /* =====================================================
+   GET CATEGORY UNDER POINTER
+=====================================================
+
+   IMPORTANT FIX:
+
+   elementsFromPoint() returns ALL elements
+   at the pointer location.
+
+   Because the draggable oval is on top,
+   elementFromPoint() was finding the oval
+   instead of the category.
+
+   We now search through the entire stack
+   until we find .categoryColumn.
+===================================================== */
+
+function getDropTarget(
+    x,
+    y
+) {
+
+    const elements =
+        document.elementsFromPoint(
+            x,
+            y
+        );
+
+
+    for (
+        const element
+        of elements
+    ) {
+
+        const category =
+            element.closest(
+                ".categoryColumn"
+            );
+
+
+        if (
+            category
+        ) {
+
+            return category;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   HIGHLIGHT CATEGORY
+===================================================== */
+
+function highlightDropZone(
+    x,
+    y
+) {
+
+    clearDropHighlights();
+
+
+    const target =
+        getDropTarget(
+            x,
+            y
+        );
+
+
+    if (
+        target
+    ) {
+
+        target.classList.add(
+            "dragOver"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CLEAR CATEGORY HIGHLIGHTS
+===================================================== */
+
+function clearDropHighlights() {
+
+    document
+        .querySelectorAll(
+            ".categoryColumn"
+        )
+        .forEach(
+            column => {
+
+                column.classList.remove(
+                    "dragOver"
+                );
+
+            }
+        );
+
+}
+
+
+/* =====================================================
    POINTER DOWN
 ===================================================== */
 
@@ -2664,12 +2726,18 @@ wordCard.addEventListener(
 
         const centerX =
             rect.left +
-            rect.width / 2;
+            (
+                rect.width /
+                2
+            );
 
 
         const centerY =
             rect.top +
-            rect.height / 2;
+            (
+                rect.height /
+                2
+            );
 
 
         dragOffsetX =
@@ -2683,12 +2751,11 @@ wordCard.addEventListener(
 
 
         /*
-           Switch from dock positioning
-           to viewport positioning.
+           Switch to fixed positioning.
         */
 
-        wordCard.style.bottom =
-            "";
+        wordCard.style.position =
+            "fixed";
 
 
         wordCard.style.left =
@@ -2699,25 +2766,28 @@ wordCard.addEventListener(
             `${centerY}px`;
 
 
+        wordCard.style.bottom =
+            "";
+
+
+        /*
+           Lock dimensions.
+        */
+
         wordCard.style.width =
             "220px";
-
 
         wordCard.style.minWidth =
             "220px";
 
-
         wordCard.style.maxWidth =
             "220px";
-
 
         wordCard.style.height =
             "58px";
 
-
         wordCard.style.minHeight =
             "58px";
-
 
         wordCard.style.maxHeight =
             "58px";
@@ -2726,6 +2796,10 @@ wordCard.addEventListener(
         wordCard.style.transform =
             "translate(-50%, -50%)";
 
+
+        /*
+           No scaling while dragging.
+        */
 
         wordCard.classList.add(
             "dragging"
@@ -2774,9 +2848,8 @@ wordCard.addEventListener(
 
 
         /*
-           Fixed dimensions.
-           Do not readjust the card width
-           while moving.
+           Fixed dimensions mean we always
+           know the half-width and half-height.
         */
 
         const halfWidth =
@@ -2792,7 +2865,7 @@ wordCard.addEventListener(
 
 
         /*
-           Keep the oval entirely visible.
+           Keep the entire oval on screen.
         */
 
         centerX =
@@ -2834,22 +2907,17 @@ wordCard.addEventListener(
         wordCard.style.width =
             "220px";
 
-
         wordCard.style.minWidth =
             "220px";
-
 
         wordCard.style.maxWidth =
             "220px";
 
-
         wordCard.style.height =
             "58px";
 
-
         wordCard.style.minHeight =
             "58px";
-
 
         wordCard.style.maxHeight =
             "58px";
@@ -2932,13 +3000,24 @@ function finishDrag() {
 
     const centerX =
         rect.left +
-        rect.width / 2;
+        (
+            rect.width /
+            2
+        );
 
 
     const centerY =
         rect.top +
-        rect.height / 2;
+        (
+            rect.height /
+            2
+        );
 
+
+    /*
+       Find category using ALL elements
+       at the pointer location.
+    */
 
     const target =
         getDropTarget(
@@ -2978,93 +3057,6 @@ function finishDrag() {
         returnWordToDock();
 
     }
-
-}
-
-
-/* =====================================================
-   FIND DROP TARGET
-===================================================== */
-
-function getDropTarget(
-    x,
-    y
-) {
-
-    const element =
-        document.elementFromPoint(
-            x,
-            y
-        );
-
-
-    if (
-        !element
-    ) {
-
-        return null;
-
-    }
-
-
-    return element.closest(
-        ".categoryColumn"
-    );
-
-}
-
-
-/* =====================================================
-   HIGHLIGHT DROP TARGET
-===================================================== */
-
-function highlightDropZone(
-    x,
-    y
-) {
-
-    clearDropHighlights();
-
-
-    const target =
-        getDropTarget(
-            x,
-            y
-        );
-
-
-    if (
-        target
-    ) {
-
-        target.classList.add(
-            "dragOver"
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   CLEAR HIGHLIGHTS
-===================================================== */
-
-function clearDropHighlights() {
-
-    document
-        .querySelectorAll(
-            ".categoryColumn"
-        )
-        .forEach(
-            column => {
-
-                column.classList.remove(
-                    "dragOver"
-                );
-
-            }
-        );
 
 }
 
@@ -3141,7 +3133,10 @@ function handleCorrectDrop(
     const points =
         100 +
         (
-            (streak - 1) *
+            (
+                streak -
+                1
+            ) *
             10
         );
 
@@ -3151,8 +3146,8 @@ function handleCorrectDrop(
 
 
     /*
-       Put a matching oval INSIDE
-       the category column.
+       Find the content area inside
+       the correct category.
     */
 
     const content =
@@ -3160,6 +3155,11 @@ function handleCorrectDrop(
             ".categoryContent"
         );
 
+
+    /*
+       Create a permanent copy of
+       the word oval.
+    */
 
     const sortedWord =
         document.createElement(
@@ -3175,10 +3175,38 @@ function handleCorrectDrop(
         currentWord.word;
 
 
+    /*
+       Explicitly lock the placed oval
+       dimensions to the same size.
+    */
+
+    sortedWord.style.width =
+        "220px";
+
+    sortedWord.style.minWidth =
+        "220px";
+
+    sortedWord.style.maxWidth =
+        "220px";
+
+    sortedWord.style.height =
+        "58px";
+
+    sortedWord.style.minHeight =
+        "58px";
+
+    sortedWord.style.maxHeight =
+        "58px";
+
+
     content.appendChild(
         sortedWord
     );
 
+
+    /*
+       Update feedback.
+    */
 
     showFeedback(
         `✓ Correct! +${points}`,
@@ -3187,9 +3215,9 @@ function handleCorrectDrop(
 
 
     /*
-       Hide the draggable card only
-       after the correctly placed copy
-       has been created.
+       Hide the draggable word only
+       after its permanent copy has
+       been successfully placed.
     */
 
     wordCard.classList.add(
@@ -3259,30 +3287,24 @@ function handleIncorrectDrop() {
 
 function returnWordToDock() {
 
-    wordCard.classList.remove(
-        "dragging"
-    );
-
+    /*
+       Keep fixed dimensions.
+    */
 
     wordCard.style.width =
         "220px";
 
-
     wordCard.style.minWidth =
         "220px";
-
 
     wordCard.style.maxWidth =
         "220px";
 
-
     wordCard.style.height =
         "58px";
 
-
     wordCard.style.minHeight =
         "58px";
-
 
     wordCard.style.maxHeight =
         "58px";
@@ -3302,6 +3324,11 @@ function returnWordToDock() {
 
     wordCard.style.transform =
         "translateX(-50%)";
+
+
+    wordCard.classList.remove(
+        "dragging"
+    );
 
 }
 
@@ -3470,8 +3497,8 @@ function endGame(
 
 
     /*
-       Completion bonus:
-       10 points per remaining second.
+       Finish all words:
+       10 points for every second remaining.
     */
 
     if (
@@ -3573,6 +3600,10 @@ function startGame() {
     );
 
 
+    /*
+       Clear all previously placed words.
+    */
+
     categoryArea
         .querySelectorAll(
             ".sortedWord"
@@ -3615,7 +3646,7 @@ playAgainButton.addEventListener(
 
 
 /* =====================================================
-   LIBRARY
+   LIBRARY BUTTON
 ===================================================== */
 
 libraryButton.addEventListener(
@@ -3630,7 +3661,7 @@ libraryButton.addEventListener(
 
 
 /* =====================================================
-   INITIALIZE
+   INITIALIZE GAME
 ===================================================== */
 
 async function initializeGame() {
@@ -3722,9 +3753,7 @@ async function initializeGame() {
 
 initializeGame();
 
-
 </script>
-
 
 </body>
 
