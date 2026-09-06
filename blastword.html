@@ -1,654 +1,4675 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlastWord - Galaga Vocabulary Learning</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BlastWord - Vocabulary Arcade</title>
+
+
     <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
         }
+
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+        }
+
 
         body {
-            background-color: #050510;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+            background:
+                #050510;
+
+            color:
+                white;
+
+            font-family:
+                "Segoe UI",
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
+
             display: flex;
+
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
         }
+
+
+        /* =====================================================
+           GAME CONTAINER
+        ===================================================== */
 
         #game-container {
+
             position: relative;
-            width: 1300px; /* 130% wider canvas layout */
-            height: 800px;
-            background: radial-gradient(circle at center, #101030 0%, #050510 100%);
-            border: 3px solid #00ffff;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-            overflow: hidden;
+
+            width:
+                min(
+                    1300px,
+                    100vw
+                );
+
+            height:
+                min(
+                    800px,
+                    100vh
+                );
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #101030 0%,
+                    #050510 100%
+                );
+
+            border:
+                3px solid
+                #00ffff;
+
+            box-shadow:
+                0 0 30px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.40
+                );
+
+            overflow:
+                hidden;
         }
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
+
+        /* =====================================================
+           CANVAS
+        ===================================================== */
+
+        #gameCanvas {
+
+            display:
+                block;
+
+            width:
+                100%;
+
+            height:
+                100%;
+
+            touch-action:
+                none;
         }
 
-        /* Target Word Footer Bar */
+
+        /* =====================================================
+           TARGET / HUD BAR
+        ===================================================== */
+
         #target-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 75px;
-            background: rgba(10, 15, 30, 0.95);
-            border-top: 2px solid #00ffff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            z-index: 10;
+
+            position:
+                absolute;
+
+            left:
+                0;
+
+            right:
+                0;
+
+            bottom:
+                0;
+
+            height:
+                88px;
+
+            background:
+                rgba(
+                    10,
+                    15,
+                    30,
+                    0.96
+                );
+
+            border-top:
+                2px solid
+                #00ffff;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                25px;
+
+            padding:
+                8px 25px;
+
+            z-index:
+                10;
+
+            pointer-events:
+                none;
         }
 
-        .prompt-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+
+        #target-area {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            min-width:
+                0;
         }
+
 
         .prompt-label {
-            font-size: 18px;
-            color: #8888aa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+
+            font-size:
+                14px;
+
+            color:
+                #8888aa;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+
+            white-space:
+                nowrap;
         }
+
 
         .target-word {
-            font-size: 36px;
-            font-weight: 800;
-            color: #00ffff;
-            text-shadow: 0 0 14px rgba(0, 255, 255, 0.8);
+
+            font-size:
+                clamp(
+                    23px,
+                    3vw,
+                    36px
+                );
+
+            font-weight:
+                900;
+
+            color:
+                #00ffff;
+
+            text-shadow:
+                0 0 14px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.80
+                );
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
         }
+
+
+        /* =====================================================
+           HUD
+        ===================================================== */
 
         .stats-container {
-            display: flex;
-            align-items: center;
-            gap: 35px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
+
+            justify-content:
+                flex-end;
         }
 
-        .ammo-board {
-            font-size: 22px;
-            color: #00ffcc;
-            font-weight: bold;
+
+        .stat {
+
+            min-width:
+                78px;
+
+            text-align:
+                center;
         }
 
-        .score-board {
-            font-size: 24px;
-            color: #ff00ff;
-            font-weight: bold;
+
+        .stat-label {
+
+            display:
+                block;
+
+            font-size:
+                9px;
+
+            color:
+                #777799;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                0.7px;
         }
 
-        /* Loading Screen Overlay */
+
+        .stat-value {
+
+            display:
+                block;
+
+            margin-top:
+                2px;
+
+            font-size:
+                20px;
+
+            font-weight:
+                900;
+        }
+
+
+        #score-display {
+
+            color:
+                #ff00ff;
+        }
+
+
+        #ammo-display {
+
+            color:
+                #00ffcc;
+        }
+
+
+        #wave-display {
+
+            color:
+                #ffd166;
+        }
+
+
+        #accuracy-display {
+
+            color:
+                #8be9fd;
+        }
+
+
+        #shields-display {
+
+            color:
+                #ff6688;
+
+            letter-spacing:
+                1px;
+        }
+
+
+        /* =====================================================
+           LIST NAME
+        ===================================================== */
+
+        #list-name-display {
+
+            position:
+                absolute;
+
+            top:
+                12px;
+
+            left:
+                50%;
+
+            transform:
+                translateX(-50%);
+
+            max-width:
+                60%;
+
+            padding:
+                7px 16px;
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    0.72
+                );
+
+            border:
+                1px solid
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.25
+                );
+
+            color:
+                #c7d2fe;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+            z-index:
+                8;
+
+            pointer-events:
+                none;
+        }
+
+
+        /* =====================================================
+           WAVE MESSAGE
+        ===================================================== */
+
+        #wave-message {
+
+            position:
+                absolute;
+
+            left:
+                50%;
+
+            top:
+                52%;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(
+                    0.8
+                );
+
+            padding:
+                14px 28px;
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.90
+                );
+
+            color:
+                #050510;
+
+            font-size:
+                28px;
+
+            font-weight:
+                900;
+
+            opacity:
+                0;
+
+            pointer-events:
+                none;
+
+            z-index:
+                25;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        #wave-message.show {
+
+            opacity:
+                1;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(
+                    1
+                );
+        }
+
+
+        /* =====================================================
+           LOADING / ERROR SCREEN
+        ===================================================== */
+
         #loading-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 16, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 26px;
-            color: #00ffff;
-            z-index: 30;
-            gap: 15px;
+
+            position:
+                absolute;
+
+            inset:
+                0;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    0.97
+                );
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            justify-content:
+                center;
+
+            align-items:
+                center;
+
+            text-align:
+                center;
+
+            padding:
+                30px;
+
+            gap:
+                15px;
+
+            font-size:
+                25px;
+
+            color:
+                #00ffff;
+
+            z-index:
+                100;
         }
+
 
         #loading-screen.hidden {
-            display: none;
+
+            display:
+                none;
         }
 
-        /* Game Over Screen Overlay */
-        #game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 16, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
+
+        #loading-title {
+
+            font-size:
+                34px;
+
+            font-weight:
+                900;
         }
+
+
+        #loading-text {
+
+            max-width:
+                700px;
+
+            font-size:
+                17px;
+
+            line-height:
+                1.6;
+
+            color:
+                #cbd5e1;
+        }
+
+
+        /* =====================================================
+           ERROR DETAILS
+        ===================================================== */
+
+        #loading-details {
+
+            max-width:
+                700px;
+
+            color:
+                #ff8899;
+
+            font-size:
+                15px;
+
+            line-height:
+                1.5;
+        }
+
+
+        /* =====================================================
+           GAME OVER
+        ===================================================== */
+
+        #game-over-screen {
+
+            position:
+                absolute;
+
+            inset:
+                0;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    0.94
+                );
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            justify-content:
+                center;
+
+            align-items:
+                center;
+
+            text-align:
+                center;
+
+            padding:
+                25px;
+
+            z-index:
+                90;
+        }
+
 
         #game-over-screen.hidden {
-            display: none;
+
+            display:
+                none;
         }
+
 
         #game-over-screen h1 {
-            font-size: 56px;
-            color: #ff3366;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 51, 102, 0.8);
+
+            font-size:
+                clamp(
+                    42px,
+                    7vw,
+                    68px
+                );
+
+            color:
+                #ff3366;
+
+            margin-bottom:
+                6px;
+
+            text-shadow:
+                0 0 15px
+                rgba(
+                    255,
+                    51,
+                    102,
+                    0.80
+                );
         }
 
-        #game-over-screen p {
-            font-size: 26px;
-            margin-bottom: 25px;
+
+        #game-over-list {
+
+            color:
+                #cbd5e1;
+
+            font-size:
+                18px;
+
+            margin-bottom:
+                25px;
+
+            max-width:
+                80%;
         }
+
+
+        /* =====================================================
+           RESULTS
+        ===================================================== */
+
+        #results-grid {
+
+            width:
+                min(
+                    700px,
+                    90%
+                );
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    1fr
+                );
+
+            gap:
+                12px;
+
+            margin-bottom:
+                25px;
+        }
+
+
+        .result-box {
+
+            padding:
+                15px 10px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.06
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.12
+                );
+
+            border-radius:
+                10px;
+        }
+
+
+        .result-label {
+
+            display:
+                block;
+
+            font-size:
+                10px;
+
+            text-transform:
+                uppercase;
+
+            color:
+                #7d8494;
+
+            letter-spacing:
+                0.7px;
+        }
+
+
+        .result-value {
+
+            display:
+                block;
+
+            margin-top:
+                4px;
+
+            font-size:
+                27px;
+
+            font-weight:
+                900;
+        }
+
+
+        #game-over-message {
+
+            max-width:
+                700px;
+
+            margin-bottom:
+                24px;
+
+            color:
+                #e2e8f0;
+
+            font-size:
+                16px;
+
+            line-height:
+                1.5;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        #button-row {
+
+            display:
+                flex;
+
+            justify-content:
+                center;
+
+            gap:
+                12px;
+
+            flex-wrap:
+                wrap;
+        }
+
+
+        .action-button {
+
+            min-width:
+                150px;
+
+            padding:
+                13px 25px;
+
+            border:
+                none;
+
+            border-radius:
+                7px;
+
+            font-size:
+                17px;
+
+            font-weight:
+                800;
+
+            cursor:
+                pointer;
+
+            transition:
+                transform 0.12s ease,
+                filter 0.12s ease;
+        }
+
+
+        .action-button:hover {
+
+            transform:
+                translateY(
+                    -2px
+                );
+
+            filter:
+                brightness(
+                    1.08
+                );
+        }
+
 
         #restart-btn {
-            padding: 14px 40px;
-            font-size: 22px;
-            font-weight: bold;
-            background: #00ffff;
-            color: #050510;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-            transition: transform 0.1s, background 0.2s;
+
+            background:
+                #00ffff;
+
+            color:
+                #050510;
+
+            box-shadow:
+                0 0 15px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.50
+                );
         }
 
-        #restart-btn:hover {
-            background: #33ffff;
-            transform: scale(1.05);
+
+        #library-btn {
+
+            background:
+                #ffffff;
+
+            color:
+                #111827;
         }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (
+            max-width: 900px
+        ) {
+
+            #target-bar {
+
+                height:
+                    105px;
+
+                padding:
+                    7px 12px;
+
+                flex-direction:
+                    column;
+
+                justify-content:
+                    center;
+
+                gap:
+                    5px;
+
+            }
+
+
+            #target-area {
+
+                max-width:
+                    90%;
+
+            }
+
+
+            .stats-container {
+
+                gap:
+                    3px;
+
+            }
+
+
+            .stat {
+
+                min-width:
+                    58px;
+
+            }
+
+
+            .stat-value {
+
+                font-size:
+                    16px;
+
+            }
+
+
+            .stat-label {
+
+                font-size:
+                    8px;
+
+            }
+
+
+            #list-name-display {
+
+                max-width:
+                    80%;
+
+                font-size:
+                    12px;
+
+            }
+
+
+            #results-grid {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+
+            }
+
+        }
+
+
+        @media (
+            max-width: 600px
+        ) {
+
+            #game-container {
+
+                border-width:
+                    2px;
+
+            }
+
+
+            .prompt-label {
+
+                font-size:
+                    11px;
+
+            }
+
+
+            .target-word {
+
+                font-size:
+                    22px;
+
+            }
+
+
+            #target-bar {
+
+                height:
+                    115px;
+
+            }
+
+
+            .stats-container {
+
+                width:
+                    100%;
+
+                justify-content:
+                    space-around;
+
+            }
+
+
+            #results-grid {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+
+            }
+
+
+            #game-over-screen {
+
+                overflow-y:
+                    auto;
+
+            }
+
+        }
+
     </style>
+
 </head>
+
+
 <body>
 
+
 <div id="game-container">
-    <div id="loading-screen">
-        <div id="loading-text">Loading Vocabulary Set...</div>
+
+
+    <!-- =====================================================
+         CANVAS
+    ===================================================== -->
+
+    <canvas
+        id="gameCanvas"
+        width="1300"
+        height="800"
+    >
+    </canvas>
+
+
+    <!-- =====================================================
+         LIST NAME
+    ===================================================== -->
+
+    <div id="list-name-display">
+        Loading vocabulary set...
     </div>
 
-    <canvas id="gameCanvas" width="1300" height="800"></canvas>
-    
+
+    <!-- =====================================================
+         WAVE MESSAGE
+    ===================================================== -->
+
+    <div id="wave-message">
+        WAVE 1
+    </div>
+
+
+    <!-- =====================================================
+         TARGET BAR
+    ===================================================== -->
+
     <div id="target-bar">
-        <div class="prompt-container">
-            <span class="prompt-label">Target Word: </span>
-            <span id="target-word-display" class="target-word">---</span>
+
+
+        <div id="target-area">
+
+            <span class="prompt-label">
+                Blast:
+            </span>
+
+            <span
+                id="target-word-display"
+                class="target-word"
+            >
+                ---
+            </span>
+
         </div>
+
+
         <div class="stats-container">
-            <div class="ammo-board">
-                Shots Left: <span id="ammo-display">40</span>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Score
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="score-display"
+                >
+                    0
+                </span>
+
             </div>
-            <div class="score-board">
-                Score: <span id="score-display">0</span>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Ammo
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="ammo-display"
+                >
+                    50
+                </span>
+
             </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Shields
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="shields-display"
+                >
+                    ♥ ♥ ♥
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Wave
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="wave-display"
+                >
+                    1
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Accuracy
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="accuracy-display"
+                >
+                    100%
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Words
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="words-display"
+                >
+                    0/20
+                </span>
+
+            </div>
+
+
         </div>
+
+
     </div>
 
-    <div id="game-over-screen" class="hidden">
-        <h1>GAME OVER</h1>
-        <p>Final Score: <span id="final-score">0</span></p>
-        <button id="restart-btn">Play Again</button>
+
+    <!-- =====================================================
+         LOADING SCREEN
+    ===================================================== -->
+
+    <div id="loading-screen">
+
+
+        <div id="loading-title">
+            BlastWord
+        </div>
+
+
+        <div id="loading-text">
+            Loading Vocabulary Set...
+        </div>
+
+
+        <div id="loading-details">
+        </div>
+
+
     </div>
+
+
+    <!-- =====================================================
+         GAME OVER SCREEN
+    ===================================================== -->
+
+    <div
+        id="game-over-screen"
+        class="hidden"
+    >
+
+
+        <h1>
+            GAME OVER
+        </h1>
+
+
+        <div id="game-over-list">
+            Vocabulary Set
+        </div>
+
+
+        <div id="results-grid">
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Score
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-score"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Accuracy
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-accuracy"
+                >
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Words Blasted
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-correct"
+                >
+                    0/20
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Best Combo
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-combo"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div id="game-over-message">
+        </div>
+
+
+        <div id="button-row">
+
+
+            <button
+                id="restart-btn"
+                class="action-button"
+                type="button"
+            >
+                PLAY AGAIN
+            </button>
+
+
+            <button
+                id="library-btn"
+                class="action-button"
+                type="button"
+            >
+                LIBRARY
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
 </div>
 
+
 <script type="module">
-    /* =========================================
-       FIREBASE IMPORTS & CONFIG
-    ========================================= */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-        authDomain: "bubbleword-30367.firebaseapp.com",
-        projectId: "bubbleword-30367",
-        storageBucket: "bubbleword-30367.firebasestorage.app",
-        messagingSenderId: "1058393039019",
-        appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
-    };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+/* =========================================================
+   FIREBASE IMPORTS
+   ========================================================= */
 
-    /* =========================================
-       VOCABULARY LOADER INTEGRATION
-    ========================================= */
-    async function loadSet(setId) {
-        const ref = doc(db, "vocabSets", setId);
-        const snapshot = await getDoc(ref);
+import {
+    initializeApp
+}
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-        if (!snapshot.exists()) {
-            throw new Error("Vocabulary set not found.");
-        }
 
-        let terms = snapshot.data().terms;
+import {
+    getFirestore,
+    doc,
+    getDoc
+}
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        if (typeof terms === "string") {
-            try {
-                terms = JSON.parse(terms);
-            } catch (error) {
-                console.error("Vocabulary JSON parse failed:", error);
-                terms = [];
-            }
-        }
 
-        if (!Array.isArray(terms)) {
-            throw new Error("Vocabulary data is not an array.");
-        }
+/* =========================================================
+   FIREBASE CONFIG
+   ========================================================= */
 
-        return terms;
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+
+};
+
+
+const app =
+    initializeApp(
+        firebaseConfig
+    );
+
+
+const db =
+    getFirestore(
+        app
+    );
+
+
+/* =========================================================
+   CONSTANTS
+   ========================================================= */
+
+const CANVAS_WIDTH =
+    1300;
+
+
+const CANVAS_HEIGHT =
+    800;
+
+
+const FOOTER_HEIGHT =
+    88;
+
+
+const MAX_WORDS_PER_GAME =
+    20;
+
+
+const MIN_UNIQUE_DEFINITIONS =
+    4;
+
+
+const MAX_AMMO =
+    50;
+
+
+const CORRECT_AMMO_BONUS =
+    2;
+
+
+const MAX_SHIELDS =
+    3;
+
+
+const SHIP_ROWS =
+    4;
+
+
+const SHIP_COLS =
+    5;
+
+
+const TOTAL_SHIPS =
+    SHIP_ROWS *
+    SHIP_COLS;
+
+
+/* =========================================================
+   DOM REFERENCES
+   ========================================================= */
+
+const canvas =
+    document.getElementById(
+        "gameCanvas"
+    );
+
+
+const ctx =
+    canvas.getContext(
+        "2d"
+    );
+
+
+const targetWordDisplay =
+    document.getElementById(
+        "target-word-display"
+    );
+
+
+const scoreDisplay =
+    document.getElementById(
+        "score-display"
+    );
+
+
+const ammoDisplay =
+    document.getElementById(
+        "ammo-display"
+    );
+
+
+const shieldsDisplay =
+    document.getElementById(
+        "shields-display"
+    );
+
+
+const waveDisplay =
+    document.getElementById(
+        "wave-display"
+    );
+
+
+const accuracyDisplay =
+    document.getElementById(
+        "accuracy-display"
+    );
+
+
+const wordsDisplay =
+    document.getElementById(
+        "words-display"
+    );
+
+
+const listNameDisplay =
+    document.getElementById(
+        "list-name-display"
+    );
+
+
+const loadingScreen =
+    document.getElementById(
+        "loading-screen"
+    );
+
+
+const loadingText =
+    document.getElementById(
+        "loading-text"
+    );
+
+
+const loadingDetails =
+    document.getElementById(
+        "loading-details"
+    );
+
+
+const gameOverScreen =
+    document.getElementById(
+        "game-over-screen"
+    );
+
+
+const gameOverList =
+    document.getElementById(
+        "game-over-list"
+    );
+
+
+const finalScore =
+    document.getElementById(
+        "final-score"
+    );
+
+
+const finalAccuracy =
+    document.getElementById(
+        "final-accuracy"
+    );
+
+
+const finalCorrect =
+    document.getElementById(
+        "final-correct"
+    );
+
+
+const finalCombo =
+    document.getElementById(
+        "final-combo"
+    );
+
+
+const gameOverMessage =
+    document.getElementById(
+        "game-over-message"
+    );
+
+
+const restartButton =
+    document.getElementById(
+        "restart-btn"
+    );
+
+
+const libraryButton =
+    document.getElementById(
+        "library-btn"
+    );
+
+
+const waveMessage =
+    document.getElementById(
+        "wave-message"
+    );
+
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let vocabList =
+    [];
+
+
+let listTitle =
+    "Vocabulary Set";
+
+
+let currentTarget =
+    null;
+
+
+let targetHistory =
+    [];
+
+
+let score =
+    0;
+
+
+let ammo =
+    MAX_AMMO;
+
+
+let shields =
+    MAX_SHIELDS;
+
+
+let correctAnswers =
+    0;
+
+
+let totalShots =
+    0;
+
+
+let streak =
+    0;
+
+
+let bestStreak =
+    0;
+
+
+let wave =
+    1;
+
+
+let isGameOver =
+    false;
+
+
+let gameStarted =
+    false;
+
+
+let bullets =
+    [];
+
+
+let ships =
+    [];
+
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
+
+const player = {
+
+    x:
+        CANVAS_WIDTH / 2,
+
+    y:
+        CANVAS_HEIGHT -
+        FOOTER_HEIGHT -
+        55,
+
+    width:
+        70,
+
+    height:
+        45,
+
+    speed:
+        9,
+
+    color:
+        "#00ffff"
+
+};
+
+
+/* =========================================================
+   MOVEMENT
+   ========================================================= */
+
+const keys = {};
+
+
+/* =========================================================
+   SHIP COLORS
+   ========================================================= */
+
+const SHIP_COLORS = [
+
+    "#1E90FF",
+
+    "#32CD32",
+
+    "#9370DB",
+
+    "#FF69B4",
+
+    "#FF8C00"
+
+];
+
+
+/* =========================================================
+   SPEED
+   ========================================================= */
+
+let horizontalDirection =
+    1;
+
+
+let horizontalSpeed =
+    1.0;
+
+
+let downwardSpeed =
+    0.04;
+
+
+/* =========================================================
+   URL
+   ========================================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const setId =
+    params.get("id") ||
+    params.get("set");
+
+
+/* =========================================================
+   NORMALIZE TEXT
+   ========================================================= */
+
+function normalizeText(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+        .trim()
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .toLowerCase();
+
+}
+
+
+/* =========================================================
+   SHUFFLE
+   ========================================================= */
+
+function shuffle(
+    array
+) {
+
+    const copy =
+        [...array];
+
+
+    for (
+        let i =
+            copy.length -
+            1;
+
+        i > 0;
+
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            copy[i],
+            copy[j]
+        ] =
+        [
+            copy[j],
+            copy[i]
+        ];
+
     }
 
-    /* =========================================
-       GAME STATE & CONFIGURATION
-    ========================================= */
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
 
-    const targetWordDisplay = document.getElementById('target-word-display');
-    const scoreDisplay = document.getElementById('score-display');
-    const ammoDisplay = document.getElementById('ammo-display');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const finalScoreDisplay = document.getElementById('final-score');
-    const loadingScreen = document.getElementById('loading-screen');
-    const restartBtn = document.getElementById('restart-btn');
+    return copy;
 
-    let vocabList = [];
+}
 
-    const SHIP_COLORS = ['#1E90FF', '#32CD32', '#9370DB', '#FF69B4', '#FF8C00'];
-    const GRID_ROWS = 4;
-    const GRID_COLS = 5;
-    const MAX_AMMO = 40;
-    
-    let score = 0;
-    let ammo = MAX_AMMO;
 
-    let isGameOver = false;
-    let currentTarget = null;
-    
-    let baseSpeed = 0.08;
-    let speedMultiplier = 1;
-    let horizontalDirection = 1;
-    let horizontalSpeed = 1.4;
+/* =========================================================
+   LOAD FIREBASE SET
+   ========================================================= */
 
-    const keys = {};
+async function loadVocabularySet(
+    id
+) {
 
-    const player = {
-        x: canvas.width / 2 - 30,
-        y: canvas.height - 120,
-        width: 60,
-        height: 40,
-        speed: 9,
-        color: '#00ffff'
-    };
+    if (!id) {
 
-    let bullets = [];
-    let ships = [];
+        throw new Error(
+            "No vocabulary set ID was provided. Open BlastWord from the Vocabulary Arcade Library."
+        );
 
-    /* =========================================
-       INITIALIZE GAME & VOCAB DATA
-    ========================================= */
-    async function initVocab() {
-        const params = new URLSearchParams(window.location.search);
-        const setId = params.get("id") || params.get("set");
+    }
 
-        if (setId) {
-            try {
-                const terms = await loadSet(setId);
-                vocabList = terms.map((v, index) => ({
-                    id: index + 1,
-                    word: v.word,
-                    def: v.meaning || v.definition || v.def
-                }));
-                console.log("Firebase vocabulary loaded:", vocabList);
-            } catch (error) {
-                console.error("Firebase vocabulary error:", error);
-                alert("Could not load Firebase vocabulary set. Using fallback list.");
-            }
-        } else {
-            console.warn("No Firebase vocabulary set ID was provided in URL query params.");
+
+    const reference =
+        doc(
+            db,
+            "vocabSets",
+            id
+        );
+
+
+    const snapshot =
+        await getDoc(
+            reference
+        );
+
+
+    if (
+        !snapshot.exists()
+    ) {
+
+        throw new Error(
+            "Vocabulary set not found in Firebase."
+        );
+
+    }
+
+
+    const data =
+        snapshot.data();
+
+
+    let items =
+        [];
+
+
+    /*
+       CURRENT FORMAT
+       items: [
+           {
+               word: "...",
+               definition: "..."
+           }
+       ]
+    */
+
+    if (
+        Array.isArray(
+            data.items
+        )
+    ) {
+
+        items =
+            data.items;
+
+    }
+
+
+    /*
+       LEGACY FORMAT
+    */
+
+    else if (
+        Array.isArray(
+            data.terms
+        )
+    ) {
+
+        items =
+            data.terms;
+
+    }
+
+
+    else if (
+        typeof data.terms ===
+        "string"
+    ) {
+
+        try {
+
+            items =
+                JSON.parse(
+                    data.terms
+                );
+
         }
 
-        // Default Fallback
-        if (!vocabList || vocabList.length === 0) {
-            vocabList = [
-                { word: "amāre", def: "to love" },
-                { word: "monēre", def: "to warn" },
-                { word: "mittere", def: "to send" },
-                { word: "audīre", def: "to hear" },
-                { word: "capere", def: "to take" },
-                { word: "vocāre", def: "to call" },
-                { word: "dīcere", def: "to say" },
-                { word: "vidēre", def: "to see" },
-                { word: "habēre", def: "to have" },
-                { word: "facere", def: "to do / make" }
+        catch {
+
+            throw new Error(
+                "The legacy vocabulary data could not be parsed."
+            );
+
+        }
+
+    }
+
+
+    /*
+       Normalize the vocabulary.
+    */
+
+    const vocabulary =
+        items
+            .filter(
+                item =>
+                    item &&
+                    item.word &&
+                    (
+                        item.definition ||
+                        item.meaning
+                    )
+            )
+            .map(
+                item => ({
+
+                    word:
+                        String(
+                            item.word
+                        ).trim(),
+
+                    definition:
+                        String(
+                            item.definition ||
+                            item.meaning ||
+                            ""
+                        ).trim()
+
+                })
+            )
+            .filter(
+                item =>
+                    item.word &&
+                    item.definition
+            );
+
+
+    return {
+
+        title:
+            data.title ||
+            "Vocabulary Set",
+
+        language:
+            data.language ||
+            "",
+
+        items:
+            vocabulary
+
+    };
+
+}
+
+
+/* =========================================================
+   VALIDATE VOCABULARY
+   ========================================================= */
+
+function validateVocabulary(
+    items
+) {
+
+    if (
+        !Array.isArray(
+            items
+        )
+    ) {
+
+        throw new Error(
+            "The vocabulary data is not an array."
+        );
+
+    }
+
+
+    if (
+        items.length <
+        MAX_WORDS_PER_GAME
+    ) {
+
+        throw new Error(
+            `BlastWord requires at least ${MAX_WORDS_PER_GAME} vocabulary items. This list contains ${items.length}.`
+        );
+
+    }
+
+
+    /*
+       Check for duplicate words.
+    */
+
+    const wordCounts =
+        new Map();
+
+
+    items.forEach(
+        item => {
+
+            const key =
+                normalizeText(
+                    item.word
+                );
+
+
+            wordCounts.set(
+                key,
+                (
+                    wordCounts.get(
+                        key
+                    ) ||
+                    0
+                ) + 1
+            );
+
+        }
+    );
+
+
+    const duplicateWords =
+        items
+            .filter(
+                item =>
+                    wordCounts.get(
+                        normalizeText(
+                            item.word
+                        )
+                    ) > 1
+            )
+            .map(
+                item =>
+                    item.word
+            );
+
+
+    if (
+        duplicateWords.length > 0
+    ) {
+
+        const uniqueDuplicates =
+            [
+                ...new Set(
+                    duplicateWords
+                )
             ];
-        }
 
-        loadingScreen.classList.add('hidden');
-        startGame();
+
+        throw new Error(
+            "Duplicate vocabulary words found: " +
+            uniqueDuplicates.join(
+                ", "
+            )
+        );
+
     }
 
-    window.startLoadedGame = function() {
-        loadingScreen.classList.add('hidden');
-        startGame();
-    };
 
-    /* =========================================
-       CONTROLS & GAMEPLAY
-    ========================================= */
-    window.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
-        if (e.code === 'Space' && !isGameOver) {
-            e.preventDefault();
-            fireBullet();
+    /*
+       Check for duplicate answers.
+
+       In BlastWord, the definition is
+       the answer the student shoots.
+
+       Therefore every definition must
+       be unique.
+    */
+
+    const definitionMap =
+        new Map();
+
+
+    items.forEach(
+        item => {
+
+            const key =
+                normalizeText(
+                    item.definition
+                );
+
+
+            if (
+                !definitionMap.has(
+                    key
+                )
+            ) {
+
+                definitionMap.set(
+                    key,
+                    []
+                );
+
+            }
+
+
+            definitionMap
+                .get(key)
+                .push(
+                    item.word
+                );
+
         }
-    });
+    );
 
-    window.addEventListener('keyup', (e) => {
-        keys[e.code] = false;
-    });
 
-    restartBtn.addEventListener('click', () => {
-        resetGame();
-    });
+    const duplicateDefinitions =
+        [...definitionMap.entries()]
+            .filter(
+                ([key, words]) =>
+                    words.length > 1
+            );
 
-    function fireBullet() {
-        if (ammo > 0) {
-            ammo--;
-            ammoDisplay.textContent = ammo;
 
-            bullets.push({
-                x: player.x + player.width / 2 - 4,
-                y: player.y,
-                width: 8,
-                height: 20,
-                speed: 13,
-                color: '#ff00ff'
+    if (
+        duplicateDefinitions.length > 0
+    ) {
+
+        const details =
+            duplicateDefinitions
+                .map(
+                    ([key, words]) =>
+                        `"${key}" → ${words.join(", ")}`
+                )
+                .join(
+                    " | "
+                );
+
+
+        throw new Error(
+            "Duplicate answers were found in this vocabulary set. " +
+            "Each definition must belong to only one vocabulary word. " +
+            details
+        );
+
+    }
+
+
+    /*
+       Unique definitions.
+    */
+
+    const uniqueDefinitions =
+        definitionMap.size;
+
+
+    if (
+        uniqueDefinitions <
+        MIN_UNIQUE_DEFINITIONS
+    ) {
+
+        throw new Error(
+            `BlastWord requires at least ${MIN_UNIQUE_DEFINITIONS} different answers. This list has only ${uniqueDefinitions}.`
+        );
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   SHOW ERROR
+   ========================================================= */
+
+function showLoadError(
+    message
+) {
+
+    loadingText.textContent =
+        "BlastWord could not start.";
+
+
+    loadingDetails.textContent =
+        message;
+
+
+    loadingScreen.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   HIDE LOADING
+   ========================================================= */
+
+function hideLoading() {
+
+    loadingScreen.classList.add(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   CREATE SHIPS
+   ========================================================= */
+
+function createShips() {
+
+    ships =
+        [];
+
+
+    const playableBottom =
+        CANVAS_HEIGHT -
+        FOOTER_HEIGHT -
+        40;
+
+
+    const shipWidth =
+        220;
+
+
+    const shipHeight =
+        68;
+
+
+    const horizontalGap =
+        18;
+
+
+    const verticalGap =
+        22;
+
+
+    const totalWidth =
+        (
+            SHIP_COLS *
+            shipWidth
+        )
+        +
+        (
+            (
+                SHIP_COLS -
+                1
+            ) *
+            horizontalGap
+        );
+
+
+    const startX =
+        (
+            CANVAS_WIDTH -
+            totalWidth
+        ) /
+        2;
+
+
+    const startY =
+        65;
+
+
+    /*
+       Start by assigning random definitions.
+    */
+
+    const shuffledDefinitions =
+        shuffle(
+            vocabList
+                .map(
+                    item =>
+                        item.definition
+                )
+        );
+
+
+    for (
+        let row = 0;
+        row < SHIP_ROWS;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < SHIP_COLS;
+            col++
+        ) {
+
+            const definition =
+                shuffledDefinitions[
+                    (
+                        row *
+                        SHIP_COLS +
+                        col
+                    )
+                    %
+                    shuffledDefinitions.length
+                ];
+
+
+            ships.push({
+
+                x:
+                    startX +
+                    col *
+                    (
+                        shipWidth +
+                        horizontalGap
+                    ),
+
+                y:
+                    startY +
+                    row *
+                    (
+                        shipHeight +
+                        verticalGap
+                    ),
+
+                width:
+                    shipWidth,
+
+                height:
+                    shipHeight,
+
+                def:
+                    definition,
+
+                color:
+                    SHIP_COLORS[
+                        (
+                            row *
+                            SHIP_COLS +
+                            col
+                        )
+                        %
+                        SHIP_COLORS.length
+                    ],
+
+                gridCol:
+                    col,
+
+                gridRow:
+                    row
+
             });
+
         }
+
     }
 
-    function getLowestShips() {
-        const lowestMap = {};
-        ships.forEach(ship => {
-            if (!lowestMap[ship.gridCol] || ship.y > lowestMap[ship.gridCol].y) {
-                lowestMap[ship.gridCol] = ship;
+
+    /*
+       Give the first target a guaranteed
+       matching ship.
+    */
+
+    setNewTarget();
+
+}
+
+
+/* =========================================================
+   SET NEW TARGET
+   ========================================================= */
+
+function setNewTarget() {
+
+    if (
+        correctAnswers >=
+        MAX_WORDS_PER_GAME
+    ) {
+
+        completeGame();
+
+        return;
+
+    }
+
+
+    /*
+       Select a vocabulary item.
+
+       Avoid repeating targets until we
+       have used most of the list.
+    */
+
+    const available =
+        vocabList.filter(
+            item =>
+                !targetHistory.includes(
+                    normalizeText(
+                        item.word
+                    )
+                )
+        );
+
+
+    let pool =
+        available.length > 0
+            ? available
+            : vocabList;
+
+
+    /*
+       Prefer a target whose definition
+       can replace a ship without making
+       the visible board ambiguous.
+    */
+
+    const selected =
+        pool[
+            Math.floor(
+                Math.random() *
+                pool.length
+            )
+        ];
+
+
+    currentTarget =
+        selected;
+
+
+    targetHistory.push(
+        normalizeText(
+            selected.word
+        )
+    );
+
+
+    targetWordDisplay.textContent =
+        selected.word;
+
+
+    /*
+       Guarantee exactly one matching ship.
+    */
+
+    ensureTargetShip();
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   GUARANTEE TARGET SHIP
+   ========================================================= */
+
+function ensureTargetShip() {
+
+    if (
+        !currentTarget
+    ) {
+
+        return;
+
+    }
+
+
+    const matchingShips =
+        ships.filter(
+            ship =>
+                normalizeText(
+                    ship.def
+                ) ===
+                normalizeText(
+                    currentTarget.definition
+                )
+        );
+
+
+    /*
+       If there is already exactly one,
+       we're finished.
+    */
+
+    if (
+        matchingShips.length === 1
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       If there are multiple matches,
+       change all but one.
+    */
+
+    if (
+        matchingShips.length > 1
+    ) {
+
+        for (
+            let i = 1;
+            i < matchingShips.length;
+            i++
+        ) {
+
+            matchingShips[i].def =
+                getDistractorDefinition(
+                    currentTarget.definition
+                );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+       There is no matching ship.
+       Replace one ship with the correct
+       definition.
+    */
+
+    const replacement =
+        ships[
+            Math.floor(
+                Math.random() *
+                ships.length
+            )
+        ];
+
+
+    replacement.def =
+        currentTarget.definition;
+
+}
+
+
+/* =========================================================
+   DISTRACTOR DEFINITION
+   ========================================================= */
+
+function getDistractorDefinition(
+    correctDefinition
+) {
+
+    const choices =
+        vocabList
+            .map(
+                item =>
+                    item.definition
+            )
+            .filter(
+                definition =>
+                    normalizeText(
+                        definition
+                    ) !==
+                    normalizeText(
+                        correctDefinition
+                    )
+            );
+
+
+    if (
+        choices.length === 0
+    ) {
+
+        return correctDefinition;
+
+    }
+
+
+    return choices[
+        Math.floor(
+            Math.random() *
+            choices.length
+        )
+    ];
+
+}
+
+
+/* =========================================================
+   HUD
+   ========================================================= */
+
+function updateHUD() {
+
+    scoreDisplay.textContent =
+        score;
+
+
+    ammoDisplay.textContent =
+        ammo;
+
+
+    waveDisplay.textContent =
+        wave;
+
+
+    wordsDisplay.textContent =
+        `${correctAnswers}/${MAX_WORDS_PER_GAME}`;
+
+
+    const percentage =
+        totalShots > 0
+
+            ? Math.round(
+                (
+                    correctAnswers /
+                    totalShots
+                ) *
+                100
+            )
+
+            : 100;
+
+
+    accuracyDisplay.textContent =
+        `${percentage}%`;
+
+
+    let shieldsText =
+        "";
+
+
+    for (
+        let i = 0;
+        i < MAX_SHIELDS;
+        i++
+    ) {
+
+        shieldsText +=
+            i < shields
+                ? "♥ "
+                : "♡ ";
+
+    }
+
+
+    shieldsDisplay.textContent =
+        shieldsText.trim();
+
+}
+
+
+/* =========================================================
+   UPDATE WAVE
+   ========================================================= */
+
+function updateWave() {
+
+    const newWave =
+        Math.floor(
+            correctAnswers / 5
+        )
+        +
+        1;
+
+
+    if (
+        newWave !== wave
+    ) {
+
+        wave =
+            newWave;
+
+
+        horizontalSpeed =
+            1.0 +
+            (
+                wave -
+                1
+            )
+            *
+            0.45;
+
+
+        downwardSpeed =
+            0.04 +
+            (
+                wave -
+                1
+            )
+            *
+            0.018;
+
+
+        showWaveMessage(
+            `WAVE ${wave}`
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   WAVE MESSAGE
+   ========================================================= */
+
+let waveMessageTimer =
+    null;
+
+
+function showWaveMessage(
+    message
+) {
+
+    waveMessage.textContent =
+        message;
+
+
+    waveMessage.classList.remove(
+        "show"
+    );
+
+
+    void waveMessage.offsetWidth;
+
+
+    waveMessage.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        waveMessageTimer
+    );
+
+
+    waveMessageTimer =
+        setTimeout(
+            () => {
+
+                waveMessage.classList.remove(
+                    "show"
+                );
+
+            },
+            900
+        );
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+window.addEventListener(
+    "keydown",
+    event => {
+
+        keys[
+            event.code
+        ] =
+            true;
+
+
+        if (
+            event.code ===
+            "Space"
+        ) {
+
+            event.preventDefault();
+
+
+            if (
+                gameStarted &&
+                !isGameOver
+            ) {
+
+                fireBulletFromPlayer();
+
             }
-        });
-        return Object.values(lowestMap);
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    event => {
+
+        keys[
+            event.code
+        ] =
+            false;
+
+    }
+);
+
+
+/* =========================================================
+   FIRE BULLET
+   ========================================================= */
+
+function fireBulletFromPlayer() {
+
+    if (
+        isGameOver ||
+        ammo <= 0
+    ) {
+
+        return;
+
     }
 
-    function pickNewTarget() {
-        const lowestShips = getLowestShips();
-        if (lowestShips.length === 0) return;
 
-        const targetShip = lowestShips[Math.floor(Math.random() * lowestShips.length)];
-        const matchedVocab = vocabList.find(v => v.def === targetShip.def);
-        
-        if (matchedVocab) {
-            currentTarget = matchedVocab;
-        } else {
-            currentTarget = vocabList[Math.floor(Math.random() * vocabList.length)];
-            targetShip.def = currentTarget.def;
-        }
+    ammo--;
 
-        targetWordDisplay.textContent = currentTarget.word;
-    }
+    totalShots++;
 
-    function initShips() {
-        ships = [];
-        const paddingX = 30;
-        const paddingY = 25;
-        const shipWidth = 215; // Scaled for wider layout
-        const shipHeight = 65;
-        const startX = 40;
-        const startY = 50;
 
-        let availableDefs = vocabList.map(v => v.def);
+    bullets.push({
 
-        for (let row = 0; row < GRID_ROWS; row++) {
-            for (let col = 0; col < GRID_COLS; col++) {
-                const randomDefIndex = Math.floor(Math.random() * availableDefs.length);
-                const assignedDef = availableDefs[randomDefIndex] || vocabList[0].def;
+        x:
+            player.x -
+            4,
 
-                ships.push({
-                    x: startX + col * (shipWidth + paddingX),
-                    y: startY + row * (shipHeight + paddingY),
-                    width: shipWidth,
-                    height: shipHeight,
-                    def: assignedDef,
-                    color: SHIP_COLORS[(row * GRID_COLS + col) % SHIP_COLORS.length],
-                    gridCol: col,
-                    gridRow: row
-                });
-            }
-        }
-        pickNewTarget();
-    }
+        y:
+            player.y -
+            5,
 
-    function respawnShip(ship) {
-        let minY = ship.y;
-        ships.forEach(s => {
-            if (s !== ship && s.gridCol === ship.gridCol) {
-                if (s.y < minY) minY = s.y;
-            }
-        });
+        width:
+            8,
 
-        ship.y = minY - (ship.height + 25);
-        const otherDefs = vocabList.filter(v => v.def !== currentTarget.def).map(v => v.def);
-        ship.def = otherDefs[Math.floor(Math.random() * otherDefs.length)];
-    }
+        height:
+            21,
 
-    function update() {
-        if (isGameOver) return;
+        speed:
+            14,
 
-        if ((keys['ArrowLeft'] || keys['KeyA']) && player.x > 0) {
-            player.x -= player.speed;
-        }
-        if ((keys['ArrowRight'] || keys['KeyD']) && player.x + player.width < canvas.width) {
-            player.x += player.speed;
-        }
+        color:
+            "#ff00ff"
 
-        for (let i = bullets.length - 1; i >= 0; i--) {
-            bullets[i].y -= bullets[i].speed;
-            if (bullets[i].y < 0) {
-                bullets.splice(i, 1);
-            }
-        }
+    });
 
-        if (ammo === 0 && bullets.length === 0) {
-            triggerGameOver();
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   CANVAS CLICK / TOUCH
+   ========================================================= */
+
+canvas.addEventListener(
+    "pointerdown",
+    event => {
+
+        if (
+            !gameStarted ||
+            isGameOver
+        ) {
+
             return;
+
         }
 
-        let minX = Infinity;
-        let maxX = -Infinity;
-        ships.forEach(ship => {
-            if (ship.x < minX) minX = ship.x;
-            if (ship.x + ship.width > maxX) maxX = ship.x + ship.width;
-        });
 
-        if (maxX >= canvas.width - 25 && horizontalDirection > 0) {
-            horizontalDirection = -1;
-        } else if (minX <= 25 && horizontalDirection < 0) {
-            horizontalDirection = 1;
+        /*
+           Only fire when the player
+           clicks/taps the game field.
+        */
+
+        fireBulletFromPlayer();
+
+    }
+);
+
+
+/* =========================================================
+   UPDATE PLAYER
+   ========================================================= */
+
+function updatePlayer() {
+
+    if (
+        keys["ArrowLeft"] ||
+        keys["KeyA"]
+    ) {
+
+        player.x -=
+            player.speed;
+
+    }
+
+
+    if (
+        keys["ArrowRight"] ||
+        keys["KeyD"]
+    ) {
+
+        player.x +=
+            player.speed;
+
+    }
+
+
+    const halfWidth =
+        player.width /
+        2;
+
+
+    player.x =
+        Math.max(
+            halfWidth,
+            Math.min(
+                CANVAS_WIDTH -
+                halfWidth,
+                player.x
+            )
+        );
+
+}
+
+
+/* =========================================================
+   UPDATE BULLETS
+   ========================================================= */
+
+function updateBullets() {
+
+    for (
+        let i =
+            bullets.length -
+            1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const bullet =
+            bullets[i];
+
+
+        bullet.y -=
+            bullet.speed;
+
+
+        if (
+            bullet.y +
+            bullet.height <
+            0
+        ) {
+
+            bullets.splice(
+                i,
+                1
+            );
+
         }
 
-        speedMultiplier += 0.00005;
-        const currentSpeed = baseSpeed * speedMultiplier;
+    }
 
-        ships.forEach(ship => {
-            ship.y += currentSpeed;
-            ship.x += horizontalDirection * horizontalSpeed;
+}
 
-            if (ship.y + ship.height >= player.y) {
-                triggerGameOver();
+
+/* =========================================================
+   UPDATE SHIPS
+   ========================================================= */
+
+function updateShips() {
+
+    if (
+        ships.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    let left =
+        Infinity;
+
+
+    let right =
+        -Infinity;
+
+
+    ships.forEach(
+        ship => {
+
+            left =
+                Math.min(
+                    left,
+                    ship.x
+                );
+
+
+            right =
+                Math.max(
+                    right,
+                    ship.x +
+                    ship.width
+                );
+
+        }
+    );
+
+
+    /*
+       Reverse horizontal direction
+       when the formation reaches the edge.
+    */
+
+    if (
+        right >=
+            CANVAS_WIDTH -
+            15
+        &&
+        horizontalDirection > 0
+    ) {
+
+        horizontalDirection =
+            -1;
+
+    }
+
+
+    else if (
+        left <= 15
+        &&
+        horizontalDirection < 0
+    ) {
+
+        horizontalDirection =
+            1;
+
+    }
+
+
+    ships.forEach(
+        ship => {
+
+            ship.x +=
+                horizontalDirection *
+                horizontalSpeed;
+
+
+            /*
+               Gradually move downward.
+            */
+
+            ship.y +=
+                downwardSpeed;
+
+
+            /*
+               Game-over boundary.
+            */
+
+            const dangerLine =
+                player.y -
+                10;
+
+
+            if (
+                ship.y +
+                ship.height >=
+                dangerLine
+            ) {
+
+                triggerGameOver(
+                    "The alien fleet reached your ship!"
+                );
+
             }
-        });
 
-        for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
-            const b = bullets[bIndex];
-            
-            for (let sIndex = 0; sIndex < ships.length; sIndex++) {
-                const s = ships[sIndex];
+        }
+    );
+
+}
+
+
+/* =========================================================
+   COLLISION DETECTION
+   ========================================================= */
+
+function rectanglesOverlap(
+    a,
+    b
+) {
+
+    return (
+
+        a.x <
+        b.x +
+        b.width
+
+        &&
+
+        a.x +
+        a.width >
+        b.x
+
+        &&
+
+        a.y <
+        b.y +
+        b.height
+
+        &&
+
+        a.y +
+        a.height >
+        b.y
+
+    );
+
+}
+
+
+/* =========================================================
+   HANDLE BULLET COLLISIONS
+   ========================================================= */
+
+function handleCollisions() {
+
+    for (
+        let bIndex =
+            bullets.length -
+            1;
+
+        bIndex >= 0;
+
+        bIndex--
+    ) {
+
+        const bullet =
+            bullets[bIndex];
+
+
+        let collisionHandled =
+            false;
+
+
+        for (
+            let sIndex = 0;
+
+            sIndex <
+            ships.length;
+
+            sIndex++
+        ) {
+
+            const ship =
+                ships[sIndex];
+
+
+            if (
+                rectanglesOverlap(
+                    bullet,
+                    ship
+                )
+            ) {
+
+                /*
+                   Remove bullet.
+                */
+
+                bullets.splice(
+                    bIndex,
+                    1
+                );
+
+
+                collisionHandled =
+                    true;
+
+
+                /*
+                   CORRECT SHIP
+                */
 
                 if (
-                    b.x < s.x + s.width &&
-                    b.x + b.width > s.x &&
-                    b.y < s.y + s.height &&
-                    b.y + b.height > s.y
+                    normalizeText(
+                        ship.def
+                    ) ===
+                    normalizeText(
+                        currentTarget.definition
+                    )
                 ) {
-                    bullets.splice(bIndex, 1);
 
-                    if (s.def === currentTarget.def) {
-                        ships.splice(sIndex, 1);
-                        score += 100;
-                        scoreDisplay.textContent = score;
+                    handleCorrectHit(
+                        ship
+                    );
 
-                        if (ships.length === 0) {
-                            initShips();
-                        } else {
-                            pickNewTarget();
-                        }
-                    } else {
-                        score = Math.max(0, score - 50);
-                        scoreDisplay.textContent = score;
-                        respawnShip(s);
-
-                        const lowest = getLowestShips();
-                        if (!lowest.some(ship => ship.def === currentTarget.def)) {
-                            pickNewTarget();
-                        }
-                    }
-                    break;
                 }
+
+
+                /*
+                   WRONG SHIP
+                */
+
+                else {
+
+                    handleWrongHit(
+                        ship
+                    );
+
+                }
+
+
+                break;
+
             }
+
         }
+
+
+        if (
+            collisionHandled
+        ) {
+
+            continue;
+
+        }
+
     }
 
-    function drawPlayer() {
-        ctx.fillStyle = player.color;
-        ctx.shadowColor = '#00ffff';
-        ctx.shadowBlur = 10;
+}
 
-        ctx.beginPath();
-        ctx.moveTo(player.x + player.width / 2, player.y);
-        ctx.lineTo(player.x + player.width, player.y + player.height);
-        ctx.lineTo(player.x + player.width * 0.75, player.y + player.height - 8);
-        ctx.lineTo(player.x + player.width / 2, player.y + player.height + 4);
-        ctx.lineTo(player.x + player.width * 0.25, player.y + player.height - 8);
-        ctx.lineTo(player.x, player.y + player.height);
-        ctx.closePath();
-        ctx.fill();
 
-        ctx.shadowBlur = 0;
+/* =========================================================
+   CORRECT HIT
+   ========================================================= */
+
+function handleCorrectHit(
+    ship
+) {
+
+    correctAnswers++;
+
+
+    streak++;
+
+
+    bestStreak =
+        Math.max(
+            bestStreak,
+            streak
+        );
+
+
+    /*
+       Base score.
+    */
+
+    let points =
+        100;
+
+
+    /*
+       Combo bonus.
+    */
+
+    points +=
+        (
+            streak -
+            1
+        )
+        *
+        25;
+
+
+    score +=
+        points;
+
+
+    /*
+       Reward accurate play with ammo.
+    */
+
+    ammo =
+        Math.min(
+            MAX_AMMO,
+            ammo +
+            CORRECT_AMMO_BONUS
+        );
+
+
+    /*
+       Remove correct ship.
+    */
+
+    const shipIndex =
+        ships.indexOf(
+            ship
+        );
+
+
+    if (
+        shipIndex >= 0
+    ) {
+
+        ships.splice(
+            shipIndex,
+            1
+        );
+
     }
 
-    /* Render retro spaceship graphics */
-    function drawShips() {
-        ships.forEach(ship => {
-            const w = ship.width;
-            const h = ship.height;
-            const x = ship.x;
-            const y = ship.y;
 
-            ctx.save();
-            ctx.translate(x, y);
+    /*
+       Correct answer explosion.
+       A visual pulse is handled by
+       the ship-removal effect below.
+    */
 
-            // Alien Spaceship Hull Outline
-            ctx.fillStyle = ship.color;
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
+    showFeedback(
+        `✓ +${points}`,
+        true
+    );
 
-            ctx.beginPath();
-            ctx.moveTo(w * 0.2, 0);                 // Upper Left Nose
-            ctx.lineTo(w * 0.8, 0);                 // Upper Right Nose
-            ctx.lineTo(w, h * 0.3);                 // Outer Right Wing
-            ctx.lineTo(w * 0.92, h * 0.75);         // Lower Right Wing
-            ctx.lineTo(w * 0.82, h);                // Right Engine Mount
-            ctx.lineTo(w * 0.18, h);                // Left Engine Mount
-            ctx.lineTo(w * 0.08, h * 0.75);         // Lower Left Wing
-            ctx.lineTo(0, h * 0.3);                 // Outer Left Wing
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
 
-            // Cockpit Window Area
-            ctx.fillStyle = 'rgba(5, 5, 16, 0.75)';
-            ctx.fillRect(w * 0.08, h * 0.15, w * 0.84, h * 0.7);
-            ctx.strokeStyle = ship.color;
-            ctx.strokeRect(w * 0.08, h * 0.15, w * 0.84, h * 0.7);
+    updateWave();
 
-            // Centered Definition Text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 18px "Segoe UI", Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(ship.def, w / 2, h / 2, w * 0.8);
 
-            ctx.restore();
-        });
+    updateHUD();
+
+
+    /*
+       Game complete?
+    */
+
+    if (
+        correctAnswers >=
+        MAX_WORDS_PER_GAME
+    ) {
+
+        completeGame();
+
+        return;
+
     }
 
-    function drawBullets() {
-        ctx.shadowColor = '#ff00ff';
-        ctx.shadowBlur = 8;
-        bullets.forEach(b => {
-            ctx.fillStyle = b.color;
-            ctx.fillRect(b.x, b.y, b.width, b.height);
-        });
-        ctx.shadowBlur = 0;
+
+    /*
+       Replace the destroyed ship
+       above the formation.
+    */
+
+    setTimeout(
+        () => {
+
+            if (
+                isGameOver
+            ) {
+
+                return;
+
+            }
+
+
+            addReplacementShip();
+
+
+            setNewTarget();
+
+        },
+        180
+    );
+
+}
+
+
+/* =========================================================
+   WRONG HIT
+   ========================================================= */
+
+function handleWrongHit(
+    ship
+) {
+
+    shields--;
+
+    streak =
+        0;
+
+
+    score =
+        Math.max(
+            0,
+            score -
+            50
+        );
+
+
+    showFeedback(
+        "✗ Wrong! -50",
+        false
+    );
+
+
+    /*
+       Move wrong ship back upward
+       rather than destroying it.
+    */
+
+    ship.y =
+        Math.max(
+            55,
+            ship.y -
+            55
+        );
+
+
+    /*
+       Change its definition to a
+       distractor if needed.
+    */
+
+    ship.def =
+        getDistractorDefinition(
+            currentTarget.definition
+        );
+
+
+    updateHUD();
+
+
+    if (
+        shields <= 0
+    ) {
+
+        triggerGameOver(
+            "Your shields were depleted!"
+        );
+
     }
 
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawPlayer();
-        drawShips();
-        drawBullets();
+}
+
+
+/* =========================================================
+   ADD REPLACEMENT SHIP
+   ========================================================= */
+
+function addReplacementShip() {
+
+    const shipWidth =
+        220;
+
+
+    const shipHeight =
+        68;
+
+
+    const horizontalGap =
+        18;
+
+
+    /*
+       Find the highest ship.
+    */
+
+    let highestY =
+        Infinity;
+
+
+    ships.forEach(
+        ship => {
+
+            highestY =
+                Math.min(
+                    highestY,
+                    ship.y
+                );
+
+        }
+    );
+
+
+    if (
+        highestY ===
+        Infinity
+    ) {
+
+        highestY =
+            70;
+
     }
 
-    function gameLoop() {
-        update();
+
+    /*
+       Pick the definition carefully.
+    */
+
+    const definition =
+        getDistractorDefinition(
+            currentTarget.definition
+        );
+
+
+    const col =
+        Math.floor(
+            Math.random() *
+            SHIP_COLS
+        );
+
+
+    ships.push({
+
+        x:
+            45 +
+            col *
+            (
+                shipWidth +
+                horizontalGap
+            ),
+
+        y:
+            highestY -
+            90,
+
+        width:
+            shipWidth,
+
+        height:
+            shipHeight,
+
+        def:
+            definition,
+
+        color:
+            SHIP_COLORS[
+                Math.floor(
+                    Math.random() *
+                    SHIP_COLORS.length
+                )
+            ],
+
+        gridCol:
+            col,
+
+        gridRow:
+            0
+
+    });
+
+}
+
+
+/* =========================================================
+   PLAYER DRAW
+   ========================================================= */
+
+function drawPlayer() {
+
+    const x =
+        player.x;
+
+
+    const y =
+        player.y;
+
+
+    const w =
+        player.width;
+
+
+    const h =
+        player.height;
+
+
+    ctx.save();
+
+
+    ctx.shadowColor =
+        "#00ffff";
+
+
+    ctx.shadowBlur =
+        12;
+
+
+    ctx.fillStyle =
+        player.color;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        x,
+        y
+    );
+
+
+    ctx.lineTo(
+        x +
+        w / 2,
+        y -
+        h
+    );
+
+
+    ctx.lineTo(
+        x +
+        w,
+        y
+    );
+
+
+    ctx.lineTo(
+        x +
+        w * 0.75,
+        y -
+        7
+    );
+
+
+    ctx.lineTo(
+        x +
+        w / 2,
+        y +
+        8
+    );
+
+
+    ctx.lineTo(
+        x +
+        w * 0.25,
+        y -
+        7
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fill();
+
+
+    /*
+       Cockpit.
+    */
+
+    ctx.fillStyle =
+        "#050510";
+
+
+    ctx.beginPath();
+
+
+    ctx.ellipse(
+        x +
+        w / 2,
+        y -
+        h * 0.45,
+        w * 0.14,
+        h * 0.20,
+        0,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   SHIP DRAW
+   ========================================================= */
+
+function drawShips() {
+
+    ships.forEach(
+        ship => {
+
+            drawAlienShip(
+                ship
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DRAW ALIEN SHIP
+   ========================================================= */
+
+function drawAlienShip(
+    ship
+) {
+
+    const x =
+        ship.x;
+
+
+    const y =
+        ship.y;
+
+
+    const w =
+        ship.width;
+
+
+    const h =
+        ship.height;
+
+
+    ctx.save();
+
+
+    ctx.translate(
+        x,
+        y
+    );
+
+
+    /*
+       Outer hull.
+    */
+
+    ctx.fillStyle =
+        ship.color;
+
+
+    ctx.strokeStyle =
+        "#ffffff";
+
+
+    ctx.lineWidth =
+        2;
+
+
+    ctx.shadowColor =
+        ship.color;
+
+
+    ctx.shadowBlur =
+        9;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        w * 0.18,
+        0
+    );
+
+
+    ctx.lineTo(
+        w * 0.82,
+        0
+    );
+
+
+    ctx.lineTo(
+        w,
+        h * 0.30
+    );
+
+
+    ctx.lineTo(
+        w * 0.92,
+        h * 0.76
+    );
+
+
+    ctx.lineTo(
+        w * 0.80,
+        h
+    );
+
+
+    ctx.lineTo(
+        w * 0.20,
+        h
+    );
+
+
+    ctx.lineTo(
+        w * 0.08,
+        h * 0.76
+    );
+
+
+    ctx.lineTo(
+        0,
+        h * 0.30
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fill();
+
+
+    ctx.stroke();
+
+
+    /*
+       Dark cockpit.
+    */
+
+    ctx.shadowBlur =
+        0;
+
+
+    ctx.fillStyle =
+        "rgba(5, 5, 16, 0.82)";
+
+
+    ctx.fillRect(
+        w * 0.07,
+        h * 0.15,
+        w * 0.86,
+        h * 0.70
+    );
+
+
+    ctx.strokeStyle =
+        ship.color;
+
+
+    ctx.strokeRect(
+        w * 0.07,
+        h * 0.15,
+        w * 0.86,
+        h * 0.70
+    );
+
+
+    /*
+       Definition text.
+    */
+
+    drawWrappedText(
+        ship.def,
+        w / 2,
+        h / 2,
+        w * 0.74,
+        17,
+        21
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   WRAPPED DEFINITION TEXT
+   ========================================================= */
+
+function drawWrappedText(
+    text,
+    x,
+    y,
+    maxWidth,
+    fontSize,
+    lineHeight
+) {
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.font =
+        `700 ${fontSize}px "Segoe UI", Arial, sans-serif`;
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    const words =
+        String(
+            text
+        ).split(
+            " "
+        );
+
+
+    const lines =
+        [];
+
+
+    let currentLine =
+        "";
+
+
+    words.forEach(
+        word => {
+
+            const testLine =
+                currentLine
+                    ? `${currentLine} ${word}`
+                    : word;
+
+
+            const width =
+                ctx.measureText(
+                    testLine
+                ).width;
+
+
+            if (
+                width >
+                maxWidth
+                &&
+                currentLine
+            ) {
+
+                lines.push(
+                    currentLine
+                );
+
+
+                currentLine =
+                    word;
+
+            }
+
+            else {
+
+                currentLine =
+                    testLine;
+
+            }
+
+        }
+    );
+
+
+    if (
+        currentLine
+    ) {
+
+        lines.push(
+            currentLine
+        );
+
+    }
+
+
+    /*
+       Limit to three lines.
+    */
+
+    const visibleLines =
+        lines.slice(
+            0,
+            3
+        );
+
+
+    const startY =
+        y -
+        (
+            (
+                visibleLines.length -
+                1
+            )
+            *
+            lineHeight
+            /
+            2
+        );
+
+
+    visibleLines.forEach(
+        (
+            line,
+            index
+        ) => {
+
+            ctx.fillText(
+                line,
+                x,
+                startY +
+                index *
+                lineHeight
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BULLET DRAW
+   ========================================================= */
+
+function drawBullets() {
+
+    ctx.save();
+
+
+    ctx.shadowColor =
+        "#ff00ff";
+
+
+    ctx.shadowBlur =
+        10;
+
+
+    bullets.forEach(
+        bullet => {
+
+            ctx.fillStyle =
+                bullet.color;
+
+
+            ctx.fillRect(
+                bullet.x,
+                bullet.y,
+                bullet.width,
+                bullet.height
+            );
+
+        }
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   DRAW BACKGROUND
+   ========================================================= */
+
+function drawBackground() {
+
+    /*
+       Dark space.
+    */
+
+    ctx.fillStyle =
+        "#050510";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        CANVAS_WIDTH,
+        CANVAS_HEIGHT
+    );
+
+
+    /*
+       Subtle radial background.
+    */
+
+    const gradient =
+        ctx.createRadialGradient(
+            CANVAS_WIDTH / 2,
+            CANVAS_HEIGHT / 2,
+            40,
+            CANVAS_WIDTH / 2,
+            CANVAS_HEIGHT / 2,
+            CANVAS_WIDTH * 0.7
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#101030"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "#050510"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        CANVAS_WIDTH,
+        CANVAS_HEIGHT
+    );
+
+
+    /*
+       Stars.
+    */
+
+    drawStars();
+
+}
+
+
+/* =========================================================
+   STAR FIELD
+========================================================= */
+
+const stars = [];
+
+
+for (
+    let i = 0;
+    i < 90;
+    i++
+) {
+
+    stars.push({
+
+        x:
+            Math.random() *
+            CANVAS_WIDTH,
+
+        y:
+            Math.random() *
+            (
+                CANVAS_HEIGHT -
+                FOOTER_HEIGHT -
+                20
+            ),
+
+        size:
+            Math.random() *
+            2
+            +
+            0.5,
+
+        alpha:
+            Math.random() *
+            0.7
+            +
+            0.2
+
+    });
+
+}
+
+
+function drawStars() {
+
+    stars.forEach(
+        star => {
+
+            ctx.globalAlpha =
+                star.alpha;
+
+
+            ctx.fillStyle =
+                "#ffffff";
+
+
+            ctx.fillRect(
+                star.x,
+                star.y,
+                star.size,
+                star.size
+            );
+
+        }
+    );
+
+
+    ctx.globalAlpha =
+        1;
+
+}
+
+
+/* =========================================================
+   DRAW EVERYTHING
+========================================================= */
+
+function draw() {
+
+    drawBackground();
+
+    drawShips();
+
+    drawBullets();
+
+    drawPlayer();
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop() {
+
+    if (
+        isGameOver
+    ) {
+
         draw();
-        if (!isGameOver) {
-            requestAnimationFrame(gameLoop);
-        }
+
+        return;
+
     }
 
-    function triggerGameOver() {
-        isGameOver = true;
-        finalScoreDisplay.textContent = score;
-        gameOverScreen.classList.remove('hidden');
+
+    updatePlayer();
+
+    updateBullets();
+
+    updateShips();
+
+    handleCollisions();
+
+    draw();
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+
+let feedbackTimer =
+    null;
+
+
+function showFeedback(
+    message,
+    correct
+) {
+
+    /*
+       Use wave message for quick
+       feedback so no extra overlay
+       is needed.
+    */
+
+    waveMessage.textContent =
+        message;
+
+
+    waveMessage.style.background =
+        correct
+            ? "rgba(34, 197, 94, 0.95)"
+            : "rgba(239, 68, 68, 0.95)";
+
+
+    waveMessage.style.color =
+        "#ffffff";
+
+
+    waveMessage.classList.remove(
+        "show"
+    );
+
+
+    void waveMessage.offsetWidth;
+
+
+    waveMessage.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        feedbackTimer
+    );
+
+
+    feedbackTimer =
+        setTimeout(
+            () => {
+
+                waveMessage.classList.remove(
+                    "show"
+                );
+
+
+                waveMessage.style.background =
+                    "rgba(0, 255, 255, 0.90)";
+
+
+                waveMessage.style.color =
+                    "#050510";
+
+            },
+            500
+        );
+
+}
+
+
+/* =========================================================
+   GAME COMPLETE
+========================================================= */
+
+function completeGame() {
+
+    triggerGameOver(
+        "Excellent work! You blasted all 20 vocabulary targets."
+    );
+
+}
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+function triggerGameOver(
+    reason
+) {
+
+    if (
+        isGameOver
+    ) {
+
+        return;
+
     }
 
-    function resetGame() {
-        score = 0;
-        ammo = MAX_AMMO;
-        speedMultiplier = 1;
-        isGameOver = false;
-        scoreDisplay.textContent = score;
-        ammoDisplay.textContent = ammo;
-        gameOverScreen.classList.add('hidden');
-        bullets = [];
-        player.x = canvas.width / 2 - 30;
-        initShips();
-        requestAnimationFrame(gameLoop);
+
+    isGameOver =
+        true;
+
+
+    gameStarted =
+        false;
+
+
+    const accuracy =
+        totalShots > 0
+
+            ? Math.round(
+                (
+                    correctAnswers /
+                    totalShots
+                )
+                *
+                100
+            )
+
+            : 100;
+
+
+    finalScore.textContent =
+        score;
+
+
+    finalAccuracy.textContent =
+        `${accuracy}%`;
+
+
+    finalCorrect.textContent =
+        `${correctAnswers}/${MAX_WORDS_PER_GAME}`;
+
+
+    finalCombo.textContent =
+        bestStreak;
+
+
+    gameOverList.textContent =
+        listTitle;
+
+
+    gameOverMessage.textContent =
+        reason;
+
+
+    gameOverScreen.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   RESET GAME
+========================================================= */
+
+function resetGame() {
+
+    score =
+        0;
+
+
+    ammo =
+        MAX_AMMO;
+
+
+    shields =
+        MAX_SHIELDS;
+
+
+    correctAnswers =
+        0;
+
+
+    totalShots =
+        0;
+
+
+    streak =
+        0;
+
+
+    bestStreak =
+        0;
+
+
+    wave =
+        1;
+
+
+    isGameOver =
+        false;
+
+
+    gameStarted =
+        true;
+
+
+    bullets =
+        [];
+
+
+    ships =
+        [];
+
+
+    targetHistory =
+        [];
+
+
+    horizontalDirection =
+        1;
+
+
+    horizontalSpeed =
+        1.0;
+
+
+    downwardSpeed =
+        0.04;
+
+
+    player.x =
+        CANVAS_WIDTH /
+        2;
+
+
+    gameOverScreen.classList.add(
+        "hidden"
+    );
+
+
+    createShips();
+
+
+    updateHUD();
+
+
+    gameLoop();
+
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame() {
+
+    resetGame();
+
+}
+
+
+/* =========================================================
+   RESTART BUTTON
+========================================================= */
+
+restartButton.addEventListener(
+    "click",
+    () => {
+
+        startGame();
+
+    }
+);
+
+
+/* =========================================================
+   LIBRARY BUTTON
+========================================================= */
+
+libraryButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "https://alexjeffersonmarsh.github.io/VocabularyArcade/library.html";
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initializeGame() {
+
+    try {
+
+        loadingText.textContent =
+            "Loading vocabulary set from Firebase...";
+
+
+        loadingDetails.textContent =
+            "";
+
+
+        const data =
+            await loadVocabularySet(
+                setId
+            );
+
+
+        /*
+           Validate BEFORE starting.
+        */
+
+        validateVocabulary(
+            data.items
+        );
+
+
+        vocabList =
+            data.items;
+
+
+        listTitle =
+            data.title;
+
+
+        listNameDisplay.textContent =
+            listTitle;
+
+
+        /*
+           Start the game.
+        */
+
+        hideLoading();
+
+
+        startGame();
+
     }
 
-    function startGame() {
-        initShips();
-        requestAnimationFrame(gameLoop);
+    catch (
+        error
+    ) {
+
+        console.error(
+            "BlastWord initialization error:",
+            error
+        );
+
+
+        showLoadError(
+            error.message ||
+            "An unexpected error prevented BlastWord from starting."
+        );
+
     }
 
-    // Initialize Vocabulary Engine
-    initVocab();
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+initializeGame();
+
+
 </script>
 
+
 </body>
+
 </html>
