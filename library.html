@@ -85,7 +85,28 @@
             background: #C98510 !important;
         }
 
+        /* =================================================
+           BLASTWORD MODAL BUTTON
+        ================================================= */
 
+.blastButton {
+    background: #D62828 !important;
+    color: white !important;
+}
+
+.blastButton:hover {
+    background: #B51F1F !important;
+}
+
+
+.modalBlast {
+    background: #D62828 !important;
+    color: white !important;
+}
+
+.modalBlast:hover {
+    background: #B51F1F !important;
+}
         /* =================================================
            QUIZWORD MODAL BUTTON
         ================================================= */
@@ -348,7 +369,21 @@
 
             </button>
 
+            <!-- =================================
+                 BLASTWORD
+            ================================== -->
 
+<button
+    id="modalBlastButton"
+    class="modalGameButton modalBlast"
+    type="button"
+>
+
+    💥<br>
+    BlastWord
+
+</button>
+            
             <!-- =================================
                  QUIZWORD
             ================================== -->
@@ -530,6 +565,8 @@ const FLASHWORD_URL =
 const SORTWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/sortword.html";
 
+const BLASTWORD_URL =
+    "https://alexjeffersonmarsh.github.io/VocabularyArcade/blastword.html";
 
 const QUIZWORD_URL =
     "https://alexjeffersonmarsh.github.io/VocabularyArcade/quizword.html";
@@ -1251,6 +1288,15 @@ function renderLists() {
 
                     </a>
 
+                    <!-- BLASTWORD -->
+
+<a
+    class="playButton blastButton"
+    href="${BLASTWORD_URL}?id=${encodeURIComponent(list.id)}"
+>
+    💥 BlastWord
+</a>
+
 
                     <!-- QUIZWORD -->
 
@@ -1549,6 +1595,33 @@ document
         }
     );
 
+    /* =========================================
+     BLASTWORD BUTTON
+    ========================================= */
+
+document
+    .getElementById(
+        "modalBlastButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                !selectedList
+            ) {
+                return;
+            }
+
+            window.location.href =
+                `${BLASTWORD_URL}?id=${
+                    encodeURIComponent(
+                        selectedList.id
+                    )
+                }`;
+
+        }
+    );
 
 /* =========================================
    QUIZWORD BUTTON
