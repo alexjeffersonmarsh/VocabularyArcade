@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlastWord</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #050510;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 700px;
+            background: radial-gradient(circle at center, #101030 0%, #050510 100%);
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Target Word Footer Bar */
+        #target-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(10, 15, 30, 0.9);
+            border-top: 2px solid #00ffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .prompt-label {
+            font-size: 14px;
+            color: #8888aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .target-word {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        .score-board {
+            font-size: 18px;
+            color: #ff00ff;
+            font-weight: bold;
+        }
+
+        /* Loading Overlay */
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 16, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #00ffff;
+            z-index: 30;
+        }
+
+        #loading-screen.hidden {
+            display: none;
+        }
+
+        /* Game Over Screen Overlay */
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 16, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        #game-over-screen.hidden {
+            display: none;
+        }
+
+        #game-over-screen h1 {
+            font-size: 48px;
+            color: #ff3366;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
+        }
+
+        #game-over-screen p {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        #restart-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #00ffff;
+            color: #050510;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        #restart-btn:hover {
+            background: #33ffff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="loading-screen">Loading Vocabulary from Firebase...</div>
+
+    <canvas id="gameCanvas" width="800" height="700"></canvas>
+    
+    <div id="target-bar">
+        <div>
+            <span class="prompt-label">Target Word: </span>
+            <span id="target-word-display" class="target-word">---</span>
+        </div>
+        <div class="score-board">
+            Score: <span id="score-display">0</span>
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="hidden">
+        <h1>GAME OVER</h1>
+        <p>Final Score: <span id="final-score">0</span></p>
+        <button id="restart-btn">Play Again</button>
+    </div>
+</div>
+
+<script type="module">
+    /* =========================================
+       FIREBASE IMPORTS & CONFIG
+    ========================================= */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+        authDomain: "bubbleword-30367.firebaseapp.com",
+        projectId: "bubbleword-30367",
+        storageBucket: "bubbleword-30367.firebasestorage.app",
+        messagingSenderId: "1058393039019",
+        appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    /* =========================================
+       GAME STATE & CONFIGURATION
+    ========================================= */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const targetWordDisplay = document.getElementById('target-word-display');
+    const scoreDisplay = document.getElementById('score-display');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const loadingScreen = document.getElementById('loading-screen');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let vocabList = [];
+
+    const SHIP_COLORS = ['#1E90FF', '#32CD32', '#9370DB', '#FF69B4', '#FF8C00'];
+    const GRID_ROWS = 4;
+    const GRID_COLS = 5;
+    
+    let score = 0;
+    let isGameOver = false;
+    let currentTarget = null;
+    let baseSpeed = 0.3;
+    let speedMultiplier = 1;
+
+    const keys = {};
+
+    const player = {
+        x: canvas.width / 2 - 20,
+        y: canvas.height - 100,
+        width: 40,
+        height: 30,
+        speed: 6,
+        color: '#00ffff'
+    };
+
+    let bullets = [];
+    let ships = [];
+
+    /* =========================================
+       FIREBASE DATA FETCHING
+    ========================================= */
+    async function loadVocabulary() {
+        try {
+            // Attempting to fetch document 'latin' from collection 'vocabulary'
+            // Adjust document path ('vocabulary/latin') if your collection structure differs
+            const docRef = doc(db, "vocabulary", "latin");
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists() && docSnap.data().words) {
+                vocabList = docSnap.data().words;
+            } else {
+                // Fetch collection fallback if words are individual documents
+                const querySnapshot = await getDocs(collection(db, "vocabulary"));
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.word && data.def) {
+                        vocabList.push({ word: data.word, def: data.def });
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn("Could not load from Firestore, using default list:", error);
+        }
+
+        // Fallback vocabulary if database response is empty
+        if (!vocabList || vocabList.length === 0) {
+            vocabList = [
+                { word: "amāre", def: "to love" },
+                { word: "monēre", def: "to warn" },
+                { word: "mittere", def: "to send" },
+                { word: "audīre", def: "to hear" },
+                { word: "capere", def: "to take" },
+                { word: "vocāre", def: "to call" },
+                { word: "dīcere", def: "to say" },
+                { word: "vidēre", def: "to see" },
+                { word: "habēre", def: "to have" },
+                { word: "facere", def: "to do / make" }
+            ];
+        }
+
+        loadingScreen.classList.add('hidden');
+        startGame();
+    }
+
+    /* =========================================
+       GAME CONTROLS & LOGIC
+    ========================================= */
+    window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+        if (e.code === 'Space' && !isGameOver) {
+            e.preventDefault();
+            fireBullet();
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+    });
+
+    restartBtn.addEventListener('click', () => {
+        resetGame();
+    });
+
+    function fireBullet() {
+        if (bullets.length < 3) {
+            bullets.push({
+                x: player.x + player.width / 2 - 3,
+                y: player.y,
+                width: 6,
+                height: 14,
+                speed: 9,
+                color: '#ff00ff'
+            });
+        }
+    }
+
+    function pickNewTarget() {
+        const randomIndex = Math.floor(Math.random() * vocabList.length);
+        currentTarget = vocabList[randomIndex];
+        targetWordDisplay.textContent = currentTarget.word;
+
+        if (ships.length > 0) {
+            const randomShip = ships[Math.floor(Math.random() * ships.length)];
+            randomShip.def = currentTarget.def;
+        }
+    }
+
+    function initShips() {
+        ships = [];
+        const paddingX = 20;
+        const paddingY = 15;
+        const shipWidth = 130;
+        const shipHeight = 45;
+        const startX = 25;
+        const startY = 40;
+
+        let availableDefs = vocabList.map(v => v.def);
+
+        for (let row = 0; row < GRID_ROWS; row++) {
+            for (let col = 0; col < GRID_COLS; col++) {
+                const randomDefIndex = Math.floor(Math.random() * availableDefs.length);
+                const assignedDef = availableDefs[randomDefIndex] || vocabList[0].def;
+
+                ships.push({
+                    x: startX + col * (shipWidth + paddingX),
+                    y: startY + row * (shipHeight + paddingY),
+                    width: shipWidth,
+                    height: shipHeight,
+                    def: assignedDef,
+                    color: SHIP_COLORS[(row * GRID_COLS + col) % SHIP_COLORS.length],
+                    gridCol: col,
+                    gridRow: row
+                });
+            }
+        }
+        pickNewTarget();
+    }
+
+    function respawnShip(ship) {
+        let minY = ship.y;
+        ships.forEach(s => {
+            if (s !== ship && s.gridCol === ship.gridCol) {
+                if (s.y < minY) minY = s.y;
+            }
+        });
+
+        ship.y = minY - (ship.height + 15);
+        const otherDefs = vocabList.filter(v => v.def !== currentTarget.def).map(v => v.def);
+        ship.def = otherDefs[Math.floor(Math.random() * otherDefs.length)];
+    }
+
+    function update() {
+        if (isGameOver) return;
+
+        if ((keys['ArrowLeft'] || keys['KeyA']) && player.x > 0) {
+            player.x -= player.speed;
+        }
+        if ((keys['ArrowRight'] || keys['KeyD']) && player.x + player.width < canvas.width) {
+            player.x += player.speed;
+        }
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            bullets[i].y -= bullets[i].speed;
+            if (bullets[i].y < 0) {
+                bullets.splice(i, 1);
+            }
+        }
+
+        speedMultiplier += 0.0001;
+        const currentSpeed = baseSpeed * speedMultiplier;
+
+        ships.forEach(ship => {
+            ship.y += currentSpeed;
+
+            if (ship.y + ship.height >= player.y) {
+                triggerGameOver();
+            }
+        });
+
+        for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
+            const b = bullets[bIndex];
+            
+            for (let sIndex = 0; sIndex < ships.length; sIndex++) {
+                const s = ships[sIndex];
+
+                if (
+                    b.x < s.x + s.width &&
+                    b.x + b.width > s.x &&
+                    b.y < s.y + s.height &&
+                    b.y + b.height > s.y
+                ) {
+                    bullets.splice(bIndex, 1);
+
+                    if (s.def === currentTarget.def) {
+                        ships.splice(sIndex, 1);
+                        score += 100;
+                        scoreDisplay.textContent = score;
+
+                        if (ships.length === 0) {
+                            initShips();
+                        } else {
+                            pickNewTarget();
+                        }
+                    } else {
+                        respawnShip(s);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.beginPath();
+        ctx.moveTo(player.x + player.width / 2, player.y);
+        ctx.lineTo(player.x + player.width, player.y + player.height);
+        ctx.lineTo(player.x + player.width / 2, player.y + player.height - 8);
+        ctx.lineTo(player.x, player.y + player.height);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function drawShips() {
+        ships.forEach(ship => {
+            ctx.fillStyle = ship.color;
+            ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ship.x, ship.y, ship.width, ship.height);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+                ship.def, 
+                ship.x + ship.width / 2, 
+                ship.y + ship.height / 2, 
+                ship.width - 10
+            );
+        });
+    }
+
+    function drawBullets() {
+        bullets.forEach(b => {
+            ctx.fillStyle = b.color;
+            ctx.fillRect(b.x, b.y, b.width, b.height);
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        drawShips();
+        drawBullets();
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        if (!isGameOver) {
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    function triggerGameOver() {
+        isGameOver = true;
+        finalScoreDisplay.textContent = score;
+        gameOverScreen.classList.remove('hidden');
+    }
+
+    function resetGame() {
+        score = 0;
+        speedMultiplier = 1;
+        isGameOver = false;
+        scoreDisplay.textContent = score;
+        gameOverScreen.classList.add('hidden');
+        bullets = [];
+        player.x = canvas.width / 2 - 20;
+        initShips();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+        initShips();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Initialize application by reading from Firebase
+    loadVocabulary();
+</script>
+
+</body>
+</html>
