@@ -1,0 +1,614 @@
+Vocabulary Arcade — Sound Bible v1.0
+1. Core Audio Identity
+
+Overall style:
+Bright, modern arcade + educational technology.
+
+Emotional target:
+Fun, rewarding, energetic, polished, never childish.
+
+Avoid:
+Realistic weapons, harsh alarms, horror sounds, excessively loud explosions, casino-like effects, cartoon voices, or sounds that could embarrass a student for getting an answer wrong.
+
+Audio hierarchy
+
+Sounds should fall into five levels:
+
+Level 1 — Micro
+Tiny interface feedback.
+0.05–0.20 sec.
+
+Level 2 — Gameplay
+Correct, incorrect, match, pop, gem clear, etc.
+0.10–0.40 sec.
+
+Level 3 — Achievement
+Streaks, combos, bonuses, level-ups.
+0.30–0.80 sec.
+
+Level 4 — Major Event
+Game start, time-up, damage, major explosion.
+0.50–1.0 sec.
+
+Level 5 — Completion
+Victory / successful completion.
+1.0–1.5 sec.
+
+The louder and longer a sound is, the less frequently it should occur.
+
+2. The Core Pitch Language
+
+To make the entire platform sound related, positive sounds should primarily use:
+
+C – D – E – G – A
+
+This is essentially a bright pentatonic vocabulary.
+
+The most important positive interval is:
+
+C → E
+
+That becomes the Vocabulary Arcade "correct" sound identity.
+
+For increasingly important achievements, we build upward:
+
+Correct:
+C5 → E5
+
+Match:
+E5 → G5
+
+Streak:
+C5 → E5 → G5
+
+Victory:
+C5 → E5 → G5 → C6
+
+Negative sounds should generally descend rather than use the same musical vocabulary.
+
+3. Master Sound Specifications
+VA-01 — UI Click
+
+Filename: ui-click-1.mp3
+
+Purpose: Buttons, menus, navigation.
+
+Duration: 0.06–0.10 sec
+
+Sound: Tiny clean digital click/tick.
+
+Pitch: Approximately C6–E6
+
+Attack: Immediate
+
+Decay: Very fast
+
+Volume: Low
+
+Frequency: Very high
+
+Personality: Neutral
+
+The user should barely notice this sound consciously.
+
+VA-02 — Game Start
+
+Filename: game-start.mp3
+
+Purpose: Game becomes active.
+
+Duration: 0.5–0.7 sec
+
+Sound: Three-note ascending digital chime.
+
+Notes: C5 → E5 → G5
+
+Rhythm: Even, quick.
+
+Volume: Medium
+
+Personality: "Let's play."
+
+This becomes one of Vocabulary Arcade's recurring signatures.
+
+4. Answer Sounds
+VA-03 — Correct
+
+Filenames:
+
+correct-1.mp3
+correct-2.mp3
+correct-3.mp3
+
+Duration: 0.15–0.22 sec
+
+Notes: C5 → E5
+
+Sound: Bright electronic chime.
+
+Attack: Very fast
+
+Decay: Fast
+
+Volume: Medium
+
+Variations: Same basic sound, tiny pitch/timbre differences.
+
+Personality: Immediate positive reinforcement.
+
+This is probably the single most important sound in the entire library.
+
+VA-04 — Incorrect
+
+Filenames:
+
+incorrect-1.mp3
+incorrect-2.mp3
+
+Duration: 0.20–0.30 sec
+
+Sound: Soft electronic buzz.
+
+Pitch: E4 → C4
+
+Wave character: Slightly rough/square.
+
+Volume: Low-medium
+
+Personality: Informative, not punishing.
+
+It should communicate:
+
+"That wasn't correct."
+
+not:
+
+"YOU FAILED."
+
+5. Matching Sounds
+VA-05 — Match
+
+Filename: match.mp3
+
+Duration: 0.25–0.35 sec
+
+Notes: E5 → G5
+
+Sound: Crystal/digital two-note chime.
+
+Volume: Medium
+
+Personality: Satisfying.
+
+Used especially in MatchWord.
+
+6. BubbleWord Sounds
+VA-06 — Bubble Pop
+
+Filenames:
+
+bubble-pop-1.mp3
+bubble-pop-2.mp3
+bubble-pop-3.mp3
+bubble-pop-4.mp3
+
+Duration: 0.10–0.18 sec
+
+Sound: Bright, soft bubble pop.
+
+Pitch: Slight variation between versions.
+
+Important: No giant cartoon "POP."
+
+It should feel like a clean arcade interaction.
+
+7. GemWords Sounds
+VA-07 — Gem Clear
+
+Filenames:
+
+gem-clear-1.mp3
+gem-clear-2.mp3
+gem-clear-3.mp3
+gem-clear-4.mp3
+
+Duration: 0.20–0.35 sec
+
+Sound: Crystal sparkle + tiny digital chime.
+
+Pitch: Higher than BubbleWord.
+
+Volume: Medium.
+
+Personality: Jewel-like, elegant, satisfying.
+
+VA-08 — Gem Combo
+
+Filenames:
+
+gem-combo-3.mp3
+gem-combo-4.mp3
+gem-combo-5.mp3
+gem-combo-6.mp3
+
+Duration: 0.30–0.65 sec
+
+The larger the combo, the higher the musical movement.
+
+Example:
+
+3 gems: C5 → E5
+
+4 gems: C5 → E5 → G5
+
+5 gems: C5 → E5 → G5 → A5
+
+6+: C5 → E5 → G5 → A5 → C6
+
+This makes the sound itself communicate the size of the achievement.
+
+8. Reward Sounds
+VA-09 — Coin / Reward
+
+Filenames:
+
+coin-1.mp3
+coin-2.mp3
+
+Duration: 0.15–0.25 sec
+
+Sound: Classic two-tone digital reward.
+
+Notes: E5 → G5
+
+Volume: Medium.
+
+Use this when the player receives something tangible:
+
+points, bonus, ammo, reward, etc.
+
+VA-10 — Streak Bonus
+
+Filename: streak-bonus.mp3
+
+Duration: 0.45–0.65 sec
+
+Notes: C5 → E5 → G5 → A5
+
+Sound: Rising arcade arpeggio.
+
+Volume: Medium-high.
+
+This is what tells the student:
+
+"You're on a roll."
+
+VA-11 — Level Up
+
+Filename: level-up.mp3
+
+Duration: 0.5–0.8 sec
+
+Sound: Rising synth sweep followed by a chime.
+
+Pitch: Low → high
+
+Volume: Medium-high.
+
+Used when BlastWord advances a wave or another game reaches a major progression point.
+
+9. Major Game Events
+VA-12 — Explosion
+
+Filenames:
+
+explosion-1.mp3
+explosion-2.mp3
+
+Duration: 0.30–0.55 sec
+
+Sound: Arcade explosion.
+
+Character: Punchy low thump + electronic burst.
+
+Avoid: Realistic explosions or gunfire.
+
+Volume: Medium-high.
+
+BlastWord's signature action sound.
+
+VA-13 — Damage
+
+Filename: damage.mp3
+
+Duration: 0.15–0.25 sec
+
+Sound: Low electronic impact.
+
+Pitch: Low.
+
+Volume: Medium.
+
+This is distinct from incorrect.
+
+Incorrect: "Your answer was wrong."
+
+Damage: "Your ship got hit."
+
+VA-14 — Shield Hit
+
+Filename: shield-hit.mp3
+
+Duration: 0.20–0.30 sec
+
+Sound: Metallic/electronic deflection.
+
+Character: Short impact + shimmering discharge.
+
+This should actually feel slightly positive because the shield protected the player.
+
+VA-15 — Laser Fire
+
+Filenames:
+
+laser-1.mp3
+laser-2.mp3
+
+Duration: 0.08–0.15 sec
+
+Sound: Bright sci-fi zap.
+
+Pitch: High.
+
+Volume: Medium-low.
+
+Important: it must remain pleasant when fired repeatedly.
+
+10. Timing Sounds
+VA-16 — Countdown Tick
+
+Filename: countdown.mp3
+
+Duration: 0.08–0.12 sec
+
+Sound: Tiny digital tick.
+
+Pitch: Medium-high.
+
+Volume: Low.
+
+Use sparingly, preferably only near the end of a timed round.
+
+VA-17 — Time Up
+
+Filename: time-up.mp3
+
+Duration: 0.50–0.75 sec
+
+Notes: G4 → E4 → C4
+
+Sound: Three descending digital notes.
+
+Volume: Medium.
+
+Distinct from Game Over.
+
+11. End States
+VA-18 — Victory
+
+Filename: victory.mp3
+
+Duration: 1.0–1.4 sec
+
+Notes:
+
+C5 → E5 → G5 → C6
+
+Then a tiny sparkle/chime.
+
+Sound: Bright arcade fanfare.
+
+Volume: Medium-high.
+
+This should become the signature Vocabulary Arcade completion sound.
+
+When a student completes a 20-word set, this is what they hear.
+
+VA-19 — Game Over
+
+Filename: game-over.mp3
+
+Duration: 0.7–1.0 sec
+
+Notes: E5 → C5 → A4
+
+Sound: Descending electronic phrase.
+
+Volume: Medium.
+
+Not sad or humiliating—just clearly signaling the end.
+
+12. Other Game-Specific Sounds
+VA-20 — Card Flip
+
+Filename: card-flip.mp3
+
+Duration: 0.10–0.20 sec
+
+Sound: Short digital/paper swish.
+
+Used primarily by FlashWord.
+
+VA-21 — Drag / Drop
+
+Filenames:
+
+drag-pickup.mp3
+drag-drop.mp3
+
+Pickup: 0.08–0.12 sec
+
+Drop: 0.12–0.20 sec
+
+The drop sound should be the satisfying one.
+
+Used by SortWord.
+
+13. Sound Variants
+
+I don't recommend making four versions of everything.
+
+The variation should focus on sounds that students hear repeatedly:
+
+correct-1
+correct-2
+correct-3
+
+incorrect-1
+incorrect-2
+
+bubble-pop-1
+bubble-pop-2
+bubble-pop-3
+bubble-pop-4
+
+gem-clear-1
+gem-clear-2
+gem-clear-3
+gem-clear-4
+
+coin-1
+coin-2
+
+laser-1
+laser-2
+
+Everything else can be a single carefully designed sound.
+
+That gives us 31 total assets while maintaining a manageable library.
+
+14. Volume Hierarchy
+
+This is particularly important for a classroom platform.
+
+I would establish this maximum hierarchy:
+
+Sound Type	Relative Volume
+UI click	Very low
+Countdown	Very low
+Card flip	Low
+Correct	Medium
+Incorrect	Medium
+Match	Medium
+Bubble pop	Medium
+Gem clear	Medium
+Coin	Medium
+Laser	Medium
+Damage	Medium
+Streak	Medium-high
+Level up	Medium-high
+Explosion	Medium-high
+Victory	Highest
+
+The victory sound gets the biggest impact.
+
+A student completing the final word should feel different from answering question #3 correctly.
+
+15. Which Sound Goes With Which Event?
+
+Here's the master mapping I would use in the games.
+
+Event	Sound
+Click button	ui-click
+Start game	game-start
+Correct answer	correct-*
+Wrong answer	incorrect-*
+Successful pairing	match
+Pop bubble	bubble-pop-*
+Clear gems	gem-clear-*
+Gem combo	gem-combo-*
+Earn points/reward	coin-*
+Build streak	streak-bonus
+New wave	level-up
+Blast enemy	explosion-*
+Fire weapon	laser-*
+Player damaged	damage
+Shield blocks hit	shield-hit
+Time warning	countdown
+Time expires	time-up
+Flip flashcard	card-flip
+Pick up draggable item	drag-pickup
+Drop draggable item	drag-drop
+Win/complete	victory
+Lose/end	game-over
+16. One Important Rule for the Code
+
+I would also establish this as part of the sound bible:
+
+Gameplay code should never directly manipulate audio files.
+
+Instead of:
+
+new Audio("sounds/correct.mp3").play();
+
+we'll eventually use:
+
+SoundFX.correct();
+
+and:
+
+SoundFX.explosion();
+
+That means the Sound Bible becomes the specification, while sounds.js becomes its implementation.
+
+This will make it possible to change the audio library later without rewriting eight games.
+
+17. Recommended File Structure
+
+I'd ultimately use:
+
+sounds/
+│
+├── ui-click-1.mp3
+├── game-start.mp3
+│
+├── correct-1.mp3
+├── correct-2.mp3
+├── correct-3.mp3
+├── incorrect-1.mp3
+├── incorrect-2.mp3
+├── match.mp3
+│
+├── bubble-pop-1.mp3
+├── bubble-pop-2.mp3
+├── bubble-pop-3.mp3
+├── bubble-pop-4.mp3
+│
+├── gem-clear-1.mp3
+├── gem-clear-2.mp3
+├── gem-clear-3.mp3
+├── gem-clear-4.mp3
+├── gem-combo-3.mp3
+├── gem-combo-4.mp3
+├── gem-combo-5.mp3
+├── gem-combo-6.mp3
+│
+├── coin-1.mp3
+├── coin-2.mp3
+├── streak-bonus.mp3
+├── level-up.mp3
+│
+├── explosion-1.mp3
+├── explosion-2.mp3
+├── laser-1.mp3
+├── laser-2.mp3
+├── damage.mp3
+├── shield-hit.mp3
+│
+├── countdown.mp3
+├── time-up.mp3
+├── card-flip.mp3
+├── drag-pickup.mp3
+├── drag-drop.mp3
+├── victory.mp3
+└── game-over.mp3
