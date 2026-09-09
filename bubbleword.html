@@ -34,9 +34,16 @@
     <canvas id="gameCanvas"></canvas>
 
 
-    <!-- MUTE BUTTON -->
+    <!-- =====================================
+         SOUND BUTTON
+    ====================================== -->
 
-    <button id="mute-btn">
+    <button
+        id="mute-btn"
+        type="button"
+        aria-label="Mute game sounds"
+        title="Mute game sounds"
+    >
         🔊
     </button>
 
@@ -56,12 +63,17 @@
 
 
 <!-- =========================================
-     MAIN GAME SCRIPT
-     
+     VOCABULARY ARCADE SOUND SYSTEM
+
      IMPORTANT:
-     Load this BEFORE the Firebase module
-     so startLoadedGame exists when Firebase
-     finishes loading.
+     sound.js must load BEFORE script.js.
+========================================= -->
+
+<script src="sounds/sound.js"></script>
+
+
+<!-- =========================================
+     MAIN GAME SCRIPT
 ========================================= -->
 
 <script src="script.js"></script>
@@ -114,6 +126,7 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
+
 const db =
     getFirestore(app);
 
@@ -147,7 +160,6 @@ async function loadSet(setId) {
         throw new Error(
             "Vocabulary set not found."
         );
-
     }
 
 
@@ -161,18 +173,21 @@ async function loadSet(setId) {
     );
 
 
-    // NEW FORMAT
+    // =====================================
+    // CURRENT FORMAT
+    // =====================================
 
     if (
         Array.isArray(data.items)
     ) {
 
         return data.items;
-
     }
 
 
+    // =====================================
     // LEGACY FORMAT
+    // =====================================
 
     let terms =
         data.terms;
@@ -196,14 +211,11 @@ async function loadSet(setId) {
             );
 
             terms = [];
-
         }
-
     }
 
 
     return terms || [];
-
 }
 
 
@@ -220,17 +232,26 @@ async function startGameWithSet(setId) {
 
 
         window.preloadedVocab =
-            vocab.map(item => ({
+            vocab
+                .map(item => ({
 
-                word:
-                    item.word,
+                    word:
+                        String(
+                            item.word || ""
+                        ).trim(),
 
-                definition:
-                    item.definition ||
-                    item.meaning ||
-                    ""
+                    definition:
+                        String(
+                            item.definition ||
+                            item.meaning ||
+                            ""
+                        ).trim()
 
-            }));
+                }))
+                .filter(item =>
+                    item.word &&
+                    item.definition
+                );
 
 
         console.log(
@@ -247,6 +268,7 @@ async function startGameWithSet(setId) {
             console.log(
                 "BUBBLEWORD: Starting game..."
             );
+
 
             window.startLoadedGame();
 
@@ -271,7 +293,6 @@ async function startGameWithSet(setId) {
                 { once: true }
 
             );
-
         }
 
     }
@@ -286,9 +307,7 @@ async function startGameWithSet(setId) {
         alert(
             "Could not load this vocabulary set."
         );
-
     }
-
 }
 
 
@@ -317,10 +336,10 @@ if (setId) {
 
 }
 else {
+
     console.error(
         "BUBBLEWORD: No vocabulary set ID found in URL."
     );
-
 }
 
 </script>
