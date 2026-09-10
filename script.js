@@ -10,6 +10,25 @@
 // =========================================
 // CANVAS SETUP
 // =========================================
+if (typeof SoundFX === "undefined") {
+
+    window.SoundFX = {
+
+        isMuted: () => false,
+        toggleMute: () => {},
+        start: () => {},
+        bubblePop: () => {},
+        coin: () => {},
+        levelUp: () => {},
+        incorrect: () => {},
+        countdown: () => {},
+        timeUp: () => {},
+        gameOver: () => {},
+        click: () => {}
+
+    };
+
+}
 
 const canvas =
     document.getElementById("gameCanvas");
@@ -145,6 +164,9 @@ function updateMuteButton() {
         return;
     }
 
+    if (typeof SoundFX === "undefined") {
+        return;
+    }
 
     const muted =
         SoundFX.isMuted();
@@ -177,12 +199,13 @@ if (muteButton) {
 
     updateMuteButton();
 
-
     muteButton.addEventListener(
         "click",
         () => {
 
-            SoundFX.toggleMute();
+            if (typeof SoundFX !== "undefined") {
+                SoundFX.toggleMute();
+            }
 
             updateMuteButton();
         }
