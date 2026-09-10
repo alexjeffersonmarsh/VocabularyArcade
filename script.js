@@ -14,6 +14,36 @@
 const canvas =
     document.getElementById("gameCanvas");
 
+// Temporary fallback if sound.js fails to load
+
+if (typeof SoundFX === "undefined") {
+
+    window.SoundFX = {
+
+        isMuted: () => false,
+
+        toggleMute: () => {},
+
+        start: () => {},
+
+        bubblePop: () => {},
+
+        coin: () => {},
+
+        levelUp: () => {},
+
+        incorrect: () => {},
+
+        countdown: () => {},
+
+        timeUp: () => {},
+
+        gameOver: () => {},
+
+        click: () => {}
+
+    };
+}
 
 const ctx =
     canvas.getContext("2d");
