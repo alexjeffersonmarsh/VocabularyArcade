@@ -72,33 +72,27 @@
          HUD
     ====================================== -->
 
-    <div id="hud">
+<div id="hud">
 
-        <div class="hud-item">
-            Score:
-            <span id="score">0</span>
-        </div>
-
-        <div class="hud-item">
-            Level:
-            <span id="level">1</span>
-        </div>
-
-        <div class="hud-item">
-            Time:
-            <span id="timer">60</span>
-        </div>
-
-        <div class="hud-item">
-            Shots:
-            <span id="attempts">20</span>
-        </div>
-
+    <div class="hud-item">
+        Score: <span id="score">0</span>
     </div>
 
-    <!-- Hidden element required by script.js -->
+    <div class="hud-item">
+        Level: <span id="level">1</span>
+    </div>
 
-    <div id="target-word"></div>
+    <div class="hud-item">
+        Time: <span id="timer">60</span>
+    </div>
+
+    <div class="hud-item">
+        Shots: <span id="attempts">20</span>
+    </div>
+
+</div>
+
+<div id="target-word"></div>
 
 
     <!-- GAME CANVAS -->
@@ -133,12 +127,14 @@
 
 
 <!-- =========================================
+     VOCABULARY ARCADE SOUND SYSTEM
 
-VOCABULARY ARCADE SOUND SYSTEM
-
+     IMPORTANT:
+     sound.js must load BEFORE script.js.
 ========================================= -->
 
 sounds/sound.jsscript>
+
 
 <!-- =========================================
      MAIN GAME SCRIPT
