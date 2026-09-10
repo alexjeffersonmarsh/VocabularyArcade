@@ -17,8 +17,47 @@
         href="styles.css"
     >
 
-</head>
+    <style>
 
+        /* =====================================
+           HUD
+        ===================================== */
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .hud-item {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+
+            padding: 8px 14px;
+
+            border-radius: 8px;
+
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #target-word {
+            display: none;
+        }
+
+        #game-container {
+            position: relative;
+        }
+
+    </style>
+
+</head>
 
 <body>
 
@@ -28,6 +67,39 @@
 ========================================= -->
 
 <div id="game-container">
+
+    <!-- =====================================
+         HUD
+    ====================================== -->
+
+    <div id="hud">
+
+        <div class="hud-item">
+            Score:
+            <span id="score">0</span>
+        </div>
+
+        <div class="hud-item">
+            Level:
+            <span id="level">1</span>
+        </div>
+
+        <div class="hud-item">
+            Time:
+            <span id="timer">60</span>
+        </div>
+
+        <div class="hud-item">
+            Shots:
+            <span id="attempts">20</span>
+        </div>
+
+    </div>
+
+    <!-- Hidden element required by script.js -->
+
+    <div id="target-word"></div>
+
 
     <!-- GAME CANVAS -->
 
@@ -50,8 +122,6 @@
 
     <!-- =====================================
          HIDDEN TEACHER PANEL
-
-         Kept because script.js references it.
     ====================================== -->
 
     <div
@@ -64,12 +134,9 @@
 
 <!-- =========================================
      VOCABULARY ARCADE SOUND SYSTEM
-
-     IMPORTANT:
-     sound.js must load BEFORE script.js.
 ========================================= -->
 
-<script src="sounds/sound.js"></script>
+sounds/sound.jsscript>
 
 
 <!-- =========================================
@@ -142,7 +209,6 @@ async function loadSet(setId) {
         setId
     );
 
-
     const ref =
         doc(
             db,
@@ -150,10 +216,8 @@ async function loadSet(setId) {
             setId
         );
 
-
     const snapshot =
         await getDoc(ref);
-
 
     if (!snapshot.exists()) {
 
@@ -162,20 +226,13 @@ async function loadSet(setId) {
         );
     }
 
-
     const data =
         snapshot.data();
-
 
     console.log(
         "BUBBLEWORD: Firebase data:",
         data
     );
-
-
-    // =====================================
-    // CURRENT FORMAT
-    // =====================================
 
     if (
         Array.isArray(data.items)
@@ -184,14 +241,8 @@ async function loadSet(setId) {
         return data.items;
     }
 
-
-    // =====================================
-    // LEGACY FORMAT
-    // =====================================
-
     let terms =
         data.terms;
-
 
     if (
         typeof terms === "string"
@@ -214,7 +265,6 @@ async function loadSet(setId) {
         }
     }
 
-
     return terms || [];
 }
 
@@ -229,7 +279,6 @@ async function startGameWithSet(setId) {
 
         const vocab =
             await loadSet(setId);
-
 
         window.preloadedVocab =
             vocab
@@ -253,12 +302,10 @@ async function startGameWithSet(setId) {
                     item.definition
                 );
 
-
         console.log(
             "BUBBLEWORD: Vocabulary loaded:",
             window.preloadedVocab
         );
-
 
         if (
             typeof window.startLoadedGame ===
@@ -269,7 +316,6 @@ async function startGameWithSet(setId) {
                 "BUBBLEWORD: Starting game..."
             );
 
-
             window.startLoadedGame();
 
         }
@@ -278,7 +324,6 @@ async function startGameWithSet(setId) {
             console.log(
                 "BUBBLEWORD: Game script has not loaded yet. Waiting..."
             );
-
 
             window.addEventListener(
 
@@ -303,7 +348,6 @@ async function startGameWithSet(setId) {
             error
         );
 
-
         alert(
             "Could not load this vocabulary set."
         );
@@ -319,7 +363,6 @@ const params =
     new URLSearchParams(
         window.location.search
     );
-
 
 const setId =
     params.get("id") ||
@@ -345,5 +388,4 @@ else {
 </script>
 
 </body>
-
 </html>
