@@ -2483,18 +2483,17 @@ function getLowestShipInEachColumn() {
                     }
 
 
-                    return
-                        (
-                            ship.y +
-                            ship.height
-                        )
-                        >
-                        (
-                            currentLowest.y +
-                            currentLowest.height
-                        )
-                            ? ship
-                            : currentLowest;
+return (
+
+ship.y + ship.height >
+
+currentLowest.y + currentLowest.height
+
+)
+
+? ship
+
+: currentLowest;
 
                 },
                 null
