@@ -2256,6 +2256,40 @@ function hideLoading() {
 
 
 /* =========================================================
+   SAFE SOUND SYSTEM
+
+   Sound must never be allowed to stop the game.
+   If sound.js is unavailable, BlastWord continues silently.
+========================================================= */
+
+function playSound(name, ...args) {
+
+    try {
+
+        const soundSystem =
+            window.SoundFX;
+
+        if (
+            soundSystem &&
+            typeof soundSystem[name] ===
+                "function"
+        ) {
+
+            soundSystem[name](...args);
+        }
+
+    }
+    catch (error) {
+
+        console.warn(
+            "BlastWord sound error:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
    SOUND BUTTON
 ========================================================= */
 
@@ -2266,8 +2300,38 @@ function updateSoundButton() {
     }
 
 
+    const soundSystem =
+        window.SoundFX;
+
+
+    if (
+        !soundSystem ||
+        typeof soundSystem.isMuted !==
+            "function"
+    ) {
+
+        soundButton.textContent =
+            "🔊";
+
+        soundButton.disabled =
+            true;
+
+        soundButton.setAttribute(
+            "aria-label",
+            "Sound system unavailable"
+        );
+
+        soundButton.setAttribute(
+            "title",
+            "Sound system unavailable"
+        );
+
+        return;
+    }
+
+
     const muted =
-        SoundFX.isMuted();
+        soundSystem.isMuted();
 
 
     soundButton.textContent =
@@ -2300,7 +2364,7 @@ soundButton.addEventListener(
     "click",
     () => {
 
-        SoundFX.toggleMute();
+        playSound("toggleMute");
 
         updateSoundButton();
     }
@@ -2522,12 +2586,9 @@ function setNewReachableTarget() {
 
 
     /*
-     * If the current target remains one
-     * of the five lowest ships, KEEP IT.
-     *
-     * This prevents the definition from
-     * changing unnecessarily after a dive
-     * ship is destroyed.
+     * Keep the current target as long as
+     * its ship is still the lowest ship
+     * in its column.
      */
 
     if (
@@ -2539,9 +2600,9 @@ function setNewReachableTarget() {
 
 
     /*
-     * Otherwise choose a new target
-     * exclusively from the bottom ship
-     * of one of the active columns.
+     * Select only from the ships that are
+     * actually exposed at the bottom of
+     * their columns.
      */
 
     const selectedShip =
@@ -2553,72 +2614,65 @@ function setNewReachableTarget() {
         ];
 
 
-    const matchingVocabulary =
-        vocabList.find(
-            item =>
-                normalizeText(
-                    item.definition
-                ) ===
-                normalizeText(
-                    selectedShip.def
-                )
-        );
-
-
     /*
-     * Every ship definition should have
-     * a corresponding vocabulary item.
+     * Each ship carries its own vocabulary
+     * word and definition. Using ship.word
+     * here avoids a second lookup that can
+     * accidentally produce an unreachable
+     * target.
      */
 
-    if (
-        !matchingVocabulary
-    ) {
+    let targetWord =
+        selectedShip.word ||
+        "";
+
+
+    if (!targetWord) {
+
+        const matchingVocabulary =
+            vocabList.find(
+                item =>
+                    normalizeText(
+                        item.definition
+                    ) ===
+                    normalizeText(
+                        selectedShip.def
+                    )
+            );
+
+
+        if (matchingVocabulary) {
+
+            targetWord =
+                matchingVocabulary.word;
+        }
+    }
+
+
+    if (!targetWord) {
 
         console.error(
-            "BLASTWORD: Could not match ship definition:",
-            selectedShip.def
+            "BLASTWORD: Ship has no matching vocabulary word.",
+            selectedShip
         );
 
+        currentTarget =
+            null;
 
-        /*
-         * Repair the ship immediately
-         * instead of displaying an unreachable
-         * target.
-         */
+        currentTargetShip =
+            null;
 
-        const replacement =
-            getUnusedDefinitionForBoard();
-
-
-        if (replacement) {
-
-            selectedShip.def =
-                replacement.definition;
-
-
-            currentTarget =
-                replacement;
-
-            currentTargetShip =
-                selectedShip;
-
-
-            targetWordDisplay.textContent =
-                replacement.word;
-
-
-            updateHUD();
-
-            return;
-        }
-
+        targetWordDisplay.textContent =
+            "---";
 
         return;
     }
 
 
-    currentTarget =
-        matchingVocabulary;
+    currentTarget = {
+        word: targetWord,
+        definition: selectedShip.def
+    };
 
 
     currentTargetShip =
@@ -2626,7 +2680,7 @@ function setNewReachableTarget() {
 
 
     targetWordDisplay.textContent =
-        currentTarget.word;
+        targetWord;
 
 
     updateHUD();
@@ -2947,7 +3001,7 @@ function fireBullet() {
             ammo <= 0
         ) {
 
-            SoundFX.incorrect();
+            playSound("incorrect");
         }
 
 
@@ -2966,7 +3020,7 @@ function fireBullet() {
      * BlastWord laser sound.
      */
 
-    SoundFX.laser();
+    playSound("laser");
 
 
     bullets.push({
@@ -3451,9 +3505,9 @@ function updateDivingShip(
         shields--;
 
 
-        SoundFX.damage();
+        playSound("damage");
 
-        SoundFX.shield();
+        playSound("shield");
 
 
         ship.diving =
@@ -3671,7 +3725,7 @@ function handleDivingShipHit(
         );
 
 
-    SoundFX.explosion();
+    playSound("explosion");
 
 
     if (
@@ -3709,17 +3763,17 @@ function handleDivingShipHit(
             );
 
 
-        SoundFX.correct();
+        playSound("correct");
 
 
-        SoundFX.coin();
+        playSound("coin");
 
 
         if (
             streak >= 3
         ) {
 
-            SoundFX.streak();
+            playSound("streak");
         }
 
 
@@ -3743,7 +3797,7 @@ function handleDivingShipHit(
             );
 
 
-        SoundFX.incorrect();
+        playSound("incorrect");
 
 
         showMessage(
@@ -3874,20 +3928,20 @@ function handleCorrectNormalHit(
     }
 
 
-    SoundFX.explosion();
+    playSound("explosion");
 
 
-    SoundFX.correct();
+    playSound("correct");
 
 
-    SoundFX.coin();
+    playSound("coin");
 
 
     if (
         streak >= 3
     ) {
 
-        SoundFX.streak();
+        playSound("streak");
     }
 
 
@@ -3947,10 +4001,10 @@ function handleWrongNormalHit(
         );
 
 
-    SoundFX.incorrect();
+    playSound("incorrect");
 
 
-    SoundFX.shield();
+    playSound("shield");
 
 
     /*
@@ -4129,26 +4183,21 @@ function respawnShipAtTop(
         0;
 
 
+    const replacement =
+        vocabList[
+            Math.floor(
+                Math.random() *
+                vocabList.length
+            )
+        ];
+
+
     ship.def =
-        getRandomDefinition();
-
-
-    const matching =
-        vocabList.find(
-            item =>
-                normalizeText(
-                    item.definition
-                ) ===
-                normalizeText(
-                    ship.def
-                )
-        );
+        replacement.definition;
 
 
     ship.word =
-        matching
-            ? matching.word
-            : "";
+        replacement.word;
 
 
     ship.color =
@@ -4288,10 +4337,10 @@ function beginNextLevel() {
         );
 
 
-    SoundFX.coin();
+    playSound("coin");
 
 
-    SoundFX.levelUp();
+    playSound("levelUp");
 
 
     showMessage(
@@ -5128,7 +5177,7 @@ function completeGame() {
     }
 
 
-    SoundFX.victory();
+    playSound("victory");
 
 
     triggerGameOver(
@@ -5172,12 +5221,12 @@ function triggerGameOver(
         )
     ) {
 
-        SoundFX.victory();
+        playSound("victory");
 
     }
     else {
 
-        SoundFX.gameOver();
+        playSound("gameOver");
     }
 
 
@@ -5321,7 +5370,7 @@ function resetGame() {
     updateHUD();
 
 
-    SoundFX.start();
+    playSound("start");
 
 
     createBoard();
@@ -5346,7 +5395,7 @@ restartButton.addEventListener(
     "click",
     () => {
 
-        SoundFX.click();
+        playSound("click");
 
         startGame();
     }
@@ -5361,7 +5410,7 @@ libraryButton.addEventListener(
     "click",
     () => {
 
-        SoundFX.click();
+        playSound("click");
 
 
         window.location.href =
