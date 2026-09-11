@@ -86,7 +86,105 @@ function wait(ms) {
 function isAnyGemMoving() {
   return document.querySelector('.gem[data-moving="true"]');
 }
+// ===== SAFE BOARD HELPERS =====
 
+function wouldCreateCluster(r, c, color) {
+
+  const visited = new Set();
+  const stack = [[r, c]];
+  let count = 0;
+
+  while (stack.length) {
+
+    const [cr, cc] = stack.pop();
+    const key = `${cr},${cc}`;
+
+    if (visited.has(key)) continue;
+    visited.add(key);
+
+    if (
+      cr < 0 ||
+      cr >= rows ||
+      cc < 0 ||
+      cc >= cols
+    ) continue;
+
+    let cell;
+
+    // Pretend the candidate gem already exists
+    if (cr === r && cc === c) {
+      cell = { color };
+    } else {
+      cell = gemBoard[cr][cc];
+    }
+
+    if (!cell || cell.color !== color) continue;
+
+    count++;
+
+    stack.push([cr + 1, cc]);
+    stack.push([cr - 1, cc]);
+    stack.push([cr, cc + 1]);
+    stack.push([cr, cc - 1]);
+  }
+
+  return count >= 3;
+}
+
+function getSafeColor(r, c) {
+
+  let options = colors.filter(
+    color => !wouldCreateCluster(r, c, color)
+  );
+
+  if (!options.length) {
+    options = [...colors];
+  }
+
+  return options[
+    Math.floor(Math.random() * options.length)
+  ];
+}
+
+function sanitizeBoard() {
+
+  let matches = findMatches();
+
+  while (matches.length) {
+
+    matches.forEach(g => {
+
+      let newColor;
+      let attempts = 0;
+
+      do {
+        newColor = colors[
+          Math.floor(Math.random() * colors.length)
+        ];
+        attempts++;
+      }
+      while (
+        wouldCreateCluster(
+          g.row,
+          g.col,
+          newColor
+        ) &&
+        attempts < 20
+      );
+
+      g.color = newColor;
+
+      const img =
+        g.element?.querySelector("img");
+
+      if (img) {
+        img.src = colorMap[newColor];
+      }
+    });
+
+    matches = findMatches();
+  }
+}
 // =========================================
 // VOCAB LOADER
 // =========================================
@@ -244,12 +342,12 @@ function buildBoard() {
       const item = items[i++];
       if (!item) continue;
 
-      const g = {
-        ...item,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        row: r,
-        col: c
-      };
+const g = {
+  ...item,
+  color: getSafeColor(r, c),
+  row: r,
+  col: c
+};
 
       g.element = createGemElement(g);
       gemGrid.appendChild(g.element);
@@ -259,6 +357,7 @@ function buildBoard() {
       positionGem(g);
     }
   }
+  sanitizeBoard();
 }
 
 // ===== CARDS =====
@@ -489,12 +588,12 @@ function refillFromCombo() {
 
         if (!base) continue;
 
-        const g = {
-          ...base,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          row: r,
-          col: c
-        };
+     const g = {
+...base,
+color: getSafeColor(r, c),
+row: r,
+col: c
+};
 
         g.element = createGemElement(g);
         gemGrid.appendChild(g.element);
@@ -527,25 +626,32 @@ async function resolveBoard() {
 
     refillFromCombo();
 
-    // let DOM register new gems
-    await wait(FALL_TIME);
+// allow DOM update
+await wait(FALL_TIME);
 
-    // second gravity pass (CRITICAL FIX)
-    let post = true;
-    while (post) {
-      post = applyGravity();
-      await wait(FALL_TIME);
-    }
+// settle refill gems
+let post = true;
 
-    // final stabilization delay
-    await wait(25);
+while (post) {
+  post = applyGravity();
+  await wait(FALL_TIME);
+}
 
-    const matches = findMatches();
+// make sure refill never created
+// an automatic bonus cluster
 
-    if (!matches.length) break;
+sanitizeBoard();
 
-    clearMatches(matches);
-    await wait(CLEAR_TIME + 10);
+await wait(25);
+
+const matches = findMatches();
+
+if (!matches.length) {
+  break;
+}
+
+clearMatches(matches);
+await wait(CLEAR_TIME + 10);
   }
 
   isProcessing = false;
