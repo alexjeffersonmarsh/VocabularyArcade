@@ -2547,6 +2547,18 @@ function setNewReachableTarget() {
         ];
 
 
+    const matchingVocabulary =
+        vocabList.find(
+            item =>
+                normalizeText(
+                    item.definition
+                ) ===
+                normalizeText(
+                    selectedShip.def
+                )
+        );
+
+
     /*
      * Every ship definition should have
      * a corresponding vocabulary item.
@@ -5307,6 +5319,9 @@ function resetGame() {
 
 
     createBoard();
+
+
+    gameLoop();
 }
 
 
