@@ -2419,18 +2419,12 @@ function getLowestShipInEachColumn() {
                     }
 
 
-                    return
-                        (
-                            ship.y +
-                            ship.height
-                        )
-                        >
-                        (
-                            currentLowest.y +
-                            currentLowest.height
-                        )
-                            ? ship
-                            : currentLowest;
+                   return (
+    (ship.y + ship.height) >
+    (currentLowest.y + currentLowest.height)
+)
+    ? ship
+    : currentLowest;
 
                 },
                 null
@@ -2547,83 +2541,17 @@ function setNewReachableTarget() {
         ];
 
 
-    const matchingVocabulary =
-        vocabList.find(
-            item =>
-                normalizeText(
-                    item.definition
-                ) ===
-                normalizeText(
-                    selectedShip.def
-                )
-        );
+currentTarget = {
+    word: selectedShip.word,
+    definition: selectedShip.def
+};
 
+currentTargetShip = selectedShip;
 
-    /*
-     * Every ship definition should have
-     * a corresponding vocabulary item.
-     */
+targetWordDisplay.textContent =
+    selectedShip.word;
 
-    if (
-        !matchingVocabulary
-    ) {
-
-        console.error(
-            "BLASTWORD: Could not match ship definition:",
-            selectedShip.def
-        );
-
-
-        /*
-         * Repair the ship immediately
-         * instead of displaying an unreachable
-         * target.
-         */
-
-        const replacement =
-            getUnusedDefinitionForBoard();
-
-
-        if (replacement) {
-
-            selectedShip.def =
-                replacement.definition;
-
-
-            currentTarget =
-                replacement;
-
-            currentTargetShip =
-                selectedShip;
-
-
-            targetWordDisplay.textContent =
-                replacement.word;
-
-
-            updateHUD();
-
-            return;
-        }
-
-
-        return;
-    }
-
-
-    currentTarget =
-        matchingVocabulary;
-
-
-    currentTargetShip =
-        selectedShip;
-
-
-    targetWordDisplay.textContent =
-        currentTarget.word;
-
-
-    updateHUD();
+updateHUD();
 }
 
 
@@ -4124,7 +4052,7 @@ function respawnShipAtTop(
 
 
     ship.def =
-        getRandomDefinition();
+        getUnusedDefinitionForBoard().definition;
 
 
     const matching =
