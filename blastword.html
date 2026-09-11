@@ -2522,26 +2522,20 @@ function setNewReachableTarget() {
 
 
     /*
-     * If the current target remains one
-     * of the five lowest ships, KEEP IT.
+     * ALWAYS choose a fresh target.
      *
-     * This prevents the definition from
-     * changing unnecessarily after a dive
-     * ship is destroyed.
-     */
-
-    if (
-        isCurrentTargetReachable()
-    ) {
-
-        return;
-    }
-
-
-    /*
-     * Otherwise choose a new target
-     * exclusively from the bottom ship
-     * of one of the active columns.
+     * The candidates are the current
+     * bottom-most normal ships in the
+     * active columns. A successful hit
+     * always causes this function to run,
+     * whether the destroyed ship was a
+     * normal formation ship or a diving
+     * attack ship.
+     *
+     * Never preserve the previous target.
+     * This keeps the vocabulary prompt
+     * synchronized with the current five
+     * reachable ships.
      */
 
     const selectedShip =
@@ -2551,18 +2545,6 @@ function setNewReachableTarget() {
                 lowestShips.length
             )
         ];
-
-
-    const matchingVocabulary =
-        vocabList.find(
-            item =>
-                normalizeText(
-                    item.definition
-                ) ===
-                normalizeText(
-                    selectedShip.def
-                )
-        );
 
 
     /*
@@ -5325,13 +5307,6 @@ function resetGame() {
 
 
     createBoard();
-
-
-    /*
-     * Start the animation/render loop after the
-     * first board has been created.
-     */
-    gameLoop();
 }
 
 
