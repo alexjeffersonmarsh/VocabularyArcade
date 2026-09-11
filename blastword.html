@@ -2256,40 +2256,6 @@ function hideLoading() {
 
 
 /* =========================================================
-   SAFE SOUND SYSTEM
-
-   Sound must never be allowed to stop the game.
-   If sound.js is unavailable, BlastWord continues silently.
-========================================================= */
-
-function playSound(name, ...args) {
-
-    try {
-
-        const soundSystem =
-            window.SoundFX;
-
-        if (
-            soundSystem &&
-            typeof soundSystem[name] ===
-                "function"
-        ) {
-
-            soundSystem[name](...args);
-        }
-
-    }
-    catch (error) {
-
-        console.warn(
-            "BlastWord sound error:",
-            error
-        );
-    }
-}
-
-
-/* =========================================================
    SOUND BUTTON
 ========================================================= */
 
@@ -2300,38 +2266,8 @@ function updateSoundButton() {
     }
 
 
-    const soundSystem =
-        window.SoundFX;
-
-
-    if (
-        !soundSystem ||
-        typeof soundSystem.isMuted !==
-            "function"
-    ) {
-
-        soundButton.textContent =
-            "🔊";
-
-        soundButton.disabled =
-            true;
-
-        soundButton.setAttribute(
-            "aria-label",
-            "Sound system unavailable"
-        );
-
-        soundButton.setAttribute(
-            "title",
-            "Sound system unavailable"
-        );
-
-        return;
-    }
-
-
     const muted =
-        soundSystem.isMuted();
+        SoundFX.isMuted();
 
 
     soundButton.textContent =
@@ -2364,7 +2300,7 @@ soundButton.addEventListener(
     "click",
     () => {
 
-        playSound("toggleMute");
+        SoundFX.toggleMute();
 
         updateSoundButton();
     }
@@ -2483,17 +2419,18 @@ function getLowestShipInEachColumn() {
                     }
 
 
-return (
-
-ship.y + ship.height >
-
-currentLowest.y + currentLowest.height
-
-)
-
-? ship
-
-: currentLowest;
+                    return
+                        (
+                            ship.y +
+                            ship.height
+                        )
+                        >
+                        (
+                            currentLowest.y +
+                            currentLowest.height
+                        )
+                            ? ship
+                            : currentLowest;
 
                 },
                 null
@@ -2585,9 +2522,12 @@ function setNewReachableTarget() {
 
 
     /*
-     * Keep the current target as long as
-     * its ship is still the lowest ship
-     * in its column.
+     * If the current target remains one
+     * of the five lowest ships, KEEP IT.
+     *
+     * This prevents the definition from
+     * changing unnecessarily after a dive
+     * ship is destroyed.
      */
 
     if (
@@ -2599,9 +2539,9 @@ function setNewReachableTarget() {
 
 
     /*
-     * Select only from the ships that are
-     * actually exposed at the bottom of
-     * their columns.
+     * Otherwise choose a new target
+     * exclusively from the bottom ship
+     * of one of the active columns.
      */
 
     const selectedShip =
@@ -2613,65 +2553,72 @@ function setNewReachableTarget() {
         ];
 
 
-    /*
-     * Each ship carries its own vocabulary
-     * word and definition. Using ship.word
-     * here avoids a second lookup that can
-     * accidentally produce an unreachable
-     * target.
-     */
-
-    let targetWord =
-        selectedShip.word ||
-        "";
-
-
-    if (!targetWord) {
-
-        const matchingVocabulary =
-            vocabList.find(
-                item =>
-                    normalizeText(
-                        item.definition
-                    ) ===
-                    normalizeText(
-                        selectedShip.def
-                    )
-            );
-
-
-        if (matchingVocabulary) {
-
-            targetWord =
-                matchingVocabulary.word;
-        }
-    }
-
-
-    if (!targetWord) {
-
-        console.error(
-            "BLASTWORD: Ship has no matching vocabulary word.",
-            selectedShip
+    const matchingVocabulary =
+        vocabList.find(
+            item =>
+                normalizeText(
+                    item.definition
+                ) ===
+                normalizeText(
+                    selectedShip.def
+                )
         );
 
-        currentTarget =
-            null;
 
-        currentTargetShip =
-            null;
+    /*
+     * Every ship definition should have
+     * a corresponding vocabulary item.
+     */
 
-        targetWordDisplay.textContent =
-            "---";
+    if (
+        !matchingVocabulary
+    ) {
+
+        console.error(
+            "BLASTWORD: Could not match ship definition:",
+            selectedShip.def
+        );
+
+
+        /*
+         * Repair the ship immediately
+         * instead of displaying an unreachable
+         * target.
+         */
+
+        const replacement =
+            getUnusedDefinitionForBoard();
+
+
+        if (replacement) {
+
+            selectedShip.def =
+                replacement.definition;
+
+
+            currentTarget =
+                replacement;
+
+            currentTargetShip =
+                selectedShip;
+
+
+            targetWordDisplay.textContent =
+                replacement.word;
+
+
+            updateHUD();
+
+            return;
+        }
+
 
         return;
     }
 
 
-    currentTarget = {
-        word: targetWord,
-        definition: selectedShip.def
-    };
+    currentTarget =
+        matchingVocabulary;
 
 
     currentTargetShip =
@@ -2679,7 +2626,7 @@ function setNewReachableTarget() {
 
 
     targetWordDisplay.textContent =
-        targetWord;
+        currentTarget.word;
 
 
     updateHUD();
@@ -3000,7 +2947,7 @@ function fireBullet() {
             ammo <= 0
         ) {
 
-            playSound("incorrect");
+            SoundFX.incorrect();
         }
 
 
@@ -3019,7 +2966,7 @@ function fireBullet() {
      * BlastWord laser sound.
      */
 
-    playSound("laser");
+    SoundFX.laser();
 
 
     bullets.push({
@@ -3504,9 +3451,9 @@ function updateDivingShip(
         shields--;
 
 
-        playSound("damage");
+        SoundFX.damage();
 
-        playSound("shield");
+        SoundFX.shield();
 
 
         ship.diving =
@@ -3724,7 +3671,7 @@ function handleDivingShipHit(
         );
 
 
-    playSound("explosion");
+    SoundFX.explosion();
 
 
     if (
@@ -3762,17 +3709,17 @@ function handleDivingShipHit(
             );
 
 
-        playSound("correct");
+        SoundFX.correct();
 
 
-        playSound("coin");
+        SoundFX.coin();
 
 
         if (
             streak >= 3
         ) {
 
-            playSound("streak");
+            SoundFX.streak();
         }
 
 
@@ -3796,7 +3743,7 @@ function handleDivingShipHit(
             );
 
 
-        playSound("incorrect");
+        SoundFX.incorrect();
 
 
         showMessage(
@@ -3927,20 +3874,20 @@ function handleCorrectNormalHit(
     }
 
 
-    playSound("explosion");
+    SoundFX.explosion();
 
 
-    playSound("correct");
+    SoundFX.correct();
 
 
-    playSound("coin");
+    SoundFX.coin();
 
 
     if (
         streak >= 3
     ) {
 
-        playSound("streak");
+        SoundFX.streak();
     }
 
 
@@ -4000,10 +3947,10 @@ function handleWrongNormalHit(
         );
 
 
-    playSound("incorrect");
+    SoundFX.incorrect();
 
 
-    playSound("shield");
+    SoundFX.shield();
 
 
     /*
@@ -4182,21 +4129,26 @@ function respawnShipAtTop(
         0;
 
 
-    const replacement =
-        vocabList[
-            Math.floor(
-                Math.random() *
-                vocabList.length
-            )
-        ];
-
-
     ship.def =
-        replacement.definition;
+        getRandomDefinition();
+
+
+    const matching =
+        vocabList.find(
+            item =>
+                normalizeText(
+                    item.definition
+                ) ===
+                normalizeText(
+                    ship.def
+                )
+        );
 
 
     ship.word =
-        replacement.word;
+        matching
+            ? matching.word
+            : "";
 
 
     ship.color =
@@ -4336,10 +4288,10 @@ function beginNextLevel() {
         );
 
 
-    playSound("coin");
+    SoundFX.coin();
 
 
-    playSound("levelUp");
+    SoundFX.levelUp();
 
 
     showMessage(
@@ -5176,7 +5128,7 @@ function completeGame() {
     }
 
 
-    playSound("victory");
+    SoundFX.victory();
 
 
     triggerGameOver(
@@ -5220,12 +5172,12 @@ function triggerGameOver(
         )
     ) {
 
-        playSound("victory");
+        SoundFX.victory();
 
     }
     else {
 
-        playSound("gameOver");
+        SoundFX.gameOver();
     }
 
 
@@ -5369,10 +5321,17 @@ function resetGame() {
     updateHUD();
 
 
-    playSound("start");
+    SoundFX.start();
 
 
     createBoard();
+
+
+    /*
+     * Start the animation/render loop after the
+     * first board has been created.
+     */
+    gameLoop();
 }
 
 
@@ -5394,7 +5353,7 @@ restartButton.addEventListener(
     "click",
     () => {
 
-        playSound("click");
+        SoundFX.click();
 
         startGame();
     }
@@ -5409,7 +5368,7 @@ libraryButton.addEventListener(
     "click",
     () => {
 
-        playSound("click");
+        SoundFX.click();
 
 
         window.location.href =
