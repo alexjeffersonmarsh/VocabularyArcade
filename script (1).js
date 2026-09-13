@@ -1,23 +1,12 @@
-// =========================================================
-// GEMWORDS
-// Shared Vocabulary Arcade Sound System
-// =========================================================
-
-
 // ===== GEMWORD SETTINGS =====
-
 const rows = 5;
 const cols = 4;
 
-
 // ===== TIMING =====
-
 const FALL_TIME = 100;
 const CLEAR_TIME = 100;
 
-
 // ===== COLORS =====
-
 const colorMap = {
   red: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-red.webp",
   blue: "https://raw.githubusercontent.com/alexjeffersonmarsh/VocabularyArcade/main/images/jewel-blue.webp",
@@ -27,9 +16,7 @@ const colorMap = {
 
 const colors = Object.keys(colorMap);
 
-
 // ===== GAME STATE =====
-
 let score = 0;
 let timeLeft = 180;
 let timerInterval;
@@ -48,295 +35,179 @@ let gemBoard = [];
 let selectedGem = null;
 let selectedCard = null;
 
-
 // ===== DOM =====
-
 const gemGrid = document.getElementById("gemGrid");
 const cardGrid = document.getElementById("cardGrid");
 const scoreDisplay = document.getElementById("score");
 const timerDisplay = document.getElementById("timer");
 
+// ===== AUDIO =====
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// =========================================================
-// SOUND SYSTEM
-// =========================================================
-// sound.js is loaded by gemword.html before this script.
-//
-// All GemWords sounds go through this safe wrapper.
-// A sound problem will NEVER stop the game.
-// =========================================================
+function playTone(freq, duration, type = "sine") {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
 
-function playSound(name, ...args) {
+  osc.type = type;
+  osc.frequency.value = freq;
 
-  try {
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioCtx.currentTime + duration
+  );
 
-    const soundSystem = window.SoundFX;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
 
-    if (
-      soundSystem &&
-      typeof soundSystem[name] === "function"
-    ) {
-
-      soundSystem[name](...args);
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "GemWords sound error:",
-      error
-    );
-
-  }
-
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
 }
 
+const playChime = () => playTone(600, 0.25);
+const playBuzz = () => playTone(150, 0.3, "square");
+const playExplosion = () => playTone(90, 0.2);
 
 // ===== COMBO TEXT =====
-
 function showComboText(text) {
-
   const div = document.createElement("div");
-
   div.className = "combo-text";
-
   div.textContent = text;
-
   document.body.appendChild(div);
 
-  setTimeout(() => {
-
-    div.remove();
-
-  }, 1000);
-
+  setTimeout(() => div.remove(), 1000);
 }
-
 
 // ===== HELPERS =====
-
 function wait(ms) {
-
-  return new Promise(
-    resolve => setTimeout(resolve, ms)
-  );
-
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
-
 
 function isAnyGemMoving() {
-
-  return document.querySelector(
-    '.gem[data-moving="true"]'
-  );
-
+  return document.querySelector('.gem[data-moving="true"]');
 }
 
+// =========================================
+// SAFE COLOR SYSTEM
+// =========================================
 
-// =========================================================
-// SAFE BOARD HELPERS
-// =========================================================
+/*
+  Determines whether placing a particular color into a specific
+  board position would create a 3+ connected group containing
+  that new gem.
 
-function wouldCreateCluster(
-  r,
-  c,
-  color
-) {
+  This deliberately ignores unrelated combos elsewhere on the
+  board. That is important during cascades because the board may
+  already contain a combo waiting to be cleared.
+*/
+function wouldCreateMatch(row, col, color) {
 
-  const visited = new Set();
+  if (
+    row < 0 ||
+    row >= rows ||
+    col < 0 ||
+    col >= cols
+  ) {
+    return false;
+  }
 
-  const stack = [[r, c]];
+  if (gemBoard[row][col] !== null) {
+    return false;
+  }
 
+  const testGem = {
+    color: color,
+    row: row,
+    col: col
+  };
+
+  gemBoard[row][col] = testGem;
+
+  const visited = Array.from(
+    { length: rows },
+    () => Array(cols).fill(false)
+  );
+
+  const stack = [[row, col]];
   let count = 0;
-
 
   while (stack.length) {
 
-    const [cr, cc] = stack.pop();
-
-    const key = `${cr},${cc}`;
-
-
-    if (visited.has(key)) {
-      continue;
-    }
-
-    visited.add(key);
-
+    const [r, c] = stack.pop();
 
     if (
-      cr < 0 ||
-      cr >= rows ||
-      cc < 0 ||
-      cc >= cols
+      r < 0 ||
+      r >= rows ||
+      c < 0 ||
+      c >= cols
     ) {
       continue;
     }
 
-
-    let cell;
-
-
-    // Pretend the candidate gem already exists.
-
-    if (
-      cr === r &&
-      cc === c
-    ) {
-
-      cell = {
-        color
-      };
-
-    } else {
-
-      cell = gemBoard[cr][cc];
-
-    }
-
-
-    if (
-      !cell ||
-      cell.color !== color
-    ) {
-
+    if (visited[r][c]) {
       continue;
-
     }
 
+    const cell = gemBoard[r][c];
 
+    if (!cell || cell.color !== color) {
+      continue;
+    }
+
+    visited[r][c] = true;
     count++;
 
+    if (count >= 3) {
+      break;
+    }
 
-    stack.push([
-      cr + 1,
-      cc
-    ]);
-
-    stack.push([
-      cr - 1,
-      cc
-    ]);
-
-    stack.push([
-      cr,
-      cc + 1
-    ]);
-
-    stack.push([
-      cr,
-      cc - 1
-    ]);
-
+    stack.push([r + 1, c]);
+    stack.push([r - 1, c]);
+    stack.push([r, c + 1]);
+    stack.push([r, c - 1]);
   }
 
+  gemBoard[row][col] = null;
 
   return count >= 3;
-
 }
 
 
-function getSafeColor(
-  r,
-  c
-) {
+/*
+  Selects a random color that will not create a combo at the
+  specified location.
 
-  let options = colors.filter(
-    color =>
-      !wouldCreateCluster(
-        r,
-        c,
-        color
-      )
+  The colors are shuffled first so the board remains visually
+  random rather than always favoring the first safe color.
+*/
+function getSafeColor(row, col) {
+
+  const shuffledColors = [...colors].sort(
+    () => Math.random() - 0.5
   );
 
+  const safeColors = shuffledColors.filter(
+    color => !wouldCreateMatch(row, col, color)
+  );
 
-  if (!options.length) {
+  /*
+    With four colors and a match rule of three, there should
+    virtually always be at least one safe choice.
 
-    options = [
-      ...colors
+    This fallback exists only as a safeguard.
+  */
+  if (safeColors.length > 0) {
+    return safeColors[
+      Math.floor(Math.random() * safeColors.length)
     ];
-
   }
 
-
-  return options[
-    Math.floor(
-      Math.random() *
-      options.length
-    )
-  ];
-
+  return shuffledColors[0];
 }
 
-
-function sanitizeBoard() {
-
-  let matches = findMatches();
-
-
-  while (matches.length) {
-
-    matches.forEach(
-      g => {
-
-        let newColor;
-
-        let attempts = 0;
-
-
-        do {
-
-          newColor =
-            colors[
-              Math.floor(
-                Math.random() *
-                colors.length
-              )
-            ];
-
-          attempts++;
-
-        }
-        while (
-          wouldCreateCluster(
-            g.row,
-            g.col,
-            newColor
-          ) &&
-          attempts < 20
-        );
-
-
-        g.color = newColor;
-
-
-        const img =
-          g.element?.querySelector("img");
-
-
-        if (img) {
-
-          img.src =
-            colorMap[newColor];
-
-        }
-
-      }
-    );
-
-
-    matches = findMatches();
-
-  }
-
-}
-
-
-// =========================================================
+// =========================================
 // VOCAB LOADER
-// =========================================================
+// =========================================
 
 async function loadVocab() {
 
@@ -344,7 +215,6 @@ async function loadVocab() {
     "Preloaded vocab:",
     window.preloadedVocab
   );
-
 
   if (
     !window.preloadedVocab ||
@@ -356,223 +226,115 @@ async function loadVocab() {
     );
 
     return false;
-
   }
-
 
   vocab =
     window.preloadedVocab.map(
-      (
-        item,
-        index
-      ) => ({
-
-        id:
-          index + 1,
-
-        word:
-          item.word,
-
-        definition:
-          item.definition
-
+      (item, index) => ({
+        id: index + 1,
+        word: item.word,
+        definition: item.definition
       })
     );
-
 
   fullVocab =
     vocab.slice(
       0,
-      Math.min(
-        vocab.length,
-        20
-      )
+      Math.min(vocab.length, 20)
     );
-
 
   masteredVocab = [];
-
   comboRecycle = [];
 
-
   return true;
-
 }
 
-
-// =========================================================
-// SCORE
-// =========================================================
-
+// ===== SCORE =====
 function updateScore(val) {
-
   score += val;
-
-  scoreDisplay.textContent =
-    score;
-
+  scoreDisplay.textContent = score;
 }
 
-
-// =========================================================
-// TIMER
-// =========================================================
-
+// ===== TIMER =====
 function startTimer() {
 
-  clearInterval(
-    timerInterval
-  );
+  clearInterval(timerInterval);
 
+  timerInterval = setInterval(() => {
 
-  timerInterval =
-    setInterval(
-      () => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
 
-        timeLeft--;
+    if (timeLeft <= 0) {
 
-        timerDisplay.textContent =
-          timeLeft;
+      clearInterval(timerInterval);
 
+      isProcessing = true;
 
-        if (
-          timeLeft <= 0
-        ) {
+      alert(
+        "Time's up! Final score: " + score
+      );
+    }
 
-          clearInterval(
-            timerInterval
-          );
-
-          isProcessing =
-            true;
-
-
-          playSound(
-            "timeUp"
-          );
-
-
-          alert(
-            "Time's up! Final score: " +
-            score
-          );
-
-        }
-
-      },
-      1000
-    );
-
+  }, 1000);
 }
 
-
-// =========================================================
-// POSITION
-// =========================================================
-
+// ===== POSITION =====
 function positionGem(g) {
 
-  if (
-    !g ||
-    !g.element
-  ) {
+  if (!g || !g.element) return;
 
-    return;
-
-  }
-
-
-  const x =
-    g.col * 147;
-
-  const y =
-    g.row * 119;
-
+  const x = g.col * 147;
+  const y = g.row * 119;
 
   g.element.setAttribute(
     "data-moving",
     "true"
   );
 
-
   g.element.style.transform =
     `translate(${x}px, ${y}px)`;
 
+  setTimeout(() => {
 
-  setTimeout(
-    () => {
+    if (g.element) {
+      g.element.setAttribute(
+        "data-moving",
+        "false"
+      );
+    }
 
-      if (
-        g.element
-      ) {
-
-        g.element.setAttribute(
-          "data-moving",
-          "false"
-        );
-
-      }
-
-    },
-    FALL_TIME - 40
-  );
-
+  }, FALL_TIME - 40);
 }
 
-
-// =========================================================
-// GEM
-// =========================================================
-
+// ===== GEM =====
 function createGemElement(g) {
 
-  const d =
-    document.createElement("div");
+  const d = document.createElement("div");
 
+  d.className = "gem";
 
-  d.className =
-    "gem";
-
-
-  d.dataset.color =
-    g.color;
-
+  d.dataset.color = g.color;
 
   // ===== GEM IMAGE =====
 
-  const img =
-    document.createElement("img");
+  const img = document.createElement("img");
 
+  img.src = colorMap[g.color];
 
-  img.src =
-    colorMap[g.color];
+  img.alt = "";
 
+  img.draggable = false;
 
-  img.alt =
-    "";
-
-
-  img.draggable =
-    false;
-
-
-  img.className =
-    "gem-image";
-
+  img.className = "gem-image";
 
   // ===== GEM LABEL =====
 
-  const label =
-    document.createElement("span");
+  const label = document.createElement("span");
 
+  label.className = "label";
 
-  label.className =
-    "label";
-
-
-  label.textContent =
-    g.word;
-
+  label.textContent = g.word;
 
   // ===== BUILD GEM =====
 
@@ -580,237 +342,125 @@ function createGemElement(g) {
 
   d.appendChild(label);
 
-
   // ===== CLICK =====
 
   d.addEventListener(
     "click",
     () => {
 
-      if (
-        isProcessing
-      ) {
-
-        return;
-
-      }
-
-
-      playSound(
-        "click"
-      );
-
+      if (isProcessing) return;
 
       selectGem(g);
 
     }
   );
 
-
   return d;
-
 }
 
-
-// =========================================================
-// BOARD
-// =========================================================
-
+// ===== BOARD =====
 function buildBoard() {
 
-  gemBoard =
-    Array.from(
-      {
-        length: rows
-      },
-      () =>
-        Array(
-          cols
-        ).fill(null)
-    );
+  gemBoard = Array.from(
+    { length: rows },
+    () => Array(cols).fill(null)
+  );
 
+  gemGrid.innerHTML = "";
 
-  gemGrid.innerHTML =
-    "";
-
-
-  const items =
-    [
-      ...fullVocab
-    ].sort(
-      () =>
-        Math.random() -
-        0.5
-    );
-
+  const items = [...fullVocab].sort(
+    () => Math.random() - 0.5
+  );
 
   let i = 0;
 
+  for (let r = 0; r < rows; r++) {
 
-  for (
-    let r = 0;
-    r < rows;
-    r++
-  ) {
+    for (let c = 0; c < cols; c++) {
 
-    for (
-      let c = 0;
-      c < cols;
-      c++
-    ) {
+      const item = items[i++];
 
-      const item =
-        items[i++];
+      if (!item) continue;
 
-
-      if (!item) {
-        continue;
-      }
-
-
+      /*
+        Create the gem without assigning a color yet.
+      */
       const g = {
-
         ...item,
-
-        color:
-          getSafeColor(
-            r,
-            c
-          ),
-
+        color: null,
         row: r,
-
         col: c
-
       };
 
+      /*
+        Choose a color that cannot create a combo at
+        this exact position.
+      */
+      g.color = getSafeColor(r, c);
 
-      g.element =
-        createGemElement(g);
+      g.element = createGemElement(g);
 
+      gemGrid.appendChild(g.element);
 
-      gemGrid.appendChild(
-        g.element
-      );
-
-
-      gemBoard[r][c] =
-        g;
-
+      gemBoard[r][c] = g;
 
       positionGem(g);
-
     }
-
   }
 
-
-  sanitizeBoard();
-
+  console.log(
+    "Initial board created with no automatic combos."
+  );
 }
 
-
-// =========================================================
-// CARDS
-// =========================================================
-
+// ===== CARDS =====
 function buildCards() {
 
-  cardGrid.innerHTML =
-    "";
+  cardGrid.innerHTML = "";
 
+  [...fullVocab]
+    .sort(() => Math.random() - 0.5)
+    .forEach(item => {
 
-  [
-    ...fullVocab
-  ]
-    .sort(
-      () =>
-        Math.random() -
-        0.5
-    )
-    .forEach(
-      item => {
+      const d = document.createElement("div");
 
-        const d =
-          document.createElement(
-            "div"
-          );
+      d.className = "card";
 
+      d.textContent = item.definition;
 
-        d.className =
-          "card";
+      d.dataset.id = item.id;
 
+      d.onclick = () => selectCard(d);
 
-        d.textContent =
-          item.definition;
+      cardGrid.appendChild(d);
 
-
-        d.dataset.id =
-          item.id;
-
-
-        d.onclick =
-          () => {
-
-            playSound(
-              "click"
-            );
-
-            selectCard(d);
-
-          };
-
-
-        cardGrid.appendChild(
-          d
-        );
-
-      }
-    );
-
+    });
 }
 
-
-// =========================================================
-// MATCH
-// =========================================================
-
+// ===== MATCH =====
 function selectGem(g) {
 
   if (
     isProcessing ||
     isAnyGemMoving()
   ) {
-
     return;
-
   }
 
-
-  if (
-    selectedGem
-  ) {
-
+  if (selectedGem) {
     selectedGem.element.classList.remove(
       "selected"
     );
-
   }
 
-
-  selectedGem =
-    g;
-
+  selectedGem = g;
 
   g.element.classList.add(
     "selected"
   );
 
-
   tryMatch();
-
 }
-
 
 function selectCard(card) {
 
@@ -818,77 +468,41 @@ function selectCard(card) {
     isProcessing ||
     isAnyGemMoving()
   ) {
-
     return;
-
   }
 
-
-  if (
-    selectedCard
-  ) {
-
+  if (selectedCard) {
     selectedCard.classList.remove(
       "selected"
     );
-
   }
 
-
-  selectedCard =
-    card;
-
+  selectedCard = card;
 
   card.classList.add(
     "selected"
   );
 
-
   tryMatch();
-
 }
-
-
-// =========================================================
-// MATCH CHECK
-// =========================================================
 
 function tryMatch() {
 
-  if (
-    !selectedGem ||
-    !selectedCard
-  ) {
-
+  if (!selectedGem || !selectedCard) {
     return;
-
   }
-
 
   if (
     selectedGem.id ===
-    Number(
-      selectedCard.dataset.id
-    )
+    Number(selectedCard.dataset.id)
   ) {
 
-    // ===== CORRECT MATCH =====
-
-    playSound(
-      "match"
-    );
-
-    playSound(
-      "correct"
-    );
-
+    playChime();
 
     updateScore(10);
 
-
     const mid =
       selectedGem.id;
-
 
     for (
       let r = 0;
@@ -907,33 +521,18 @@ function tryMatch() {
           gemBoard[r][c].id === mid
         ) {
 
-          playSound(
-            "gemClear"
-          );
-
-
           gemBoard[r][c]
             .element
             .remove();
 
-
-          gemBoard[r][c] =
-            null;
-
+          gemBoard[r][c] = null;
         }
-
       }
-
     }
 
-
-    masteredVocab.push(
-      mid
-    );
-
+    masteredVocab.push(mid);
 
     selectedCard.remove();
-
 
     // ===== CHECK FOR GAME COMPLETION =====
 
@@ -941,7 +540,6 @@ function tryMatch() {
       document.querySelectorAll(
         ".card"
       );
-
 
     if (
       remainingCards.length === 0
@@ -951,91 +549,49 @@ function tryMatch() {
         timerInterval
       );
 
-
       const timeBonus =
         timeLeft * 10;
-
 
       updateScore(
         timeBonus
       );
 
+      setTimeout(() => {
 
-      playSound(
-        "coin"
-      );
+        alert(
+          `Board Complete!\n\nTime Bonus: ${timeBonus}\nFinal Score: ${score}`
+        );
 
-
-      playSound(
-        "victory"
-      );
-
-
-      setTimeout(
-        () => {
-
-          alert(
-            `Board Complete!\n\nTime Bonus: ${timeBonus}\nFinal Score: ${score}`
-          );
-
-        },
-        300
-      );
-
+      }, 300);
 
       return;
-
     }
-
 
     resolveBoard();
 
-
   } else {
 
-    // ===== INCORRECT MATCH =====
+    playBuzz();
 
-    playSound(
-      "incorrect"
-    );
-
-
-    updateScore(
-      -2
-    );
-
+    updateScore(-2);
   }
-
 
   selectedGem?.element.classList.remove(
     "selected"
   );
 
-
   selectedCard?.classList.remove(
     "selected"
   );
 
-
-  selectedGem =
-    null;
-
-
-  selectedCard =
-    null;
-
+  selectedGem = null;
+  selectedCard = null;
 }
 
-
-// =========================================================
-// GRAVITY
-// =========================================================
-
+// ===== GRAVITY =====
 function applyGravity() {
 
-  let moved =
-    false;
-
+  let moved = false;
 
   for (
     let c = 0;
@@ -1045,7 +601,6 @@ function applyGravity() {
 
     let writeRow =
       rows - 1;
-
 
     for (
       let r = rows - 1;
@@ -1064,62 +619,38 @@ function applyGravity() {
           const g =
             gemBoard[r][c];
 
-
           gemBoard[writeRow][c] =
             g;
-
 
           gemBoard[r][c] =
             null;
 
-
           g.row =
             writeRow;
 
-
           positionGem(g);
 
-
-          moved =
-            true;
-
+          moved = true;
         }
 
-
         writeRow--;
-
       }
-
     }
-
   }
 
-
   return moved;
-
 }
 
-
-// =========================================================
-// MATCH DETECTION
-// =========================================================
-
+// ===== MATCH DETECTION =====
 function findMatches() {
 
   const visited =
     Array.from(
-      {
-        length: rows
-      },
-      () =>
-        Array(
-          cols
-        ).fill(false)
+      { length: rows },
+      () => Array(cols).fill(false)
     );
 
-
   const matches = [];
-
 
   function flood(
     r,
@@ -1128,20 +659,12 @@ function findMatches() {
     group
   ) {
 
-    const stack =
-      [[r, c]];
+    const stack = [[r, c]];
 
+    while (stack.length) {
 
-    while (
-      stack.length
-    ) {
-
-      const [
-        cr,
-        cc
-      ] =
+      const [cr, cc] =
         stack.pop();
-
 
       if (
         cr < 0 ||
@@ -1149,43 +672,28 @@ function findMatches() {
         cc < 0 ||
         cc >= cols
       ) {
-
         continue;
-
       }
-
 
       if (
         visited[cr][cc]
       ) {
-
         continue;
-
       }
-
 
       const cell =
         gemBoard[cr][cc];
-
 
       if (
         !cell ||
         cell.color !== color
       ) {
-
         continue;
-
       }
 
+      visited[cr][cc] = true;
 
-      visited[cr][cc] =
-        true;
-
-
-      group.push(
-        cell
-      );
-
+      group.push(cell);
 
       stack.push([
         cr + 1,
@@ -1206,11 +714,8 @@ function findMatches() {
         cr,
         cc - 1
       ]);
-
     }
-
   }
-
 
   for (
     let r = 0;
@@ -1227,20 +732,14 @@ function findMatches() {
       const cell =
         gemBoard[r][c];
 
-
       if (
         !cell ||
         visited[r][c]
       ) {
-
         continue;
-
       }
 
-
-      const group =
-        [];
-
+      const group = [];
 
       flood(
         r,
@@ -1249,7 +748,6 @@ function findMatches() {
         group
       );
 
-
       if (
         group.length >= 3
       ) {
@@ -1257,47 +755,25 @@ function findMatches() {
         matches.push(
           ...group
         );
-
       }
-
     }
-
   }
-
 
   return [
     ...new Set(matches)
   ];
-
 }
 
+// ===== COMBO CLEAR =====
+function clearMatches(matches) {
 
-// =========================================================
-// COMBO CLEAR
-// =========================================================
-
-function clearMatches(
-  matches
-) {
-
-  if (
-    !matches.length
-  ) {
-
+  if (!matches.length) {
     return;
-
   }
 
-
-  // Gem clear sound.
-
-  playSound(
-    "gemClear"
-  );
-
+  playExplosion();
 
   comboMultiplier++;
-
 
   updateScore(
     matches.length *
@@ -1305,72 +781,44 @@ function clearMatches(
     comboMultiplier
   );
 
-
-  // Stronger combo sound when applicable.
-
   if (
     comboMultiplier > 1
   ) {
-
-    playSound(
-      "gemCombo",
-      comboMultiplier
-    );
-
 
     showComboText(
       comboMultiplier +
       "x COMBO!"
     );
-
   }
 
+  matches.forEach(g => {
 
-  matches.forEach(
-    g => {
-
-      if (
-        g.element
-      ) {
-
-        g.element.remove();
-
-      }
-
-
-      if (
-        gemBoard[g.row]?.[g.col] ===
-        g
-      ) {
-
-        gemBoard[g.row][g.col] =
-          null;
-
-      }
-
-
-      if (
-        !masteredVocab.includes(
-          g.id
-        )
-      ) {
-
-        comboRecycle.push(
-          g.id
-        );
-
-      }
-
+    if (g.element) {
+      g.element.remove();
     }
-  );
 
+    if (
+      gemBoard[g.row]?.[g.col] === g
+    ) {
+
+      gemBoard[g.row][g.col] =
+        null;
+    }
+
+    if (
+      !masteredVocab.includes(
+        g.id
+      )
+    ) {
+
+      comboRecycle.push(
+        g.id
+      );
+    }
+  });
 }
 
-
-// =========================================================
-// COMBO REFILL
-// =========================================================
-
+// ===== COMBO REFILL =====
 function refillFromCombo() {
 
   for (
@@ -1393,253 +841,170 @@ function refillFromCombo() {
         const id =
           comboRecycle.pop();
 
-
         const base =
           fullVocab.find(
-            v =>
-              v.id === id
+            v => v.id === id
           );
-
 
         if (!base) {
           continue;
         }
 
-
+        /*
+          Create the gem without a color.
+        */
         const g = {
-
           ...base,
-
-          color:
-            getSafeColor(
-              r,
-              c
-            ),
-
+          color: null,
           row: r,
-
           col: c
-
         };
 
+        /*
+          CRITICAL CHANGE:
+
+          The replacement gem receives a color that will
+          NOT create a 3+ combo at its new position.
+        */
+        g.color =
+          getSafeColor(r, c);
 
         g.element =
           createGemElement(g);
-
 
         gemGrid.appendChild(
           g.element
         );
 
-
         gemBoard[r][c] =
           g;
 
-
         positionGem(g);
-
       }
-
     }
-
   }
-
 }
 
-
-// =========================================================
-// RESOLVE BOARD
-// =========================================================
-
+// ===== RESOLVE BOARD =====
 async function resolveBoard() {
 
-  isProcessing =
-    true;
+  isProcessing = true;
 
-
-  comboMultiplier =
-    1;
-
+  comboMultiplier = 1;
 
   while (true) {
 
     // ===== FULL SETTLE =====
 
-    let moved =
-      true;
+    let moved = true;
 
+    while (moved) {
 
-    while (
-      moved
-    ) {
-
-      moved =
-        applyGravity();
-
+      moved = applyGravity();
 
       await wait(
         FALL_TIME
       );
-
     }
 
+    // ===== STABILIZE DOM =====
 
-    // Stabilize DOM before refill.
+    await wait(20);
 
-    await wait(
-      20
-    );
-
-
-    // ===== REFILL =====
+    // ===== REFILL EMPTY SPACES =====
 
     refillFromCombo();
 
-
-    // Allow DOM update.
+    // ===== LET NEW GEMS REGISTER =====
 
     await wait(
       FALL_TIME
     );
 
+    // ===== SECOND GRAVITY PASS =====
 
-    // ===== SETTLE REFILL =====
+    let post = true;
 
-    let post =
-      true;
+    while (post) {
 
-
-    while (
-      post
-    ) {
-
-      post =
-        applyGravity();
-
+      post = applyGravity();
 
       await wait(
         FALL_TIME
       );
-
     }
 
+    // ===== FINAL STABILIZATION =====
 
-    // Make sure refill never
-    // created an automatic cluster.
+    await wait(25);
 
-    sanitizeBoard();
-
-
-    await wait(
-      25
-    );
-
+    // ===== CHECK FOR CASCADE =====
 
     const matches =
       findMatches();
 
-
     if (
       !matches.length
     ) {
-
       break;
-
     }
 
+    /*
+      Any combo found here is a legitimate cascade caused
+      by gravity or the existing board state.
 
+      New replacement gems themselves were prevented from
+      creating a combo when they spawned.
+    */
     clearMatches(
       matches
     );
 
-
     await wait(
       CLEAR_TIME + 10
     );
-
   }
 
-
-  isProcessing =
-    false;
-
+  isProcessing = false;
 }
 
-
-// =========================================================
-// START LOADED GAME
-// =========================================================
-
+// ===== START =====
 async function startLoadedGame() {
 
-  score =
-    0;
+  score = 0;
 
+  timeLeft = 180;
 
-  timeLeft =
-    180;
+  selectedGem = null;
 
+  selectedCard = null;
 
-  selectedGem =
-    null;
+  scoreDisplay.textContent = 0;
 
-
-  selectedCard =
-    null;
-
-
-  scoreDisplay.textContent =
-    0;
-
-
-  timerDisplay.textContent =
-    180;
-
+  timerDisplay.textContent = 180;
 
   const loaded =
     await loadVocab();
 
-
   if (!loaded) {
-
     return;
-
   }
-
 
   buildBoard();
 
   buildCards();
 
-
-  // Start the shared sound system.
-
-  playSound(
-    "start"
-  );
-
-
   startTimer();
-
 
   console.log(
     "GemWords started successfully."
   );
-
 }
-
-
-// =========================================================
-// PUBLIC START FUNCTION
-// =========================================================
 
 window.startLoadedGame =
   startLoadedGame;
 
-
-// =========================================================
-// READY
-// =========================================================
+// ===== READY =====
 
 console.log(
   "GemWords loaded and waiting for vocabulary."
