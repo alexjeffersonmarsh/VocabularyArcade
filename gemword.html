@@ -4,13 +4,246 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Vocabulary Jewel Game</title>
 
-<link rel="stylesheet" href="style.css">
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+<style>
+
+/* =========================================
+   GAME COMPLETE SCREEN
+========================================= */
+
+.game-complete-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0, 0, 0, 0.90);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 9999;
+}
+
+
+.game-complete-screen.show {
+
+    display: flex;
+
+}
+
+
+.game-complete-panel {
+
+    width: min(
+        520px,
+        90vw
+    );
+
+    padding: 40px;
+
+    background:
+        #1b1b20;
+
+    border:
+        3px solid #777;
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0 0 35px rgba(
+            0,
+            0,
+            0,
+            0.85
+        );
+
+    text-align:
+        center;
+
+    font-family:
+        "Times New Roman",
+        serif;
+
+}
+
+
+.game-complete-panel h1 {
+
+    margin-top:
+        0;
+
+    margin-bottom:
+        30px;
+
+    font-size:
+        38px;
+
+    color:
+        #ffffff;
+
+}
+
+
+.results-list-name,
+.results-stat {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        20px;
+
+    padding:
+        14px 18px;
+
+    margin:
+        10px 0;
+
+    background:
+        #29292f;
+
+    border-radius:
+        10px;
+
+    font-size:
+        22px;
+
+}
+
+
+.results-label {
+
+    color:
+        #aaa;
+
+    font-size:
+        17px;
+
+}
+
+
+#resultsListName,
+#resultsScore,
+#resultsAccuracy {
+
+    color:
+        #ffffff;
+
+    font-weight:
+        bold;
+
+}
+
+
+#resultsAccuracy {
+
+    font-size:
+        28px;
+
+}
+
+
+.results-buttons {
+
+    display:
+        flex;
+
+    gap:
+        15px;
+
+    justify-content:
+        center;
+
+    margin-top:
+        30px;
+
+}
+
+
+.results-buttons button {
+
+    padding:
+        12px 22px;
+
+    border:
+        none;
+
+    border-radius:
+        8px;
+
+    cursor:
+        pointer;
+
+    font-family:
+        "Times New Roman",
+        serif;
+
+    font-size:
+        18px;
+
+    font-weight:
+        bold;
+
+}
+
+
+#playAgainButton {
+
+    background:
+        #7b2cbf;
+
+    color:
+        white;
+
+}
+
+
+#libraryButton {
+
+    background:
+        #444;
+
+    color:
+        white;
+
+}
+
+
+#playAgainButton:hover,
+#libraryButton:hover {
+
+    opacity:
+        0.85;
+
+}
+
+</style>
 
 </head>
+
 
 <body>
 
@@ -23,7 +256,9 @@
 
     <h2>GemWords</h2>
 
-    <p>Select a vocabulary set from your library.</p>
+    <p>
+        Select a vocabulary set from your library.
+    </p>
 
     <select id="setSelector">
 
@@ -40,30 +275,45 @@
 </div>
 
 
-<!-- ===== HUD ===== -->
+<!-- =========================================
+     HUD
+========================================= -->
 
 <div class="stats-hud">
 
     <div class="stat-item">
+
         SCORE:
-        <span id="score">0</span>
+        <span id="score">
+            0
+        </span>
+
     </div>
 
+
     <div class="stat-item">
+
         TIME:
-        <span id="timer">180</span>
+        <span id="timer">
+            180
+        </span>
+
     </div>
 
 </div>
 
 
-<!-- ===== GAME AREA ===== -->
+<!-- =========================================
+     GAME AREA
+========================================= -->
 
 <div id="game-container">
 
     <div class="board-column">
 
-        <h3>Words</h3>
+        <h3>
+            Words
+        </h3>
 
         <div id="gemGrid"></div>
 
@@ -72,9 +322,90 @@
 
     <div class="board-column">
 
-        <h3>Definitions</h3>
+        <h3>
+            Definitions
+        </h3>
 
         <div id="cardGrid"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     GAME COMPLETE SCREEN
+========================================= -->
+
+<div
+    id="gameCompleteScreen"
+    class="game-complete-screen"
+>
+
+    <div class="game-complete-panel">
+
+        <h1>
+            GemWords Complete!
+        </h1>
+
+
+        <div class="results-list-name">
+
+            <span class="results-label">
+                Vocabulary List
+            </span>
+
+            <span id="resultsListName">
+                Vocabulary List
+            </span>
+
+        </div>
+
+
+        <div class="results-stat">
+
+            <span class="results-label">
+                Score
+            </span>
+
+            <span id="resultsScore">
+                0
+            </span>
+
+        </div>
+
+
+        <div class="results-stat">
+
+            <span class="results-label">
+                Accuracy
+            </span>
+
+            <span id="resultsAccuracy">
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="results-buttons">
+
+            <button
+                id="playAgainButton"
+                type="button"
+            >
+                Play Again
+            </button>
+
+
+            <button
+                id="libraryButton"
+                type="button"
+            >
+                Back to Library
+            </button>
+
+        </div>
 
     </div>
 
@@ -94,8 +425,12 @@
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 
 import {
     getFirestore,
@@ -104,7 +439,9 @@ import {
     collection,
     getDocs
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 
 const firebaseConfig = {
@@ -130,11 +467,18 @@ const firebaseConfig = {
 };
 
 
+
 const app =
-    initializeApp(firebaseConfig);
+    initializeApp(
+        firebaseConfig
+    );
+
 
 const db =
-    getFirestore(app);
+    getFirestore(
+        app
+    );
+
 
 
 /* =========================================
@@ -148,6 +492,7 @@ async function loadVocabularySets() {
             "setSelector"
         );
 
+
     try {
 
         const snapshot =
@@ -159,32 +504,34 @@ async function loadVocabularySets() {
             );
 
 
-        snapshot.forEach(docSnap => {
+        snapshot.forEach(
+            docSnap => {
 
-            const data =
-                docSnap.data();
+                const data =
+                    docSnap.data();
 
 
-            const option =
-                document.createElement(
-                    "option"
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    docSnap.id;
+
+
+                option.textContent =
+                    data.title ||
+                    docSnap.id;
+
+
+                selector.appendChild(
+                    option
                 );
 
-
-            option.value =
-                docSnap.id;
-
-
-            option.textContent =
-                data.title ||
-                docSnap.id;
-
-
-            selector.appendChild(
-                option
-            );
-
-        });
+            }
+        );
 
 
         console.log(
@@ -204,6 +551,7 @@ async function loadVocabularySets() {
 }
 
 
+
 /* =========================================
    LOAD VOCAB SET
 ========================================= */
@@ -219,7 +567,9 @@ async function loadSet(setId) {
 
 
     const snapshot =
-        await getDoc(ref);
+        await getDoc(
+            ref
+        );
 
 
     if (!snapshot.exists()) {
@@ -235,7 +585,19 @@ async function loadSet(setId) {
         snapshot.data();
 
 
-    /* New format */
+    /* =====================================
+       SAVE LIST TITLE
+    ===================================== */
+
+    window.preloadedVocabTitle =
+        data.title ||
+        setId;
+
+
+
+    /* =====================================
+       NEW FORMAT
+    ===================================== */
 
     if (
         Array.isArray(
@@ -248,7 +610,10 @@ async function loadSet(setId) {
     }
 
 
-    /* Legacy format */
+
+    /* =====================================
+       LEGACY FORMAT
+    ===================================== */
 
     let terms =
         data.terms;
@@ -266,6 +631,7 @@ async function loadSet(setId) {
                     terms
                 );
 
+
         } catch(error) {
 
             console.error(
@@ -273,7 +639,9 @@ async function loadSet(setId) {
                 error
             );
 
-            terms = [];
+
+            terms =
+                [];
 
         }
 
@@ -283,6 +651,7 @@ async function loadSet(setId) {
     return terms || [];
 
 }
+
 
 
 /* =========================================
@@ -318,17 +687,19 @@ async function startGameWithSet(setId) {
 
 
         window.preloadedVocab =
-            vocab.map(item => ({
+            vocab.map(
+                item => ({
 
-                word:
-                    item.word,
+                    word:
+                        item.word,
 
-                definition:
-                    item.definition ||
-                    item.meaning ||
-                    ""
+                    definition:
+                        item.definition ||
+                        item.meaning ||
+                        ""
 
-            }));
+                })
+            );
 
 
         console.log(
@@ -336,6 +707,17 @@ async function startGameWithSet(setId) {
             window.preloadedVocab
         );
 
+
+        console.log(
+            "GEMWORDS: Vocabulary list title:",
+            window.preloadedVocabTitle
+        );
+
+
+
+        /* =================================
+           HIDE TEACHER PANEL
+        ================================= */
 
         const panel =
             document.getElementById(
@@ -350,6 +732,11 @@ async function startGameWithSet(setId) {
 
         }
 
+
+
+        /* =================================
+           START GAME
+        ================================= */
 
         if (
             typeof window.startLoadedGame ===
@@ -394,11 +781,13 @@ window.startGameWithSet =
     startGameWithSet;
 
 
+
 /* =========================================
    LOAD DROPDOWN ON PAGE OPEN
 ========================================= */
 
 loadVocabularySets();
+
 
 
 /* =========================================
@@ -423,6 +812,7 @@ if (setId) {
     );
 
 }
+
 
 
 /* =========================================
@@ -451,6 +841,7 @@ document
                 alert(
                     "Please select a vocabulary set."
                 );
+
 
                 return;
 
