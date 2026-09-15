@@ -1,350 +1,591 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BubbleWord</title>
+<title>WordPreps | Vocabulary Practice Games</title>
 
-<link rel="stylesheet" href="styles.css">
+<meta name="description"
+      content="WordPreps provides interactive vocabulary practice through engaging educational games.">
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+header {
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: #60a5fa;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    font-weight: 600;
+}
+
+nav a:hover {
+    color: #60a5fa;
+}
+
+/* ================================
+   HERO
+================================ */
+
+.hero {
+    min-height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.hero-content {
+    max-width: 850px;
+}
+
+.hero h1 {
+    font-size: clamp(48px, 8vw, 86px);
+    margin: 0 0 20px 0;
+    font-weight: 900;
+    letter-spacing: -3px;
+}
+
+.hero h1 span {
+    color: #60a5fa;
+}
+
+.hero h2 {
+    font-size: clamp(24px, 4vw, 38px);
+    margin: 0 0 25px 0;
+    font-weight: 600;
+}
+
+.hero p {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.button {
+    display: inline-block;
+    padding: 16px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    margin: 8px;
+}
+
+.primary-button {
+    background: #2563eb;
+    color: white;
+}
+
+.primary-button:hover {
+    background: #1d4ed8;
+}
+
+.secondary-button {
+    border: 2px solid #475569;
+    color: white;
+}
+
+.secondary-button:hover {
+    border-color: #60a5fa;
+    color: #60a5fa;
+}
+
+/* ================================
+   GAMES
+================================ */
+
+.games {
+    background: #111827;
+    padding: 80px 25px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.section-description {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 18px;
+    margin-bottom: 50px;
+}
+
+.game-grid {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.game-card {
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.game-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.game-card h3 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.game-card p {
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* ================================
+   HOW IT WORKS
+================================ */
+
+.how-it-works {
+    padding: 80px 25px;
+    text-align: center;
+}
+
+.steps {
+    max-width: 900px;
+    margin: 50px auto 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+}
+
+.step {
+    padding: 20px;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.step h3 {
+    font-size: 21px;
+}
+
+.step p {
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* ================================
+   CALL TO ACTION
+================================ */
+
+.cta {
+    background: #1d4ed8;
+    padding: 80px 25px;
+    text-align: center;
+}
+
+.cta h2 {
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.cta p {
+    font-size: 19px;
+    margin-bottom: 30px;
+}
+
+.cta-button {
+    background: white;
+    color: #1d4ed8;
+}
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    background: #020617;
+    text-align: center;
+    padding: 30px 20px;
+    color: #64748b;
+}
+
+footer a {
+    color: #94a3b8;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: white;
+}
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 650px) {
+
+    header {
+        padding: 20px;
+    }
+
+    nav a {
+        margin-left: 10px;
+        font-size: 14px;
+    }
+
+    .hero {
+        min-height: 500px;
+        padding: 60px 20px;
+    }
+
+    .hero h1 {
+        letter-spacing: -2px;
+    }
+
+}
+
+</style>
 
 </head>
 
+
 <body>
 
-<!-- =========================================
-     TEACHER PANEL
-========================================= -->
 
-<div id="teacher-panel">
+<!-- ================================
+     HEADER
+================================ -->
 
-    <h2>BubbleWord</h2>
+<header>
 
-   <p>Select a vocabulary list from the library or load a legacy JSON file.</p>
+    <div class="logo">
+        Word<span>Preps</span>
+    </div>
 
-<input
-    type="text"
-    id="vocab-url"
-    placeholder="Optional: paste legacy JSON URL"
->
+    <nav>
+        <a href="library.html">Vocabulary Library</a>
+    </nav>
+
+</header>
 
 
-    <p style="font-size:13px;color:#666;margin-top:10px;">
-        Example:
-        <br><br>
-        https://alexjeffersonmarsh.github.io/bubble-vocab-lists/sat-unit-1.json
+<!-- ================================
+     HERO
+================================ -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            WORD<span>PREPS</span>
+        </h1>
+
+        <h2>
+            Vocabulary Practice That Feels Like a Game.
+        </h2>
+
+        <p>
+            Build vocabulary, strengthen recall, and practice new words
+            through interactive games designed for students and teachers.
+        </p>
+
+        <a class="button primary-button" href="library.html">
+            Explore Vocabulary Library
+        </a>
+
+        <a class="button secondary-button" href="#games">
+            Explore the Games
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ================================
+     GAMES
+================================ -->
+
+<section class="games" id="games">
+
+    <h2 class="section-title">
+        Vocabulary Arcade
+    </h2>
+
+    <p class="section-description">
+        Choose a game and turn vocabulary practice into active learning.
     </p>
 
-    <button id="start-game-btn">
-        Start Game
-    </button>
 
-</div>
+    <div class="game-grid">
 
-<!-- =========================================
-     GAME AREA
-========================================= -->
 
-<div id="game-container">
+        <!-- GEMWORDS -->
 
-    <canvas id="gameCanvas"></canvas>
+        <div class="game-card">
 
-    <!-- LEFT HUD -->
-    <div id="hud-left">
-        <div class="hud-box">
-            Score: <span id="score">0</span>
+            <div class="game-icon">
+                💎
+            </div>
+
+            <h3>
+                GemWords
+            </h3>
+
+            <p>
+                Match vocabulary words with their definitions
+                and build your score.
+            </p>
+
         </div>
-        <div class="hud-box">
-            Level: <span id="level">1</span>
+
+
+        <!-- BUBBLEWORD -->
+
+        <div class="game-card">
+
+            <div class="game-icon">
+                🫧
+            </div>
+
+            <h3>
+                BubbleWord
+            </h3>
+
+            <p>
+                Find the correct vocabulary bubbles
+                before they disappear.
+            </p>
+
         </div>
+
+
+        <!-- MATCHWORD -->
+
+        <div class="game-card">
+
+            <div class="game-icon">
+                🎯
+            </div>
+
+            <h3>
+                MatchWord
+            </h3>
+
+            <p>
+                Test vocabulary recognition by matching
+                words and meanings.
+            </p>
+
+        </div>
+
+
+        <!-- FLASHWORD -->
+
+        <div class="game-card">
+
+            <div class="game-icon">
+                ⚡
+            </div>
+
+            <h3>
+                FlashWord
+            </h3>
+
+            <p>
+                Practice vocabulary quickly with
+                interactive digital flashcards.
+            </p>
+
+        </div>
+
+
     </div>
 
-    <!-- RIGHT HUD -->
-    <div id="hud-right">
-        <div class="hud-box">
-            Time: <span id="timer">60</span>
+</section>
+
+
+<!-- ================================
+     HOW IT WORKS
+================================ -->
+
+<section class="how-it-works">
+
+    <h2 class="section-title">
+        How WordPreps Works
+    </h2>
+
+    <p class="section-description">
+        Three simple steps to better vocabulary practice.
+    </p>
+
+
+    <div class="steps">
+
+
+        <div class="step">
+
+            <div class="step-number">
+                1
+            </div>
+
+            <h3>
+                Choose a Set
+            </h3>
+
+            <p>
+                Select a vocabulary set from the
+                WordPreps vocabulary library.
+            </p>
+
         </div>
-        <div class="hud-box">
-            Shots Left: <span id="attempts">20</span>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                2
+            </div>
+
+            <h3>
+                Choose a Game
+            </h3>
+
+            <p>
+                Pick the vocabulary game that
+                fits the way you want to practice.
+            </p>
+
         </div>
-        <div class="hud-box">
-            <button id="mute-btn">🔊</button>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                3
+            </div>
+
+            <h3>
+                Practice
+            </h3>
+
+            <p>
+                Play, practice, and strengthen
+                vocabulary recall.
+            </p>
+
         </div>
+
+
     </div>
 
-    <!-- TARGET WORD -->
-    <div id="target-word-bar">
-        <div id="target-label">
-            Find the definition for:
-        </div>
-        <div id="target-word">
-            PRESS START
-        </div>
-    </div>
+</section>
 
-</div>
 
-<!-- =========================================
-     JSON LOADER (LEGACY SUPPORT)
-========================================= -->
+<!-- ================================
+     CALL TO ACTION
+================================ -->
 
-<script>
+<section class="cta">
 
-window.preloadedVocab = null;
+    <h2>
+        Ready to Practice?
+    </h2>
 
-// Load via ?vocab=URL
-async function loadVocabularyFromURL() {
+    <p>
+        Choose a vocabulary set and start playing.
+    </p>
 
-    const params = new URLSearchParams(window.location.search);
+    <a class="button cta-button" href="library.html">
+        Open Vocabulary Library
+    </a>
 
-    // ✅ VERY IMPORTANT: skip JSON loader if Firebase ID exists
-    if (params.get("id")) {
-        return;
-    }
+</section>
 
-    const vocabURL = params.get("vocab");
 
-    if (!vocabURL) return;
+<!-- ================================
+     FOOTER
+================================ -->
 
-    try {
+<footer>
 
-        const response = await fetch(vocabURL);
-        const data = await response.json();
+    <p>
+        © 2026 WordPreps · Vocabulary Arcade
+    </p>
 
-        window.preloadedVocab = data;
+    <p>
+        <a href="library.html">
+            Vocabulary Library
+        </a>
+    </p>
 
-        document.getElementById("teacher-panel").style.display = "none";
+</footer>
 
-        if (window.startLoadedGame) {
-            window.startLoadedGame();
-        }
-
-    } catch (err) {
-
-        console.error(err);
-        alert("Could not load vocabulary list.");
-
-    }
-}
-
-// Manual input
-async function loadVocabularyManually() {
-
-    const url = document.getElementById("vocab-url").value.trim();
-
-    if (!url) {
-        alert("Please enter a vocabulary URL.");
-        return;
-    }
-
-    try {
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        window.preloadedVocab = data;
-
-        if (window.startLoadedGame) {
-            window.startLoadedGame();
-        }
-
-    } catch (error) {
-
-        console.error(error);
-        alert("Could not load vocabulary list.");
-
-    }
-}
-
-document
-    .getElementById("start-game-btn")
-    .addEventListener("click", loadVocabularyManually);
-
-// Auto-load JSON if present
-loadVocabularyFromURL();
-
-</script>
-
-<!-- =========================================
-     FIREBASE LOADER (MAIN SYSTEM)
-========================================= -->
-
-<script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-    getFirestore,
-    doc,
-    getDoc
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-  authDomain: "bubbleword-30367.firebaseapp.com",
-  projectId: "bubbleword-30367",
-  storageBucket: "bubbleword-30367.firebasestorage.app",
-  messagingSenderId: "1058393039019",
-  appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/*
-=================================================
-LOAD VOCAB SET FROM FIRESTORE
-Supports:
-
-NEW FORMAT
-{
-  title,
-  language,
-  items: [
-    {
-      word,
-      definition
-    }
-  ]
-}
-
-LEGACY FORMAT
-{
-  terms: [
-    {
-      word,
-      meaning
-    }
-  ]
-}
-=================================================
-*/
-
-async function loadSet(setId) {
-
-    const ref = doc(db, "vocabSets", setId);
-    const snapshot = await getDoc(ref);
-
-    if (!snapshot.exists()) {
-        throw new Error("Vocabulary set not found.");
-    }
-
-    const data = snapshot.data();
-
-    // NEW FORMAT FROM setup.html
-    if (Array.isArray(data.items)) {
-        return data.items;
-    }
-
-    // LEGACY FORMAT
-    let terms = data.terms;
-
-    if (typeof terms === "string") {
-
-        try {
-
-            terms = JSON.parse(terms);
-
-        } catch (error) {
-
-            console.error(
-                "Could not parse terms JSON:",
-                error
-            );
-
-            terms = [];
-
-        }
-    }
-
-    return terms || [];
-}
-
-/*
-=================================================
-READ FIREBASE DOCUMENT ID FROM URL
-
-Examples
-
-play.html?id=abc123
-
-index.html?id=abc123
-
-Legacy support:
-?set=abc123
-=================================================
-*/
-
-const params = new URLSearchParams(
-    window.location.search
-);
-
-const setId =
-    params.get("id") ||
-    params.get("set");
-
-if (setId) {
-
-    loadSet(setId)
-
-        .then(vocab => {
-
-            /*
-            Normalize old and new formats
-            into one structure the game expects.
-            */
-
-            window.preloadedVocab = vocab.map(item => ({
-
-                word:
-                    item.word,
-
-                definition:
-                    item.definition ||
-                    item.meaning ||
-                    ""
-
-            }));
-
-            console.log(
-                "Loaded Firebase vocabulary:",
-                window.preloadedVocab
-            );
-
-            document
-                .getElementById("teacher-panel")
-                .style.display = "none";
-
-            if (window.startLoadedGame) {
-                window.startLoadedGame();
-            }
-
-        })
-
-        .catch(error => {
-
-            console.error(error);
-
-            alert(
-                "Could not load vocabulary set from Firebase."
-            );
-
-        });
-
-}
-
-</script>
-
-
-<!-- =========================================
-     GAME LOGIC
-========================================= -->
-
-<script src="script.js"></script>
 
 </body>
+
 </html>
+```
