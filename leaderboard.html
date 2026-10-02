@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#17131f">
+    <title>Live Leaderboard | Vocabulary Arcade</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --page: #111015;
+            --panel: #1c1923;
+            --panel-alt: #25212e;
+            --border: #3c3548;
+            --text: #f7f4fb;
+            --muted: #b8afc5;
+            --purple: #8b45ce;
+            --purple-hover: #a45ce8;
+            --green: #58c995;
+            --red: #ff7d88;
+            --gold: #f4cc72;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 28px 18px 48px;
+            background: radial-gradient(ellipse at top, #292035 0%, var(--page) 58%);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page-shell { width: min(1080px, 100%); margin: 0 auto; }
+        .topline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .brand { margin: 0; font-size: clamp(23px, 4vw, 30px); letter-spacing: -0.7px; }
+        .brand span { color: #c79af2; }
+        .eyebrow {
+            margin: 0 0 7px;
+            color: #c5a0e7;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .top-tag {
+            padding: 8px 11px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .intro { margin-bottom: 24px; }
+        .intro h2 { margin: 0 0 9px; font-size: clamp(25px, 5vw, 36px); }
+        .intro p { max-width: 720px; margin: 0; color: var(--muted); line-height: 1.6; }
+
+        .panel {
+            padding: clamp(18px, 3.5vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(28, 25, 35, 0.96);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+        }
+        .lookup-panel { margin-bottom: 20px; }
+        .lookup-panel h3 { margin: 0 0 8px; font-size: 20px; }
+        .lookup-panel p { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+        .lookup-form { display: flex; flex-wrap: wrap; gap: 10px; }
+        input {
+            flex: 1 1 230px;
+            min-width: 0;
+            min-height: 48px;
+            padding: 11px 14px;
+            border: 1px solid #51475f;
+            border-radius: 9px;
+            outline: none;
+            background: #131118;
+            color: var(--text);
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        input:focus-visible, button:focus-visible, a:focus-visible {
+            outline: 3px solid #c69cf0;
+            outline-offset: 2px;
+        }
+        button, .button-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+        button:hover:not(:disabled), .button-link:hover { transform: translateY(-1px); }
+        button:disabled { cursor: not-allowed; opacity: 0.55; }
+        .primary-button { background: var(--purple); color: #fff; }
+        .primary-button:hover:not(:disabled) { background: var(--purple-hover); }
+        .secondary-button, .button-link { border: 1px solid #554b62; background: #302a39; color: var(--text); }
+
+        .notice {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+        .notice.show { display: block; }
+        .notice.error { border-color: #864751; color: #ffd2d7; background: #321e25; }
+        .notice.success { border-color: #356c54; color: #c9f7df; background: #1a2b24; }
+
+        #leaderboardPanel { display: none; }
+        #leaderboardPanel.show { display: block; }
+        .session-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+        .session-heading h2 { margin: 0 0 7px; font-size: clamp(23px, 4vw, 32px); }
+        .session-heading p { margin: 0; color: var(--muted); line-height: 1.5; }
+        .status-pill {
+            flex: 0 0 auto;
+            padding: 8px 11px;
+            border: 1px solid #66517e;
+            border-radius: 999px;
+            color: #e4caff;
+            background: #332541;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .status-pill.active { border-color: #356c54; color: #c9f7df; background: #1a2b24; }
+        .status-pill.finished { border-color: #695f70; color: #d3cbd9; background: #302a35; }
+
+        .session-overview {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin: 20px 0 24px;
+        }
+        .overview-tile {
+            min-width: 0;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            background: var(--panel-alt);
+        }
+        .overview-label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .overview-value { display: block; overflow-wrap: anywhere; font-size: 17px; font-weight: 800; }
+        #overviewCode { color: #e4c7ff; letter-spacing: 2px; }
+        .table-heading {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+            margin: 0 0 12px;
+        }
+        .table-heading h3 { margin: 0; font-size: 20px; }
+        #updateTime { color: var(--muted); font-size: 12px; }
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 590px; }
+        thead { background: #30283a; }
+        th {
+            padding: 14px 15px;
+            color: #d6c7e5;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        td { padding: 15px; border-top: 1px solid #393242; font-size: 14px; }
+        tbody tr { background: #211d29; }
+        tbody tr:nth-child(even) { background: #25212e; }
+        tbody tr:hover { background: #30273b; }
+        td.score-cell { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .rank-cell { width: 74px; color: var(--muted); font-weight: 800; }
+        .rank-medal { color: var(--gold); }
+        .player-name { max-width: 280px; overflow-wrap: anywhere; font-weight: 700; }
+        .player-subtitle { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; font-weight: 400; }
+        .accuracy-cell { font-variant-numeric: tabular-nums; }
+        .player-status {
+            display: inline-block;
+            padding: 5px 8px;
+            border: 1px solid #554b62;
+            border-radius: 999px;
+            color: #d4cbdd;
+            background: #302a39;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .player-status.finished { border-color: #356c54; color: #c9f7df; background: #1a2b24; }
+        .player-status.playing { border-color: #66517e; color: #e4caff; background: #332541; }
+        .player-status.left { color: #b8afc5; opacity: 0.8; }
+        #emptyState {
+            padding: 35px 18px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.6;
+        }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .footer-note { margin: 22px 4px 0; color: #92899e; font-size: 12px; line-height: 1.6; text-align: center; }
+
+        @media (max-width: 720px) {
+            .session-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .session-heading { flex-direction: column; }
+            .lookup-form button { flex: 1 1 100%; }
+        }
+        @media (max-width: 420px) {
+            body { padding: 20px 12px 36px; }
+            .topline { align-items: flex-start; }
+            .top-tag { margin-top: 5px; }
+            .session-overview { grid-template-columns: 1fr 1fr; }
+            .overview-tile { padding: 12px; }
+            .overview-value { font-size: 15px; }
+            .actions button, .actions .button-link { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+    <main class="page-shell">
+        <header class="topline">
+            <div>
+                <p class="eyebrow">Classroom Competition</p>
+                <h1 class="brand">Vocabulary <span>Arcade</span></h1>
+            </div>
+            <div class="top-tag">Live Leaderboard</div>
+        </header>
+
+        <section class="intro">
+            <h2>Class leaderboard</h2>
+            <p>Enter the game code from your teacher, or open this page using the leaderboard link your teacher shared. Scores and participant status update automatically as Firebase receives changes.</p>
+        </section>
+
+        <section class="panel lookup-panel" aria-labelledby="lookupHeading">
+            <h3 id="lookupHeading">Find a game session</h3>
+            <p>Enter the six-character code displayed on your teacher's screen.</p>
+            <form id="lookupForm" class="lookup-form">
+                <input id="sessionCodeInput" name="code" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234" aria-label="Six-character game code" required>
+                <button id="lookupButton" class="primary-button" type="submit">View Leaderboard</button>
+            </form>
+            <div id="pageNotice" class="notice show" role="status" aria-live="polite">Connecting to Vocabulary Arcade...</div>
+        </section>
+
+        <section id="leaderboardPanel" class="panel" aria-labelledby="sessionTitle">
+            <div class="session-heading">
+                <div>
+                    <p class="eyebrow" id="gameTypeLabel">Game Session</p>
+                    <h2 id="sessionTitle">Class leaderboard</h2>
+                    <p id="sessionSubtitle">Waiting for session details...</p>
+                </div>
+                <span id="sessionStatus" class="status-pill">Waiting</span>
+            </div>
+
+            <div class="session-overview">
+                <div class="overview-tile">
+                    <span class="overview-label">Game code</span>
+                    <span id="overviewCode" class="overview-value">------</span>
+                </div>
+                <div class="overview-tile">
+                    <span class="overview-label">Players</span>
+                    <span id="playerCount" class="overview-value">0</span>
+                </div>
+                <div class="overview-tile">
+                    <span class="overview-label">Finished</span>
+                    <span id="finishedCount" class="overview-value">0</span>
+                </div>
+                <div class="overview-tile">
+                    <span class="overview-label">Leading score</span>
+                    <span id="leadingScore" class="overview-value">—</span>
+                </div>
+            </div>
+
+            <div class="table-heading">
+                <h3>Rankings</h3>
+                <span id="updateTime" aria-live="polite">Waiting for live data...</span>
+            </div>
+
+            <div class="table-wrap">
+                <table aria-label="Live game leaderboard">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Player</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Accuracy</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardRows"></tbody>
+                </table>
+                <div id="emptyState">No students have joined this session yet. Players will appear here when they join.</div>
+            </div>
+
+            <div class="actions">
+                <button id="copyLinkButton" class="primary-button" type="button">Copy Join Link</button>
+                <a id="joinGameLink" class="button-link" href="join.html">Open Student Join Page</a>
+                <button id="changeCodeButton" class="secondary-button" type="button">View Another Code</button>
+            </div>
+            <div id="leaderboardNotice" class="notice" role="status" aria-live="polite"></div>
+        </section>
+
+        <p class="footer-note">Use nicknames or teacher-assigned aliases rather than sensitive personal information. The leaderboard can display scores only after the selected game is connected to submit results to this session.</p>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+            authDomain: "bubbleword-30367.firebaseapp.com",
+            projectId: "bubbleword-30367",
+            storageBucket: "bubbleword-30367.firebasestorage.app",
+            messagingSenderId: "1058393039019",
+            appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const lookupForm = document.getElementById("lookupForm");
+        const sessionCodeInput = document.getElementById("sessionCodeInput");
+        const lookupButton = document.getElementById("lookupButton");
+        const pageNotice = document.getElementById("pageNotice");
+        const leaderboardPanel = document.getElementById("leaderboardPanel");
+        const gameTypeLabel = document.getElementById("gameTypeLabel");
+        const sessionTitle = document.getElementById("sessionTitle");
+        const sessionSubtitle = document.getElementById("sessionSubtitle");
+        const sessionStatus = document.getElementById("sessionStatus");
+        const overviewCode = document.getElementById("overviewCode");
+        const playerCount = document.getElementById("playerCount");
+        const finishedCount = document.getElementById("finishedCount");
+        const leadingScore = document.getElementById("leadingScore");
+        const updateTime = document.getElementById("updateTime");
+        const leaderboardRows = document.getElementById("leaderboardRows");
+        const emptyState = document.getElementById("emptyState");
+        const copyLinkButton = document.getElementById("copyLinkButton");
+        const joinGameLink = document.getElementById("joinGameLink");
+        const changeCodeButton = document.getElementById("changeCodeButton");
+        const leaderboardNotice = document.getElementById("leaderboardNotice");
+
+        let currentJoinCode = "";
+        let currentSessionId = "";
+        let unsubscribeSession = null;
+        let unsubscribeParticipants = null;
+        let liveSessionData = null;
+        let latestPlayers = [];
+
+        const numberFormat = new Intl.NumberFormat();
+        const VALID_CODE_PATTERN = /^[A-HJ-NP-Z2-9]{6}$/;
+
+        function showNotice(element, message, type = "") {
+            element.textContent = message;
+            element.className = "notice show" + (type ? " " + type : "");
+        }
+
+        function hideNotice(element) {
+            element.textContent = "";
+            element.className = "notice";
+        }
+
+        function normalizeCode(value) {
+            return String(value || "")
+                .toUpperCase()
+                .replace(/\s+/g, "")
+                .replace(/[^A-HJ-NP-Z2-9]/g, "")
+                .slice(0, 6);
+        }
+
+        function stopListeners() {
+            if (typeof unsubscribeSession === "function") unsubscribeSession();
+            if (typeof unsubscribeParticipants === "function") unsubscribeParticipants();
+            unsubscribeSession = null;
+            unsubscribeParticipants = null;
+        }
+
+        function renderSessionStatus(status) {
+            const normalized = status || "waiting";
+            const readable = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+            sessionStatus.textContent = readable;
+            sessionStatus.className = "status-pill";
+            if (normalized === "active") sessionStatus.classList.add("active");
+            if (normalized === "finished") sessionStatus.classList.add("finished");
+        }
+
+        function getAccuracy(data) {
+            const attempts = Number(data.totalAttempts || 0);
+            if (attempts <= 0) return "—";
+
+            let accuracy = Number(data.accuracy);
+            if (!Number.isFinite(accuracy)) {
+                accuracy = (Number(data.correctAnswers || 0) / attempts) * 100;
+            } else if (accuracy > 0 && accuracy <= 1) {
+                accuracy *= 100;
+            }
+
+            accuracy = Math.max(0, Math.min(100, accuracy));
+            return Math.round(accuracy) + "%";
+        }
+
+        function getPlayerStatus(data) {
+            if (data.completed === true) return { label: "Finished", className: "finished" };
+            if (data.participantStatus === "left") return { label: "Left", className: "left" };
+            if (Number(data.totalAttempts || 0) > 0 || Number(data.score || 0) > 0) {
+                return { label: "Playing", className: "playing" };
+            }
+            return { label: "Joined", className: "" };
+        }
+
+        function makeCell(text, className = "") {
+            const cell = document.createElement("td");
+            if (className) cell.className = className;
+            cell.textContent = text;
+            return cell;
+        }
+
+        function renderLeaderboard() {
+            const players = [...latestPlayers].sort((a, b) => {
+                const scoreDifference = b.score - a.score;
+                if (scoreDifference !== 0) return scoreDifference;
+
+                // Score is the primary ranking value. These only determine display order
+                // among equal scores, not whether tied scores share the same rank.
+                const accuracyA = a.totalAttempts > 0 ? a.correctAnswers / a.totalAttempts : -1;
+                const accuracyB = b.totalAttempts > 0 ? b.correctAnswers / b.totalAttempts : -1;
+                if (accuracyB !== accuracyA) return accuracyB - accuracyA;
+
+                const completedDifference = Number(b.completed) - Number(a.completed);
+                if (completedDifference !== 0) return completedDifference;
+                return a.joinedAt - b.joinedAt || a.name.localeCompare(b.name);
+            });
+
+            playerCount.textContent = numberFormat.format(players.length);
+            finishedCount.textContent = numberFormat.format(players.filter(player => player.completed).length);
+            leadingScore.textContent = players.length ? numberFormat.format(players[0].score) : "—";
+            emptyState.style.display = players.length ? "none" : "block";
+            leaderboardRows.replaceChildren();
+
+            let previousScore = null;
+            let currentRank = 0;
+
+            players.forEach((player, index) => {
+                if (previousScore === null || player.score !== previousScore) {
+                    currentRank = index + 1;
+                    previousScore = player.score;
+                }
+
+                const row = document.createElement("tr");
+                const rankCell = makeCell(String(currentRank), "rank-cell" + (currentRank <= 3 ? " rank-medal" : ""));
+                const nameCell = document.createElement("td");
+                const name = document.createElement("span");
+                name.className = "player-name";
+                name.textContent = player.name;
+                nameCell.appendChild(name);
+
+                const status = getPlayerStatus(player.raw);
+                const statusCell = document.createElement("td");
+                const statusPill = document.createElement("span");
+                statusPill.className = "player-status" + (status.className ? " " + status.className : "");
+                statusPill.textContent = status.label;
+                statusCell.appendChild(statusPill);
+
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(makeCell(numberFormat.format(player.score), "score-cell"));
+                row.appendChild(makeCell(getAccuracy(player.raw), "accuracy-cell"));
+                row.appendChild(statusCell);
+                leaderboardRows.appendChild(row);
+            });
+
+            updateTime.textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+        }
+
+        function renderSession(data) {
+            liveSessionData = data;
+            gameTypeLabel.textContent = data.gameTitle || data.gameType || "Game Session";
+            sessionTitle.textContent = data.vocabTitle || "Vocabulary Arcade";
+            sessionSubtitle.textContent = "Live rankings for " + (data.gameTitle || data.gameType || "this game") + ".";
+            overviewCode.textContent = data.joinCode || currentJoinCode;
+            renderSessionStatus(data.status || "waiting");
+
+            const joinUrl = new URL("join.html", window.location.href);
+            joinUrl.searchParams.set("code", currentJoinCode);
+            joinGameLink.href = joinUrl.toString();
+        }
+
+        async function openLeaderboard(rawCode) {
+            const code = normalizeCode(rawCode);
+            sessionCodeInput.value = code;
+
+            if (!VALID_CODE_PATTERN.test(code)) {
+                showNotice(pageNotice, "Enter the six-character game code from your teacher.", "error");
+                sessionCodeInput.focus();
+                return;
+            }
+
+            lookupButton.disabled = true;
+            lookupButton.textContent = "Loading...";
+            hideNotice(pageNotice);
+            hideNotice(leaderboardNotice);
+            stopListeners();
+            currentJoinCode = "";
+            currentSessionId = "";
+            liveSessionData = null;
+            latestPlayers = [];
+            leaderboardPanel.classList.remove("show");
+
+            try {
+                const codeSnapshot = await getDoc(doc(db, "sessionCodes", code));
+                if (!codeSnapshot.exists()) {
+                    throw new Error("That game code was not found. Check the code with your teacher.");
+                }
+
+                const codeData = codeSnapshot.data();
+                if (!codeData.sessionId) {
+                    throw new Error("This code is not linked to a game session. Ask your teacher to create a new session.");
+                }
+
+                const sessionId = codeData.sessionId;
+                const sessionRef = doc(db, "gameSessions", sessionId);
+                const sessionSnapshot = await getDoc(sessionRef);
+                if (!sessionSnapshot.exists()) {
+                    throw new Error("The game session could not be found.");
+                }
+
+                currentJoinCode = code;
+                currentSessionId = sessionId;
+                renderSession({ ...sessionSnapshot.data(), joinCode: code });
+                leaderboardPanel.classList.add("show");
+                window.history.replaceState({}, "", `${window.location.pathname}?code=${encodeURIComponent(code)}`);
+                showNotice(pageNotice, "Connected to the session. The leaderboard updates automatically.", "success");
+
+                unsubscribeSession = onSnapshot(sessionRef, snapshot => {
+                    if (!snapshot.exists()) {
+                        showNotice(leaderboardNotice, "This game session is no longer available.", "error");
+                        renderSessionStatus("finished");
+                        return;
+                    }
+                    renderSession({ ...snapshot.data(), joinCode: code });
+                }, error => {
+                    console.error("Session listener error:", error);
+                    showNotice(leaderboardNotice, "Could not monitor session status. Check Firestore read permissions.", "error");
+                });
+
+                const participantsRef = collection(db, "gameSessions", sessionId, "participants");
+                unsubscribeParticipants = onSnapshot(participantsRef, snapshot => {
+                    latestPlayers = snapshot.docs.map(playerDoc => {
+                        const data = playerDoc.data();
+                        const numericScore = Number(data.score);
+                        return {
+                            id: playerDoc.id,
+                            name: String(data.displayName || "Player").slice(0, 24),
+                            score: Number.isFinite(numericScore) ? numericScore : 0,
+                            correctAnswers: Number(data.correctAnswers || 0),
+                            totalAttempts: Number(data.totalAttempts || 0),
+                            completed: data.completed === true,
+                            joinedAt: data.joinedAt && typeof data.joinedAt.toMillis === "function" ? data.joinedAt.toMillis() : 0,
+                            raw: data
+                        };
+                    });
+                    renderLeaderboard();
+                }, error => {
+                    console.error("Participant listener error:", error);
+                    showNotice(leaderboardNotice, "Could not load the participant list. Check Firestore read permissions for this session.", "error");
+                });
+            } catch (error) {
+                console.error("Could not open leaderboard:", error);
+                showNotice(pageNotice, error.message || "Could not load the leaderboard. Please try again.", "error");
+            } finally {
+                lookupButton.disabled = false;
+                lookupButton.textContent = "View Leaderboard";
+            }
+        }
+
+        async function copyJoinLink() {
+            if (!currentJoinCode) return;
+            const url = new URL("join.html", window.location.href);
+            url.searchParams.set("code", currentJoinCode);
+
+            try {
+                await navigator.clipboard.writeText(url.toString());
+                showNotice(leaderboardNotice, "Student join link copied to the clipboard.", "success");
+            } catch (error) {
+                const temporaryInput = document.createElement("input");
+                temporaryInput.value = url.toString();
+                temporaryInput.setAttribute("readonly", "");
+                temporaryInput.style.position = "absolute";
+                temporaryInput.style.left = "-9999px";
+                document.body.appendChild(temporaryInput);
+                temporaryInput.select();
+                const copied = document.execCommand("copy");
+                temporaryInput.remove();
+                showNotice(
+                    leaderboardNotice,
+                    copied ? "Student join link copied to the clipboard." : "Copy is unavailable. Use the Student Join Page button and copy its URL.",
+                    copied ? "success" : "error"
+                );
+            }
+        }
+
+        lookupForm.addEventListener("submit", event => {
+            event.preventDefault();
+            openLeaderboard(sessionCodeInput.value);
+        });
+
+        sessionCodeInput.addEventListener("input", () => {
+            sessionCodeInput.value = normalizeCode(sessionCodeInput.value);
+        });
+
+        copyLinkButton.addEventListener("click", copyJoinLink);
+
+        changeCodeButton.addEventListener("click", () => {
+            stopListeners();
+            currentJoinCode = "";
+            currentSessionId = "";
+            liveSessionData = null;
+            latestPlayers = [];
+            leaderboardPanel.classList.remove("show");
+            sessionCodeInput.value = "";
+            hideNotice(leaderboardNotice);
+            showNotice(pageNotice, "Enter another game code to view a different leaderboard.");
+            sessionCodeInput.focus();
+        });
+
+        async function initializePage() {
+            lookupButton.disabled = true;
+            try {
+                await signInAnonymously(auth);
+                lookupButton.disabled = false;
+                showNotice(pageNotice, "Connected. Enter a game code to view its live leaderboard.", "success");
+                const params = new URLSearchParams(window.location.search);
+                const initialCode = params.get("code") || params.get("session");
+                if (initialCode) {
+                    sessionCodeInput.value = normalizeCode(initialCode);
+                    await openLeaderboard(initialCode);
+                }
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                showNotice(pageNotice, "Could not connect to Firebase. Confirm that Anonymous Authentication is enabled. Details: " + (error.message || "Unknown error"), "error");
+            }
+        }
+
+        window.addEventListener("beforeunload", stopListeners);
+        initializePage();
+    </script>
+</body>
+</html>
