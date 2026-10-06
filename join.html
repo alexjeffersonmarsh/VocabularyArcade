@@ -429,7 +429,7 @@
         // can load its vocabulary from the session and submit session results.
         // Keeping this empty prevents students from being sent to an
         // unintegrated game page when the teacher starts a session.
-        const SESSION_INTEGRATED_GAMES = new Set([]);
+      const SESSION_INTEGRATED_GAMES = new Set(["gemword"]);
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
