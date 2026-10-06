@@ -4,17 +4,24 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Vocabulary Jewel Game</title>
+<meta
+    name="theme-color"
+    content="#17131f"
+>
+
+<title>GemWords | Vocabulary Arcade</title>
 
 <link
     rel="stylesheet"
     href="style.css"
 >
+
 
 <style>
 
@@ -38,6 +45,9 @@
     justify-content: center;
 
     z-index: 9999;
+
+    padding: 20px;
+
 }
 
 
@@ -51,11 +61,16 @@
 .game-complete-panel {
 
     width: min(
-        520px,
-        90vw
+        540px,
+        94vw
     );
 
-    padding: 40px;
+    padding:
+        clamp(
+            22px,
+            5vw,
+            40px
+        );
 
     background:
         #1b1b20;
@@ -81,25 +96,33 @@
         "Times New Roman",
         serif;
 
+    color:
+        #ffffff;
+
 }
 
 
 .game-complete-panel h1 {
 
-    margin-top:
-        0;
-
-    margin-bottom:
-        30px;
+    margin:
+        0 0 28px;
 
     font-size:
-        38px;
+        clamp(
+            28px,
+            6vw,
+            38px
+        );
 
     color:
         #ffffff;
 
 }
 
+
+/* =========================================
+   RESULTS
+========================================= */
 
 .results-list-name,
 .results-stat {
@@ -114,10 +137,10 @@
         center;
 
     gap:
-        20px;
+        16px;
 
     padding:
-        14px 18px;
+        14px 16px;
 
     margin:
         10px 0;
@@ -129,7 +152,10 @@
         10px;
 
     font-size:
-        22px;
+        20px;
+
+    text-align:
+        left;
 
 }
 
@@ -140,7 +166,7 @@
         #aaa;
 
     font-size:
-        17px;
+        16px;
 
 }
 
@@ -155,38 +181,54 @@
     font-weight:
         bold;
 
+    overflow-wrap:
+        anywhere;
+
+    text-align:
+        right;
+
 }
 
 
 #resultsAccuracy {
 
     font-size:
-        28px;
+        27px;
 
 }
 
+
+/* =========================================
+   RESULT BUTTONS
+========================================= */
 
 .results-buttons {
 
     display:
         flex;
 
+    flex-wrap:
+        wrap;
+
     gap:
-        15px;
+        12px;
 
     justify-content:
         center;
 
     margin-top:
-        30px;
+        28px;
 
 }
 
 
 .results-buttons button {
 
+    min-height:
+        44px;
+
     padding:
-        12px 22px;
+        12px 18px;
 
     border:
         none;
@@ -202,7 +244,7 @@
         serif;
 
     font-size:
-        18px;
+        17px;
 
     font-weight:
         bold;
@@ -221,6 +263,17 @@
 }
 
 
+#leaderboardButton {
+
+    background:
+        #246c54;
+
+    color:
+        white;
+
+}
+
+
 #libraryButton {
 
     background:
@@ -232,11 +285,55 @@
 }
 
 
-#playAgainButton:hover,
-#libraryButton:hover {
+.results-buttons button:hover {
 
-    opacity:
-        0.85;
+    filter:
+        brightness(
+            1.12
+        );
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .results-list-name,
+    .results-stat {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            6px;
+
+    }
+
+
+    #resultsListName,
+    #resultsScore,
+    #resultsAccuracy {
+
+        text-align:
+            left;
+
+    }
+
+
+    .results-buttons button {
+
+        flex:
+            1 1 100%;
+
+    }
 
 }
 
@@ -249,12 +346,14 @@
 
 
 <!-- =========================================
-     TEACHER PANEL
+     TEACHER / STANDALONE PANEL
 ========================================= -->
 
 <div id="teacher-panel">
 
-    <h2>GemWords</h2>
+    <h2>
+        GemWords
+    </h2>
 
     <p>
         Select a vocabulary set from your library.
@@ -268,11 +367,15 @@
 
     </select>
 
-    <button id="load-set-btn">
+    <button
+        id="load-set-btn"
+        type="button"
+    >
         Start Game
     </button>
 
 </div>
+
 
 
 <!-- =========================================
@@ -301,6 +404,7 @@
     </div>
 
 </div>
+
 
 
 <!-- =========================================
@@ -333,6 +437,7 @@
 </div>
 
 
+
 <!-- =========================================
      GAME COMPLETE SCREEN
 ========================================= -->
@@ -344,72 +449,121 @@
 
     <div class="game-complete-panel">
 
-        <h1>
+
+        <h1 id="gameCompleteHeading">
+
             GemWords Complete!
+
         </h1>
+
 
 
         <div class="results-list-name">
 
             <span class="results-label">
+
                 Vocabulary List
+
             </span>
+
 
             <span id="resultsListName">
+
                 Vocabulary List
+
             </span>
 
         </div>
 
 
+
         <div class="results-stat">
 
             <span class="results-label">
+
                 Score
+
             </span>
+
 
             <span id="resultsScore">
+
                 0
+
             </span>
 
         </div>
+
 
 
         <div class="results-stat">
 
             <span class="results-label">
+
                 Accuracy
+
             </span>
 
+
             <span id="resultsAccuracy">
+
                 0%
+
             </span>
 
         </div>
+
 
 
         <div class="results-buttons">
+
 
             <button
                 id="playAgainButton"
                 type="button"
             >
+
                 Play Again
+
             </button>
+
+
+
+            <!--
+                This button is hidden during
+                standalone play and only appears
+                during a classroom session.
+            -->
+
+            <button
+                id="leaderboardButton"
+                type="button"
+                style="display:none;"
+            >
+
+                View Leaderboard
+
+            </button>
+
 
 
             <button
                 id="libraryButton"
                 type="button"
             >
+
                 Back to Library
+
             </button>
 
+
         </div>
+
 
     </div>
 
 </div>
+
 
 
 <!-- =========================================
@@ -419,30 +573,65 @@
 <script src="script (1).js"></script>
 
 
+
 <!-- =========================================
-     FIREBASE
+     FIREBASE + SESSION SYSTEM
 ========================================= -->
 
 <script type="module">
 
+
+/* =========================================
+   FIREBASE IMPORTS
+========================================= */
+
 import {
+
     initializeApp
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
+
 import {
+
+    getAuth,
+    onAuthStateChanged,
+    signInAnonymously
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+
+import {
+
     getFirestore,
     doc,
     getDoc,
     collection,
-    getDocs
+    getDocs,
+    updateDoc,
+    serverTimestamp
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
+
+/* =========================================
+   FIREBASE CONFIGURATION
+========================================= */
 
 const firebaseConfig = {
 
@@ -468,9 +657,19 @@ const firebaseConfig = {
 
 
 
+/* =========================================
+   INITIALIZE FIREBASE
+========================================= */
+
 const app =
     initializeApp(
         firebaseConfig
+    );
+
+
+const auth =
+    getAuth(
+        app
     );
 
 
@@ -482,97 +681,205 @@ const db =
 
 
 /* =========================================
-   POPULATE DROPDOWN
+   DOM ELEMENTS
 ========================================= */
 
-async function loadVocabularySets() {
-
-    const selector =
-        document.getElementById(
-            "setSelector"
-        );
+const teacherPanel =
+    document.getElementById(
+        "teacher-panel"
+    );
 
 
-    try {
-
-        const snapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "vocabSets"
-                )
-            );
+const setSelector =
+    document.getElementById(
+        "setSelector"
+    );
 
 
-        snapshot.forEach(
-            docSnap => {
-
-                const data =
-                    docSnap.data();
-
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
+const loadSetButton =
+    document.getElementById(
+        "load-set-btn"
+    );
 
 
-                option.value =
-                    docSnap.id;
+
+/* =========================================
+   SESSION STATE
+========================================= */
+
+let sessionParticipantRef =
+    null;
 
 
-                option.textContent =
-                    data.title ||
-                    docSnap.id;
+
+/* =========================================
+   ERROR HANDLER
+========================================= */
+
+function showLoadError(
+    message,
+    error
+) {
+
+    console.error(
+        message,
+        error || ""
+    );
 
 
-                selector.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-        console.log(
-            "Vocabulary sets loaded."
-        );
-
-
-    } catch(error) {
-
-        console.error(
-            "Error loading sets:",
-            error
-        );
-
-    }
+    alert(
+        message +
+        (
+            error &&
+            error.message
+                ? "\n\n" +
+                  error.message
+                : ""
+        )
+    );
 
 }
 
 
 
 /* =========================================
-   LOAD VOCAB SET
+   NORMALIZE SESSION CODE
 ========================================= */
 
-async function loadSet(setId) {
+function normalizeCode(
+    value
+) {
 
-    const ref =
-        doc(
-            db,
-            "vocabSets",
-            setId
+    return String(
+        value || ""
+    )
+        .toUpperCase()
+        .replace(
+            /\s+/g,
+            ""
+        )
+        .replace(
+            /[^A-HJ-NP-Z2-9]/g,
+            ""
+        )
+        .slice(
+            0,
+            6
         );
 
+}
+
+
+
+/* =========================================
+   WAIT FOR AUTH
+========================================= */
+
+function waitForAuthState() {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+            let unsubscribe =
+                () => {};
+
+
+            unsubscribe =
+                onAuthStateChanged(
+
+                    auth,
+
+                    user => {
+
+                        unsubscribe();
+
+                        resolve(
+                            user
+                        );
+
+                    },
+
+                    error => {
+
+                        unsubscribe();
+
+                        reject(
+                            error
+                        );
+
+                    }
+
+                );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================
+   ENSURE ANONYMOUS SIGN-IN
+========================================= */
+
+async function ensureSignedIn() {
+
+    let user =
+        auth.currentUser;
+
+
+    if (!user) {
+
+        user =
+            await waitForAuthState();
+
+    }
+
+
+    if (!user) {
+
+        const credential =
+            await signInAnonymously(
+                auth
+            );
+
+
+        user =
+            credential.user;
+
+    }
+
+
+    return user;
+
+}
+
+
+
+/* =========================================
+   LOAD VOCABULARY SET
+========================================= */
+
+async function loadSet(
+    setId
+) {
 
     const snapshot =
         await getDoc(
-            ref
+            doc(
+                db,
+                "vocabSets",
+                setId
+            )
         );
 
 
-    if (!snapshot.exists()) {
+    if (
+        !snapshot.exists()
+    ) {
 
         throw new Error(
             "Vocabulary set not found."
@@ -585,9 +892,8 @@ async function loadSet(setId) {
         snapshot.data();
 
 
-    /* =====================================
-       SAVE LIST TITLE
-    ===================================== */
+
+    /* SAVE LIST TITLE */
 
     window.preloadedVocabTitle =
         data.title ||
@@ -596,7 +902,7 @@ async function loadSet(setId) {
 
 
     /* =====================================
-       NEW FORMAT
+       CURRENT FORMAT
     ===================================== */
 
     if (
@@ -631,11 +937,10 @@ async function loadSet(setId) {
                     terms
                 );
 
-
         } catch(error) {
 
             console.error(
-                "Parse error:",
+                "Could not parse legacy terms:",
                 error
             );
 
@@ -648,22 +953,89 @@ async function loadSet(setId) {
     }
 
 
-    return terms || [];
+    return Array.isArray(
+        terms
+    )
+        ? terms
+        : [];
 
 }
 
 
 
 /* =========================================
-   START GAME
+   LOAD STANDALONE VOCABULARY SETS
 ========================================= */
 
-async function startGameWithSet(setId) {
+async function loadVocabularySets() {
+
+    setSelector.innerHTML =
+        `
+        <option value="">
+            Select Vocabulary Set
+        </option>
+        `;
+
+
+    const snapshot =
+        await getDocs(
+            collection(
+                db,
+                "vocabSets"
+            )
+        );
+
+
+    snapshot.forEach(
+        docSnap => {
+
+            const data =
+                docSnap.data();
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                docSnap.id;
+
+
+            option.textContent =
+                data.title ||
+                docSnap.id;
+
+
+            setSelector.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    console.log(
+        "Vocabulary sets loaded."
+    );
+
+}
+
+
+
+/* =========================================
+   START STANDALONE GAME
+========================================= */
+
+async function startGameWithSet(
+    setId
+) {
 
     try {
 
         console.log(
-            "GEMWORDS: Loading set:",
+            "GEMWORDS: Loading standalone set:",
             setId
         );
 
@@ -672,18 +1044,6 @@ async function startGameWithSet(setId) {
             await loadSet(
                 setId
             );
-
-
-        console.log(
-            "GEMWORDS: Firebase set loaded:",
-            vocab
-        );
-
-
-        console.log(
-            "GEMWORDS: Number of vocabulary items:",
-            vocab.length
-        );
 
 
         window.preloadedVocab =
@@ -703,73 +1063,39 @@ async function startGameWithSet(setId) {
 
 
         console.log(
-            "GEMWORDS: preloadedVocab:",
+            "GEMWORDS: Standalone vocabulary loaded.",
             window.preloadedVocab
         );
 
 
-        console.log(
-            "GEMWORDS: Vocabulary list title:",
-            window.preloadedVocabTitle
-        );
+        if (teacherPanel) {
 
-
-
-        /* =================================
-           HIDE TEACHER PANEL
-        ================================= */
-
-        const panel =
-            document.getElementById(
-                "teacher-panel"
-            );
-
-
-        if (panel) {
-
-            panel.style.display =
+            teacherPanel.style.display =
                 "none";
 
         }
 
 
-
-        /* =================================
-           START GAME
-        ================================= */
-
         if (
-            typeof window.startLoadedGame ===
+            typeof window.startLoadedGame !==
             "function"
         ) {
 
-            console.log(
-                "GEMWORDS: Starting game..."
-            );
-
-
-            window.startLoadedGame();
-
-
-        } else {
-
-            console.error(
-                "GEMWORDS: startLoadedGame() does not exist."
+            throw new Error(
+                "startLoadedGame() is not available."
             );
 
         }
 
 
+        await window.startLoadedGame();
+
+
     } catch(error) {
 
-        console.error(
-            "Could not load vocabulary:",
+        showLoadError(
+            "Could not load the vocabulary set.",
             error
-        );
-
-
-        alert(
-            "Could not load vocabulary set."
         );
 
     }
@@ -777,83 +1103,614 @@ async function startGameWithSet(setId) {
 }
 
 
-window.startGameWithSet =
-    startGameWithSet;
-
-
 
 /* =========================================
-   LOAD DROPDOWN ON PAGE OPEN
+   START CLASSROOM SESSION GAME
 ========================================= */
 
-loadVocabularySets();
+async function startGameWithSession(
+    rawCode,
+    participantParam
+) {
+
+    try {
+
+        const code =
+            normalizeCode(
+                rawCode
+            );
+
+
+        if (
+            !/^[A-HJ-NP-Z2-9]{6}$/.test(
+                code
+            )
+        ) {
+
+            throw new Error(
+                "The game code in this link is invalid."
+            );
+
+        }
 
 
 
-/* =========================================
-   URL PARAM SUPPORT
-========================================= */
+        /* =================================
+           ANONYMOUS AUTH
+        ================================= */
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+        const user =
+            await ensureSignedIn();
 
 
-const setId =
-    params.get("id") ||
-    params.get("set");
+
+        /* =================================
+           VERIFY PARTICIPANT
+        ================================= */
+
+        if (
+            !participantParam ||
+            participantParam !==
+                user.uid
+        ) {
+
+            throw new Error(
+                "This game link does not match this participant. Return to join.html and join the session again."
+            );
+
+        }
 
 
-if (setId) {
 
-    startGameWithSet(
-        setId
-    );
+        /* =================================
+           LOOK UP GAME CODE
+        ================================= */
+
+        const codeSnapshot =
+            await getDoc(
+                doc(
+                    db,
+                    "sessionCodes",
+                    code
+                )
+            );
+
+
+        if (
+            !codeSnapshot.exists()
+        ) {
+
+            throw new Error(
+                "That game code was not found."
+            );
+
+        }
+
+
+        const codeData =
+            codeSnapshot.data();
+
+
+        if (
+            !codeData.sessionId
+        ) {
+
+            throw new Error(
+                "This game code is not linked to a session."
+            );
+
+        }
+
+
+
+        /* =================================
+           LOAD SESSION
+        ================================= */
+
+        const sessionRef =
+            doc(
+                db,
+                "gameSessions",
+                codeData.sessionId
+            );
+
+
+        const sessionSnapshot =
+            await getDoc(
+                sessionRef
+            );
+
+
+        if (
+            !sessionSnapshot.exists()
+        ) {
+
+            throw new Error(
+                "The game session could not be found."
+            );
+
+        }
+
+
+        const session =
+            sessionSnapshot.data();
+
+
+
+        /* =================================
+           CHECK SESSION STATUS
+        ================================= */
+
+        if (
+            session.status !==
+            "active"
+        ) {
+
+            throw new Error(
+                "This game session is not currently active. Check with your teacher."
+            );
+
+        }
+
+
+
+        /* =================================
+           VERIFY GAME TYPE
+        ================================= */
+
+        if (
+            session.gameType !==
+            "gemword"
+        ) {
+
+            throw new Error(
+                "This session is for " +
+                (
+                    session.gameTitle ||
+                    session.gameType
+                ) +
+                ", not GemWords."
+            );
+
+        }
+
+
+
+        /* =================================
+           VERIFY VOCABULARY SET
+        ================================= */
+
+        if (
+            !session.vocabSetId
+        ) {
+
+            throw new Error(
+                "The session does not have a vocabulary set assigned."
+            );
+
+        }
+
+
+
+        /* =================================
+           FIND PARTICIPANT RECORD
+        ================================= */
+
+        const participantRef =
+            doc(
+                db,
+                "gameSessions",
+                codeData.sessionId,
+                "participants",
+                user.uid
+            );
+
+
+        const participantSnapshot =
+            await getDoc(
+                participantRef
+            );
+
+
+        if (
+            !participantSnapshot.exists()
+        ) {
+
+            throw new Error(
+                "Your participant record was not found. Return to join.html and join the session again."
+            );
+
+        }
+
+
+        sessionParticipantRef =
+            participantRef;
+
+
+
+        /* =================================
+           LOAD TEACHER'S VOCABULARY SET
+        ================================= */
+
+        const vocabulary =
+            await loadSet(
+                session.vocabSetId
+            );
+
+
+        window.preloadedVocab =
+            vocabulary.map(
+                item => ({
+
+                    word:
+                        item.word,
+
+                    definition:
+                        item.definition ||
+                        item.meaning ||
+                        ""
+
+                })
+            );
+
+
+        window.preloadedVocabTitle =
+            session.vocabTitle ||
+            window.preloadedVocabTitle ||
+            "Vocabulary List";
+
+
+
+        /* =================================
+           CREATE SESSION CONTEXT
+        ================================= */
+
+        window.gameSessionContext = {
+
+            joinCode:
+                code,
+
+            sessionId:
+                codeData.sessionId,
+
+            participantId:
+                user.uid,
+
+            vocabSetId:
+                session.vocabSetId
+
+        };
+
+
+
+        /* =================================
+           RESULT SUBMISSION
+        ================================= */
+
+        window.submitGemWordsSessionResult =
+            async function(result) {
+
+                if (
+                    !sessionParticipantRef
+                ) {
+
+                    throw new Error(
+                        "No GemWords participant record is connected."
+                    );
+
+                }
+
+
+                await updateDoc(
+                    sessionParticipantRef,
+                    {
+
+                        score:
+                            Number(
+                                result.score
+                            ) || 0,
+
+
+                        correctAnswers:
+                            Number(
+                                result.correctAnswers
+                            ) || 0,
+
+
+                        totalAttempts:
+                            Number(
+                                result.totalAttempts
+                            ) || 0,
+
+
+                        accuracy:
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    Number(
+                                        result.accuracy
+                                    ) || 0
+                                )
+                            ),
+
+
+                        completed:
+                            result.completed ===
+                            true,
+
+
+                        gameWon:
+                            result.gameWon ===
+                            true,
+
+
+                        completionReason:
+                            String(
+                                result.completionReason ||
+                                ""
+                            ),
+
+
+                        participantStatus:
+                            result.completed ===
+                            true
+                                ? "finished"
+                                : "playing",
+
+
+                        lastUpdatedAt:
+                            serverTimestamp()
+
+                    }
+                );
+
+            };
+
+
+
+        /* =================================
+           RESET SESSION RESULT
+        ================================= */
+
+        window.resetGemWordsSessionResult =
+            async function() {
+
+                if (
+                    !sessionParticipantRef
+                ) {
+
+                    return;
+
+                }
+
+
+                await updateDoc(
+                    sessionParticipantRef,
+                    {
+
+                        score:
+                            0,
+
+                        correctAnswers:
+                            0,
+
+                        totalAttempts:
+                            0,
+
+                        accuracy:
+                            0,
+
+                        completed:
+                            false,
+
+                        gameWon:
+                            false,
+
+                        completionReason:
+                            "",
+
+                        participantStatus:
+                            "playing",
+
+                        gameStartedAt:
+                            serverTimestamp(),
+
+                        lastUpdatedAt:
+                            serverTimestamp()
+
+                    }
+                );
+
+            };
+
+
+
+        /* =================================
+           HIDE STANDALONE PANEL
+        ================================= */
+
+        if (teacherPanel) {
+
+            teacherPanel.style.display =
+                "none";
+
+        }
+
+
+
+        /* =================================
+           START GEMWORDS
+        ================================= */
+
+        if (
+            typeof window.startLoadedGame !==
+            "function"
+        ) {
+
+            throw new Error(
+                "startLoadedGame() is not available."
+            );
+
+        }
+
+
+        console.log(
+            "GEMWORDS: Starting classroom session:",
+            code
+        );
+
+
+        await window.startLoadedGame();
+
+
+    } catch(error) {
+
+        showLoadError(
+            "Could not start this GemWords session.",
+            error
+        );
+
+    }
 
 }
 
 
 
 /* =========================================
-   BUTTON CLICK
+   STANDALONE START BUTTON
 ========================================= */
 
-document
-    .getElementById(
-        "load-set-btn"
-    )
-    .addEventListener(
-        "click",
-        () => {
+loadSetButton.addEventListener(
+    "click",
+    () => {
+
+        const setId =
+            setSelector.value;
 
 
-            const selectedSet =
-                document
-                .getElementById(
-                    "setSelector"
-                )
-                .value;
+        if (!setId) {
 
-
-            if (!selectedSet) {
-
-                alert(
-                    "Please select a vocabulary set."
-                );
-
-
-                return;
-
-            }
-
-
-            startGameWithSet(
-                selectedSet
+            alert(
+                "Please select a vocabulary set."
             );
 
+
+            return;
+
         }
-    );
+
+
+        startGameWithSet(
+            setId
+        );
+
+    }
+);
+
+
+
+/* =========================================
+   DETERMINE HOW GEMWORDS WAS OPENED
+========================================= */
+
+async function initializePage() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const sessionCode =
+        params.get(
+            "session"
+        );
+
+
+    const participantId =
+        params.get(
+            "participant"
+        );
+
+
+
+    /* =================================
+       CLASSROOM MODE
+    ================================= */
+
+    if (
+        sessionCode
+    ) {
+
+        await startGameWithSession(
+            sessionCode,
+            participantId
+        );
+
+
+        return;
+
+    }
+
+
+
+    /* =================================
+       STANDALONE MODE
+    ================================= */
+
+    try {
+
+        await loadVocabularySets();
+
+
+    } catch(error) {
+
+        showLoadError(
+            "Could not load vocabulary sets from Firebase.",
+            error
+        );
+
+
+        return;
+
+    }
+
+
+
+    /* =================================
+       LIBRARY / URL MODE
+    ================================= */
+
+    const setId =
+        params.get(
+            "id"
+        ) ||
+        params.get(
+            "set"
+        );
+
+
+    if (
+        setId
+    ) {
+
+        await startGameWithSet(
+            setId
+        );
+
+    }
+
+}
+
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+initializePage();
+
 
 </script>
 
