@@ -175,6 +175,16 @@
             color: var(--text);
         }
 
+        .leaderboard-button {
+            border: 1px solid #356c54;
+            background: #246c54;
+            color: #ffffff;
+        }
+
+        .leaderboard-button:hover:not(:disabled) {
+            background: #2e8668;
+        }
+
         .notice {
             display: none;
             margin-top: 18px;
@@ -384,7 +394,12 @@
 
             <div id="lobbyNotice" class="notice" role="status" aria-live="polite"></div>
             <div class="button-row">
-                <button id="leaveButton" class="secondary-button" type="button">Leave Lobby</button>
+                <button id="leaderboardButton" class="leaderboard-button" type="button">
+                    View Class Leaderboard
+                </button>
+                <button id="leaveButton" class="secondary-button" type="button">
+                    Leave Lobby
+                </button>
             </div>
         </section>
 
@@ -429,7 +444,7 @@
         // can load its vocabulary from the session and submit session results.
         // Keeping this empty prevents students from being sent to an
         // unintegrated game page when the teacher starts a session.
-      const SESSION_INTEGRATED_GAMES = new Set(["gemword"]);
+        const SESSION_INTEGRATED_GAMES = new Set([]);
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -448,6 +463,7 @@
         const lobbyNotice = document.getElementById("lobbyNotice");
         const participantCount = document.getElementById("participantCount");
         const participantList = document.getElementById("participantList");
+        const leaderboardButton = document.getElementById("leaderboardButton");
         const leaveButton = document.getElementById("leaveButton");
 
         let currentUser = null;
@@ -689,6 +705,34 @@
             }
         }
 
+        function openLeaderboard() {
+            if (!joinedCode) {
+                showNotice(
+                    lobbyNotice,
+                    "The leaderboard is not available until you join a game session.",
+                    "error"
+                );
+                return;
+            }
+
+            const leaderboardUrl = new URL(
+                "leaderboard.html",
+                window.location.href
+            );
+
+            leaderboardUrl.searchParams.set(
+                "code",
+                joinedCode
+            );
+
+            // Open the leaderboard in a new tab so the current lobby can remain open.
+            window.open(
+                leaderboardUrl.toString(),
+                "_blank",
+                "noopener"
+            );
+        }
+
         async function leaveLobby() {
             stopListeners();
             redirecting = false;
@@ -725,6 +769,7 @@
         });
 
         joinForm.addEventListener("submit", joinGame);
+        leaderboardButton.addEventListener("click", openLeaderboard);
         leaveButton.addEventListener("click", leaveLobby);
 
         async function initializePage() {
