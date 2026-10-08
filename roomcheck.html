@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoomCheck — Find Your Room</title>
+<style>
+*{box-sizing:border-box}
+:root{--navy:#0b1f3a;--navy2:#071426;--red:#b3202a;--red2:#8f1820;--white:#fff;--gray:#687386;--border:#d7dce3;--green:#2e7d4f;--greenbg:#eef8f1;--errorbg:#fff1f1}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,var(--navy2),var(--navy));color:var(--navy)}
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:25px}
+.card{width:min(100%,620px);background:white;border-radius:16px;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.28)}
+.banner{background:var(--red);color:white;text-align:center;font-size:14px;font-weight:800;letter-spacing:2px;padding:15px}
+h1{margin:35px 35px 8px;text-align:center;font-size:clamp(34px,7vw,48px)}
+.subtitle{text-align:center;color:var(--gray);font-size:17px;line-height:1.5;margin:0 auto 30px;padding:0 35px}
+form{padding:0 35px}
+label{display:block;font-weight:700;margin-bottom:9px}
+input{width:100%;padding:17px;border:2px solid var(--border);border-radius:9px;font-size:21px;outline:none}
+input:focus{border-color:var(--navy);box-shadow:0 0 0 4px rgba(11,31,58,.12)}
+.help{font-size:13px;color:var(--gray);margin:8px 0 17px}
+button{width:100%;padding:17px;border:0;border-radius:9px;background:var(--red);color:white;font-size:17px;font-weight:800;letter-spacing:.6px;cursor:pointer}
+button:hover{background:var(--red2)}
+button:disabled{opacity:.65;cursor:wait}
+.result{margin:28px 35px 0;padding:25px;border:2px solid var(--green);border-radius:12px;background:var(--greenbg);text-align:center}
+.result.error{border-color:var(--red);background:var(--errorbg)}
+.result-label{font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.room{font-size:clamp(58px,13vw,86px);font-weight:900;line-height:1;margin:7px 0 12px}
+.message{font-size:16px}
+.note{margin:30px 35px 35px;padding:16px;border-radius:8px;background:#f3f5f8;color:var(--gray);font-size:14px;text-align:center;line-height:1.5}
+.note strong{display:block;color:var(--navy);margin-bottom:3px}
+footer{text-align:center;color:rgba(255,255,255,.7);font-size:12px;margin-top:16px}
+@media(max-width:500px){.page{padding:15px}.subtitle,form{padding-left:22px;padding-right:22px}.result,.note{margin-left:22px;margin-right:22px}}
+</style>
+</head>
+<body>
+<main class="page">
+<section class="card">
+<div class="banner">ROOMCHECK</div>
+<h1>Find Your Room</h1>
+<p class="subtitle">Enter your student ID number below to find your assigned room.</p>
+
+<form id="lookupForm" autocomplete="off">
+<label for="studentId">Student ID Number</label>
+<input id="studentId" type="text" inputmode="numeric" maxlength="30" placeholder="Enter your student ID">
+<div class="help">Enter your complete student ID number.</div>
+<button id="lookupButton" type="submit">FIND MY ROOM</button>
+</form>
+
+<div id="result" class="result" hidden></div>
+
+<div class="note">
+<strong>Need help?</strong>
+Check that you entered your complete student ID number.
+</div>
+</section>
+<footer>RoomCheck Student Room Assignment System</footer>
+</main>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+/* =========================================================
+   FIREBASE CONFIGURATION
+   Replace these values with YOUR Firebase Web App config.
+   Firebase Console → Project Settings → Your apps
+   ========================================================= */
+const firebaseConfig={
+apiKey:"PASTE_YOUR_API_KEY_HERE",
+authDomain:"PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+projectId:"PASTE_YOUR_PROJECT_ID",
+storageBucket:"PASTE_YOUR_STORAGE_BUCKET_HERE",
+messagingSenderId:"PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+appId:"PASTE_YOUR_APP_ID_HERE"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const form=document.getElementById("lookupForm");
+const input=document.getElementById("studentId");
+const button=document.getElementById("lookupButton");
+const result=document.getElementById("result");
+
+form.addEventListener("submit",async e=>{
+e.preventDefault();
+const studentId=input.value.trim();
+if(!studentId){showError("Please enter your student ID number.");return}
+
+button.disabled=true;
+button.textContent="LOOKING UP...";
+
+try{
+const ref=doc(db,"roomAssignments",studentId);
+const snap=await getDoc(ref);
+
+if(snap.exists()){
+const data=snap.data();
+if(data.room)showRoom(data.room);
+else showError("This student record does not have a room assigned.");
+}else{
+showError("We could not find a room assignment for that student ID.");
+}
+}catch(error){
+console.error(error);
+showError("There was a problem connecting to the room assignment system. Please try again.");
+}finally{
+button.disabled=false;
+button.textContent="FIND MY ROOM";
+}
+});
+
+function showRoom(room){
+result.hidden=false;
+result.className="result";
+result.innerHTML=`<div class="result-label">Your Assigned Room</div>
+<div class="room">${escapeHtml(room)}</div>
+<div class="message">Please proceed to Room ${escapeHtml(room)}.</div>`;
+}
+
+function showError(message){
+result.hidden=false;
+result.className="result error";
+result.innerHTML=`<div class="result-label">Assignment Not Found</div>
+<div class="message">${escapeHtml(message)}</div>`;
+}
+
+function escapeHtml(value){
+return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+input.focus();
+</script>
+</body>
+</html>
