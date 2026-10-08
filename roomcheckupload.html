@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RoomCheck — Teacher Upload</title>
+<style>
+*{box-sizing:border-box}
+:root{--navy:#0b1f3a;--navy2:#071426;--red:#b3202a;--red2:#8f1820;--white:#fff;--gray:#687386;--border:#d7dce3;--green:#2e7d4f;--greenbg:#eef8f1;--errorbg:#fff1f1;--light:#f3f5f8}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,var(--navy2),var(--navy));color:var(--navy)}
+.page{min-height:100vh;padding:30px 20px}
+.card{width:min(100%,850px);margin:auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.28)}
+.banner{background:var(--red);color:#fff;text-align:center;font-weight:800;letter-spacing:2px;padding:15px}
+.content{padding:35px}
+h1{margin:0 0 8px;font-size:38px}
+.subtitle{margin:0 0 30px;color:var(--gray);line-height:1.5}
+.instructions{background:var(--light);border-radius:10px;padding:22px;margin-bottom:25px;line-height:1.55}
+.instructions h2{font-size:19px;margin:0 0 10px}
+.instructions code{background:#fff;padding:3px 6px;border-radius:4px}
+.file-area{border:2px dashed var(--border);border-radius:12px;padding:30px;text-align:center}
+input[type=file]{display:block;width:100%;margin:15px 0 20px}
+button{border:0;border-radius:8px;padding:15px 22px;background:var(--red);color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+button:hover{background:var(--red2)}
+button:disabled{opacity:.6;cursor:wait}
+.preview{margin-top:25px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+th{background:var(--navy);color:#fff}
+.status{margin-top:20px;padding:18px;border-radius:9px;line-height:1.5}
+.status.success{background:var(--greenbg);border:2px solid var(--green)}
+.status.error{background:var(--errorbg);border:2px solid var(--red)}
+.status.info{background:var(--light)}
+.warning{font-size:13px;color:var(--gray);margin-top:20px}
+footer{text-align:center;color:rgba(255,255,255,.7);font-size:12px;margin-top:15px}
+@media(max-width:600px){.content{padding:22px}h1{font-size:30px}}
+</style>
+</head>
+<body>
+<main class="page">
+<section class="card">
+<div class="banner">ROOMCHECK • TEACHER UPLOAD</div>
+<div class="content">
+<h1>Upload Room Assignments</h1>
+<p class="subtitle">Upload a CSV containing your student IDs and assigned room numbers.</p>
+
+<div class="instructions">
+<h2>CSV format</h2>
+Your spreadsheet should have exactly two columns:
+<br><br>
+<code>Student ID</code> &nbsp;&nbsp; <code>Room</code>
+<br><br>
+Example:
+<br>
+<code>20030405,1201</code><br>
+<code>20030406,1201</code><br>
+<code>20030407,1202</code>
+<br><br>
+A header row is allowed. The uploader will recognize <strong>Student ID</strong> and <strong>Room</strong>.
+</div>
+
+<div class="file-area">
+<strong>Select your CSV file</strong>
+<input id="csvFile" type="file" accept=".csv,text/csv">
+<button id="uploadButton" disabled>UPLOAD ASSIGNMENTS</button>
+</div>
+
+<div id="preview" class="preview"></div>
+<div id="status"></div>
+
+<p class="warning">
+<strong>Important:</strong> This page writes records to Firestore. Protect this page and use Firebase Authentication/security rules before using it with real student data.
+</p>
+</div>
+</section>
+<footer>RoomCheck Teacher Administration</footer>
+</main>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import{getFirestore,doc,setDoc}from"https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+/* =========================================================
+   FIREBASE CONFIGURATION
+   Use the SAME Firebase project as roomcheck.html.
+   ========================================================= */
+const firebaseConfig={
+apiKey:"PASTE_YOUR_API_KEY_HERE",
+authDomain:"PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+projectId:"PASTE_YOUR_PROJECT_ID",
+storageBucket:"PASTE_YOUR_STORAGE_BUCKET_HERE",
+messagingSenderId:"PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+appId:"PASTE_YOUR_APP_ID_HERE"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const fileInput=document.getElementById("csvFile");
+const uploadButton=document.getElementById("uploadButton");
+const preview=document.getElementById("preview");
+const status=document.getElementById("status");
+
+let records=[];
+
+fileInput.addEventListener("change",async()=>{
+records=[];
+preview.innerHTML="";
+status.innerHTML="";
+const file=fileInput.files[0];
+if(!file){uploadButton.disabled=true;return}
+
+try{
+const text=await file.text();
+records=parseCSV(text);
+
+if(records.length===0){
+showStatus("error","No valid student records were found.");
+uploadButton.disabled=true;
+return;
+}
+
+let html=`<table><thead><tr><th>Student ID</th><th>Room</th></tr></thead><tbody>`;
+records.slice(0,10).forEach(r=>{
+html+=`<tr><td>${escapeHtml(r.studentId)}</td><td>${escapeHtml(r.room)}</td></tr>`;
+});
+html+=`</tbody></table>`;
+if(records.length>10)html+=`<p>Showing first 10 of ${records.length} records.</p>`;
+preview.innerHTML=html;
+showStatus("info",`${records.length.toLocaleString()} student assignment(s) ready to upload.`);
+uploadButton.disabled=false;
+}catch(error){
+console.error(error);
+showStatus("error","The CSV could not be read.");
+uploadButton.disabled=true;
+}
+});
+
+uploadButton.addEventListener("click",async()=>{
+if(!records.length)return;
+
+uploadButton.disabled=true;
+uploadButton.textContent="UPLOADING...";
+showStatus("info",`Uploading ${records.length.toLocaleString()} assignments. Please wait...`);
+
+try{
+let completed=0;
+
+/*
+Firestore's batch API is intentionally not used here so this
+starter version remains simple. For 1,700 records, the upload
+is still manageable, but we can optimize it with batches in
+the next version if desired.
+*/
+for(const record of records){
+await setDoc(doc(db,"roomAssignments",record.studentId),{
+room:record.room
+});
+completed++;
+if(completed%50===0){
+showStatus("info",`Uploading... ${completed.toLocaleString()} of ${records.length.toLocaleString()}`);
+}
+}
+
+showStatus("success",`SUCCESS! ${completed.toLocaleString()} student assignments have been uploaded to RoomCheck.`);
+}catch(error){
+console.error(error);
+showStatus("error","The upload stopped because Firebase returned an error. Check your Firestore rules and Firebase configuration.");
+}finally{
+uploadButton.disabled=false;
+uploadButton.textContent="UPLOAD ASSIGNMENTS";
+}
+});
+
+function parseCSV(text){
+const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+if(!lines.length)return[];
+
+let start=0;
+const first=lines[0].toLowerCase();
+if(first.includes("student")||first.includes("id"))start=1;
+
+const output=[];
+for(let i=start;i<lines.length;i++){
+const columns=splitCSVLine(lines[i]);
+if(columns.length<2)continue;
+
+const studentId=columns[0].trim().replace(/^["']|["']$/g,"");
+const room=columns[1].trim().replace(/^["']|["']$/g,"");
+
+if(studentId&&room){
+output.push({studentId,room});
+}
+}
+return output;
+}
+
+function splitCSVLine(line){
+const result=[];
+let current="";
+let quoted=false;
+
+for(let i=0;i<line.length;i++){
+const char=line[i];
+
+if(char==='"'){
+if(quoted&&line[i+1]==='"'){current+='"';i++}
+else quoted=!quoted;
+}else if(char===","&&!quoted){
+result.push(current);
+current="";
+}else{
+current+=char;
+}
+}
+result.push(current);
+return result;
+}
+
+function showStatus(type,message){
+status.className=`status ${type}`;
+status.textContent=message;
+}
+
+function escapeHtml(value){
+return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+</script>
+</body>
+</html>
