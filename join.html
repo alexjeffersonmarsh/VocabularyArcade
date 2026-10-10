@@ -440,11 +440,9 @@
             quizword: "quizword.html"
         };
 
-        // Add a game type here only after that game's HTML/JavaScript
-        // can load its vocabulary from the session and submit session results.
-        // Keeping this empty prevents students from being sent to an
-        // unintegrated game page when the teacher starts a session.
-        const SESSION_INTEGRATED_GAMES = new Set([]);
+        // GemWords is enabled for classroom sessions. Add other games only
+        // after their pages can load session vocabulary and submit results.
+        const SESSION_INTEGRATED_GAMES = new Set(["gemword"]);
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
