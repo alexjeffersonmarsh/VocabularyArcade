@@ -1,1051 +1,2482 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#17131f">
-    <title>Create Game | Vocabulary Arcade</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BlastWord - Vocabulary Arcade</title>
+
+
     <style>
-        :root {
-            color-scheme: dark;
-            --page: #111015;
-            --panel: #1c1923;
-            --panel-alt: #25212e;
-            --border: #3c3548;
-            --text: #f7f4fb;
-            --muted: #b8afc5;
-            --purple: #8b45ce;
-            --purple-hover: #a45ce8;
-            --green: #58c995;
-            --red: #ff7d88;
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
         }
 
-        * { box-sizing: border-box; }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
 
         body {
-            margin: 0;
-            min-height: 100vh;
-            padding: 28px 18px 48px;
-            background: radial-gradient(ellipse at top, #292035 0%, var(--page) 58%);
-            color: var(--text);
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .page-shell {
-            width: min(920px, 100%);
-            margin: 0 auto;
-        }
-
-        .topline {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 30px;
-        }
-
-        .brand {
-            margin: 0;
-            font-size: clamp(23px, 4vw, 30px);
-            letter-spacing: -0.7px;
-        }
-
-        .brand span { color: #c79af2; }
-
-        .eyebrow {
-            margin: 0 0 7px;
-            color: #c5a0e7;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .top-tag {
-            padding: 8px 11px;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            color: var(--muted);
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .intro { margin-bottom: 24px; }
-
-        .intro h2 {
-            margin: 0 0 9px;
-            font-size: clamp(25px, 5vw, 36px);
-        }
-
-        .intro p {
-            max-width: 660px;
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .panel {
-            padding: clamp(20px, 4vw, 34px);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            background: rgba(28, 25, 35, 0.96);
-            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
-        }
-
-        .panel h3 {
-            margin: 0 0 8px;
-            font-size: 21px;
-        }
-
-        .panel-description {
-            margin: 0 0 24px;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 20px;
-        }
-
-        .field { min-width: 0; }
-
-        .field label {
-            display: block;
-            margin-bottom: 9px;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        select {
-            width: 100%;
-            min-height: 48px;
-            padding: 11px 13px;
-            border: 1px solid #51475f;
-            border-radius: 9px;
-            outline: none;
-            background: #131118;
-            color: var(--text);
-            font-size: 15px;
-        }
-
-        select:focus-visible, button:focus-visible {
-            outline: 3px solid #c69cf0;
-            outline-offset: 2px;
-        }
-
-        .field-hint {
-            margin: 8px 0 0;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.45;
-        }
-
-        .button-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 11px;
-            margin-top: 25px;
-        }
-
-        button {
-            min-height: 44px;
-            padding: 11px 17px;
-            border: 0;
-            border-radius: 9px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 700;
-            transition: background 0.15s ease, transform 0.15s ease;
-        }
-
-        button:hover:not(:disabled) { transform: translateY(-1px); }
-        button:disabled { cursor: not-allowed; opacity: 0.55; }
-
-        .primary-button {
-            background: var(--purple);
+            background: #050510;
             color: white;
-        }
 
-        .primary-button:hover:not(:disabled) { background: var(--purple-hover); }
+            font-family:
+                "Segoe UI",
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
 
-        .secondary-button {
-            border: 1px solid #554b62;
-            background: #302a39;
-            color: var(--text);
-        }
-
-        .danger-button {
-            border: 1px solid #7d424c;
-            background: #3b222b;
-            color: #ffdce0;
-        }
-
-        .notice {
-            display: none;
-            margin-top: 18px;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.5;
-            overflow-wrap: anywhere;
-        }
-
-        .notice.show { display: block; }
-        .notice.error { border-color: #864751; color: #ffd2d7; background: #321e25; }
-        .notice.success { border-color: #356c54; color: #c9f7df; background: #1a2b24; }
-
-        #sessionPanel { display: none; margin-top: 22px; }
-        #sessionPanel.show { display: block; }
-
-        .session-heading {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 22px;
-        }
-
-        .session-heading h3 { margin-bottom: 5px; }
-        .session-heading p { margin: 0; color: var(--muted); font-size: 14px; }
-
-        .status-pill {
-            flex: 0 0 auto;
-            padding: 7px 10px;
-            border: 1px solid #66517e;
-            border-radius: 999px;
-            color: #e4caff;
-            background: #332541;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-pill.active {
-            border-color: #356c54;
-            color: #c9f7df;
-            background: #1a2b24;
-        }
-
-        .status-pill.finished {
-            border-color: #695f70;
-            color: #d3cbd9;
-            background: #302a35;
-        }
-
-        .code-box {
-            padding: 22px 18px;
-            border: 1px dashed #7e5b9c;
-            border-radius: 13px;
-            background: #17121e;
-            text-align: center;
-        }
-
-        .code-label {
-            margin-bottom: 8px;
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        #sessionCodeDisplay {
-            margin: 0;
-            color: #e4c7ff;
-            font-size: clamp(35px, 8vw, 50px);
-            font-weight: 800;
-            letter-spacing: 8px;
-            overflow-wrap: anywhere;
-        }
-
-        .session-details {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-top: 17px;
-        }
-
-        .detail-tile {
-            min-width: 0;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--panel-alt);
-        }
-
-        .detail-label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .detail-value {
-            display: block;
-            font-size: 15px;
-            font-weight: 700;
-            overflow-wrap: anywhere;
-        }
-
-        .session-message {
-            margin: 17px 0 0;
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.55;
-        }
-
-        .leaderboard-panel { display: none; margin-top: 22px; }
-        .leaderboard-panel.show { display: block; }
-
-        .leaderboard-heading {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .leaderboard-heading h3 { margin-bottom: 6px; }
-        .leaderboard-heading p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
-
-        .live-tag {
-            display: inline-flex;
+            justify-content: center;
             align-items: center;
-            gap: 7px;
-            flex: 0 0 auto;
-            padding: 7px 10px;
-            border: 1px solid #356c54;
-            border-radius: 999px;
-            background: #1a2b24;
-            color: #c9f7df;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .5px;
-            text-transform: uppercase;
         }
 
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #58c995;
-            box-shadow: 0 0 0 3px rgba(88, 201, 149, .13);
-        }
 
-        .leaderboard-overview {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 21px;
-        }
+        /* =====================================================
+           GAME CONTAINER
+        ===================================================== */
 
-        .leaderboard-stat {
-            min-width: 0;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--panel-alt);
-        }
+        #game-container {
 
-        .leaderboard-stat-label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--muted);
-            font-size: 12px;
-        }
+            position: relative;
 
-        .leaderboard-stat-value {
-            display: block;
-            font-size: clamp(20px, 4vw, 26px);
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            overflow-wrap: anywhere;
-        }
+            width: min(
+                1300px,
+                100vw
+            );
 
-        .leaderboard-table-heading {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
+            height: min(
+                800px,
+                100vh
+            );
 
-        .leaderboard-table-heading h4 { margin: 0; font-size: 16px; }
-        #leaderboardUpdateTime { color: var(--muted); font-size: 12px; text-align: right; }
-
-        .leaderboard-table-wrap {
-            overflow-x: auto;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-        }
-
-        .leaderboard-table {
-            width: 100%;
-            min-width: 500px;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .leaderboard-table th {
-            padding: 12px 14px;
-            background: #17131d;
-            color: var(--muted);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .7px;
-            text-transform: uppercase;
-        }
-
-        .leaderboard-table td {
-            padding: 13px 14px;
-            border-top: 1px solid rgba(60, 53, 72, .8);
-            font-size: 14px;
-        }
-
-        .leaderboard-table tbody tr:first-child td { border-top: 0; }
-        .leaderboard-table tbody tr:hover { background: rgba(255, 255, 255, .025); }
-        .leaderboard-rank { width: 62px; color: #d6b8f1; font-weight: 800; }
-        .leaderboard-score { font-size: 16px !important; font-weight: 800; font-variant-numeric: tabular-nums; }
-        .leaderboard-muted { color: var(--muted); font-variant-numeric: tabular-nums; }
-
-        .player-status {
-            display: inline-block;
-            padding: 5px 8px;
-            border: 1px solid #51475f;
-            border-radius: 999px;
-            background: #292431;
-            color: #d6cddd;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .player-status.playing { border-color: #66517e; background: #332541; color: #e4caff; }
-        .player-status.finished { border-color: #356c54; background: #1a2b24; color: #c9f7df; }
-        .player-status.left { border-color: #695f70; background: #302a35; color: #d3cbd9; }
-
-        #leaderboardEmptyState {
-            padding: 25px 16px;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.55;
-            text-align: center;
-        }
-
-        .footer-note {
-            margin-top: 19px;
-            color: #9f96ac;
-            font-size: 12px;
-            line-height: 1.55;
-        }
-
-        @media (max-width: 620px) {
-            body { padding: 20px 12px 35px; }
-            .topline { align-items: flex-start; }
-            .top-tag { max-width: 110px; white-space: normal; text-align: center; }
-            .form-grid, .session-details, .leaderboard-overview { grid-template-columns: 1fr; }
-            .session-heading, .leaderboard-heading { flex-direction: column; }
-            .button-row button { flex: 1 1 100%; }
-            .leaderboard-table-heading { align-items: flex-start; flex-direction: column; }
-            #leaderboardUpdateTime { text-align: left; }
-            #sessionCodeDisplay { letter-spacing: 5px; }
-        }
-    </style>
-</head>
-<body>
-    <main class="page-shell">
-        <header class="topline">
-            <div>
-                <p class="eyebrow">Teacher Control Panel</p>
-                <h1 class="brand">Vocabulary <span>Arcade</span></h1>
-            </div>
-            <div class="top-tag">Game Sessions</div>
-        </header>
-
-        <section class="intro">
-            <h2>Create a classroom game</h2>
-            <p>Choose a vocabulary set and a game to create a shareable code. Students enter the code on the student join page, and their progress appears in the live leaderboard below.</p>
-        </section>
-
-        <section class="panel" aria-labelledby="createHeading">
-            <h3 id="createHeading">New game session</h3>
-            <p class="panel-description">Each session gets its own leaderboard space, separate from other classes and game sessions.</p>
-
-            <form id="createGameForm">
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="vocabSetSelect">Vocabulary set</label>
-                        <select id="vocabSetSelect" name="vocabSetId" required disabled>
-                            <option value="">Loading vocabulary sets...</option>
-                        </select>
-                        <p class="field-hint">Select the list students will use during this session.</p>
-                    </div>
-
-                    <div class="field">
-                        <label for="gameSelect">Game</label>
-                        <select id="gameSelect" name="gameType" required>
-                            <option value="gemword">GemWords</option>
-                            <option value="bubbleword">BubbleWord</option>
-                            <option value="blastword">BlastWord</option>
-                            <option value="choiceword">ChoiceWord</option>
-                            <option value="matchword">MatchWord</option>
-                            <option value="flashword">FlashWord</option>
-                            <option value="sortword">SortWord</option>
-                            <option value="quizword">QuizWord</option>
-                        </select>
-                        <p class="field-hint">The selected game type will be saved with the session.</p>
-                    </div>
-                </div>
-
-                <div class="button-row">
-                    <button class="primary-button" id="createSessionButton" type="submit" disabled>Create Game Code</button>
-                </div>
-            </form>
-
-            <div id="pageNotice" class="notice" role="status" aria-live="polite"></div>
-        </section>
-
-        <section id="sessionPanel" class="panel" aria-labelledby="sessionHeading" aria-live="polite">
-            <div class="session-heading">
-                <div>
-                    <h3 id="sessionHeading">Your game session is ready</h3>
-                    <p>Share the code with your class.</p>
-                </div>
-                <span id="sessionStatus" class="status-pill">Waiting</span>
-            </div>
-
-            <div class="code-box">
-                <div class="code-label">GAME CODE</div>
-                <p id="sessionCodeDisplay">------</p>
-                <div class="button-row" style="justify-content:center; margin-top:16px;">
-                    <button id="copyCodeButton" class="secondary-button" type="button">Copy Code</button>
-                </div>
-            </div>
-
-            <div class="session-details">
-                <div class="detail-tile">
-                    <span class="detail-label">Vocabulary set</span>
-                    <span id="sessionVocabTitle" class="detail-value">—</span>
-                </div>
-                <div class="detail-tile">
-                    <span class="detail-label">Game</span>
-                    <span id="sessionGameTitle" class="detail-value">—</span>
-                </div>
-            </div>
-
-            <p id="sessionMessage" class="session-message">The session is waiting. Start it when your class is ready.</p>
-
-            <div class="button-row">
-                <button id="startSessionButton" class="primary-button" type="button">Start Session</button>
-                <button id="endSessionButton" class="danger-button" type="button" disabled>End Session</button>
-                <button id="newSessionButton" class="secondary-button" type="button">Create Another</button>
-            </div>
-            <div id="sessionNotice" class="notice" role="status" aria-live="polite"></div>
-        </section>
-
-        <section id="leaderboardPanel" class="panel leaderboard-panel" aria-labelledby="leaderboardHeading">
-            <div class="leaderboard-heading">
-                <div>
-                    <p class="eyebrow">Live Session Results</p>
-                    <h3 id="leaderboardHeading">Class leaderboard</h3>
-                    <p>Scores and player status update automatically while students play. Keep this page open to monitor the class.</p>
-                </div>
-                <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>Live updates</span>
-            </div>
-
-            <div class="leaderboard-overview" aria-label="Leaderboard summary">
-                <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-label">Players joined</span>
-                    <span id="leaderboardPlayerCount" class="leaderboard-stat-value">0</span>
-                </div>
-                <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-label">Finished</span>
-                    <span id="leaderboardFinishedCount" class="leaderboard-stat-value">0</span>
-                </div>
-                <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-label">Leading score</span>
-                    <span id="leaderboardLeadingScore" class="leaderboard-stat-value">—</span>
-                </div>
-            </div>
-
-            <div class="leaderboard-table-heading">
-                <h4>Player rankings</h4>
-                <span id="leaderboardUpdateTime" aria-live="polite">Waiting for students to join...</span>
-            </div>
-
-            <div class="leaderboard-table-wrap">
-                <table class="leaderboard-table" aria-label="Live class leaderboard">
-                    <thead>
-                        <tr>
-                            <th scope="col">Rank</th>
-                            <th scope="col">Player</th>
-                            <th scope="col">Score</th>
-                            <th scope="col">Accuracy</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardRows"></tbody>
-                </table>
-                <div id="leaderboardEmptyState">No students have joined this session yet. Players will appear here as they join.</div>
-            </div>
-            <div id="leaderboardNotice" class="notice" role="status" aria-live="polite"></div>
-        </section>
-
-        <p class="footer-note">Use nicknames or teacher-assigned aliases rather than sensitive personal information. Keep this page open during class to monitor the live leaderboard.</p>
-    </main>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import {
-            getFirestore,
-            collection,
-            getDocs,
-            doc,
-            updateDoc,
-            runTransaction,
-            serverTimestamp,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
-            authDomain: "bubbleword-30367.firebaseapp.com",
-            projectId: "bubbleword-30367",
-            storageBucket: "bubbleword-30367.firebasestorage.app",
-            messagingSenderId: "1058393039019",
-            appId: "1:1058393039019:web:72ffaf6dab677b9a3657ee"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const vocabSetSelect = document.getElementById("vocabSetSelect");
-        const gameSelect = document.getElementById("gameSelect");
-        const createGameForm = document.getElementById("createGameForm");
-        const createSessionButton = document.getElementById("createSessionButton");
-        const pageNotice = document.getElementById("pageNotice");
-        const sessionPanel = document.getElementById("sessionPanel");
-        const sessionCodeDisplay = document.getElementById("sessionCodeDisplay");
-        const sessionStatus = document.getElementById("sessionStatus");
-        const sessionVocabTitle = document.getElementById("sessionVocabTitle");
-        const sessionGameTitle = document.getElementById("sessionGameTitle");
-        const sessionMessage = document.getElementById("sessionMessage");
-        const sessionNotice = document.getElementById("sessionNotice");
-        const copyCodeButton = document.getElementById("copyCodeButton");
-        const startSessionButton = document.getElementById("startSessionButton");
-        const endSessionButton = document.getElementById("endSessionButton");
-        const newSessionButton = document.getElementById("newSessionButton");
-        const leaderboardPanel = document.getElementById("leaderboardPanel");
-        const leaderboardPlayerCount = document.getElementById("leaderboardPlayerCount");
-        const leaderboardFinishedCount = document.getElementById("leaderboardFinishedCount");
-        const leaderboardLeadingScore = document.getElementById("leaderboardLeadingScore");
-        const leaderboardUpdateTime = document.getElementById("leaderboardUpdateTime");
-        const leaderboardRows = document.getElementById("leaderboardRows");
-        const leaderboardEmptyState = document.getElementById("leaderboardEmptyState");
-        const leaderboardNotice = document.getElementById("leaderboardNotice");
-
-        const JOIN_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        const MAX_CODE_ATTEMPTS = 12;
-
-        let currentUser = null;
-        let currentSessionRef = null;
-        let currentSession = null;
-        let vocabSetsById = new Map();
-        let unsubscribeParticipants = null;
-        let latestParticipants = [];
-        const numberFormat = new Intl.NumberFormat();
-
-        function showNotice(element, message, type = "") {
-            element.textContent = message;
-            element.className = "notice show" + (type ? " " + type : "");
-        }
-
-        function hideNotice(element) {
-            element.textContent = "";
-            element.className = "notice";
-        }
-
-        function getGameTitle(value) {
-            const option = Array.from(gameSelect.options).find(item => item.value === value);
-            return option ? option.textContent : value;
-        }
-
-        function generateJoinCode() {
-            const randomBytes = new Uint8Array(6);
-            crypto.getRandomValues(randomBytes);
-            return Array.from(randomBytes, byte => JOIN_CODE_CHARS[byte % JOIN_CODE_CHARS.length]).join("");
-        }
-
-        async function createSessionWithUniqueCode(sessionRef, sessionData) {
-            for (let attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
-                const joinCode = generateJoinCode();
-                const codeRef = doc(db, "sessionCodes", joinCode);
-
-                try {
-                    await runTransaction(db, async transaction => {
-                        const existingCode = await transaction.get(codeRef);
-
-                        if (existingCode.exists()) {
-                            const collision = new Error("That game code is already in use.");
-                            collision.code = "JOIN_CODE_COLLISION";
-                            throw collision;
-                        }
-
-                        // The code registry lets join.html look up the long session ID
-                        // without querying or listing every session document.
-                        transaction.set(codeRef, {
-                            sessionId: sessionRef.id,
-                            createdBy: currentUser.uid,
-                            createdAt: serverTimestamp()
-                        });
-
-                        transaction.set(sessionRef, {
-                            ...sessionData,
-                            joinCode
-                        });
-                    });
-
-                    return joinCode;
-                } catch (error) {
-                    if (error.code === "JOIN_CODE_COLLISION") {
-                        continue;
-                    }
-                    throw error;
-                }
-            }
-
-            throw new Error("Could not generate a unique game code. Please try again.");
-        }
-
-        async function loadVocabularySets() {
-            vocabSetSelect.innerHTML = "<option value=\"\">Choose a vocabulary set...</option>";
-            vocabSetsById.clear();
-
-            const snapshot = await getDocs(collection(db, "vocabSets"));
-            const sets = snapshot.docs.map(docSnap => {
-                const data = docSnap.data();
-                return {
-                    id: docSnap.id,
-                    title: data.title || docSnap.id
-                };
-            }).sort((a, b) => a.title.localeCompare(b.title));
-
-            for (const set of sets) {
-                vocabSetsById.set(set.id, set);
-                const option = document.createElement("option");
-                option.value = set.id;
-                option.textContent = set.title;
-                vocabSetSelect.appendChild(option);
-            }
-
-            vocabSetSelect.disabled = sets.length === 0;
-            createSessionButton.disabled = sets.length === 0;
-
-            if (sets.length === 0) {
-                showNotice(pageNotice, "No vocabulary sets were found in Firestore's vocabSets collection.", "error");
-            }
-        }
-
-        function renderSessionStatus(status) {
-            const normalized = status || "waiting";
-            sessionStatus.textContent = normalized;
-            sessionStatus.className = "status-pill";
-            if (normalized === "active") sessionStatus.classList.add("active");
-            if (normalized === "finished") sessionStatus.classList.add("finished");
-
-            startSessionButton.disabled = normalized !== "waiting";
-            endSessionButton.disabled = normalized !== "active";
-
-            if (normalized === "waiting") {
-                sessionMessage.textContent = "The session is waiting. Share the code with students, then start the session when your class is ready.";
-            } else if (normalized === "active") {
-                sessionMessage.textContent = "The session is active. The leaderboard below updates automatically as students join and their scores change.";
-            } else {
-                sessionMessage.textContent = "This session has ended. Its code should no longer be used for a new game.";
-            }
-        }
-
-        async function createGameSession(event) {
-            event.preventDefault();
-            hideNotice(pageNotice);
-            hideNotice(sessionNotice);
-
-            const vocabSetId = vocabSetSelect.value;
-            const selectedSet = vocabSetsById.get(vocabSetId);
-            const gameType = gameSelect.value;
-
-            if (!selectedSet) {
-                showNotice(pageNotice, "Please select a vocabulary set.", "error");
-                return;
-            }
-
-            if (!currentUser) {
-                showNotice(pageNotice, "Firebase Authentication is not ready. Refresh the page and try again.", "error");
-                return;
-            }
-
-            createSessionButton.disabled = true;
-            createSessionButton.textContent = "Creating Session...";
-
-            try {
-                const sessionRef = doc(collection(db, "gameSessions"));
-                const gameTitle = getGameTitle(gameType);
-
-                const sessionData = {
-                    status: "waiting",
-                    gameType,
-                    gameTitle,
-                    vocabSetId: selectedSet.id,
-                    vocabTitle: selectedSet.title,
-                    createdBy: currentUser.uid,
-                    createdAt: serverTimestamp(),
-                    startedAt: null,
-                    finishedAt: null,
-                    schemaVersion: 1
-                };
-
-                const joinCode = await createSessionWithUniqueCode(
-                    sessionRef,
-                    sessionData
+            background:
+                radial-gradient(
+                    circle at center,
+                    #101030 0%,
+                    #050510 100%
                 );
 
-                currentSessionRef = sessionRef;
-                currentSession = { ...sessionData, joinCode, gameTitle, vocabTitle: selectedSet.title };
+            border:
+                3px solid #00ffff;
 
-                sessionCodeDisplay.textContent = joinCode;
-                sessionVocabTitle.textContent = selectedSet.title;
-                sessionGameTitle.textContent = gameTitle;
-                renderSessionStatus("waiting");
-                sessionPanel.classList.add("show");
-                leaderboardPanel.classList.add("show");
-                hideNotice(leaderboardNotice);
-                startParticipantListener(sessionRef.id);
-                showNotice(sessionNotice, "Session created successfully. Copy the code to share it with your class.", "success");
-                sessionPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-            } catch (error) {
-                console.error("Could not create game session:", error);
-                showNotice(pageNotice, "Could not create the session. " + (error.message || "Check your Firebase Authentication and Firestore rules, then try again."), "error");
-            } finally {
-                createSessionButton.disabled = false;
-                createSessionButton.textContent = "Create Game Code";
+            box-shadow:
+                0 0 30px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.4
+                );
+
+            overflow: hidden;
+        }
+
+
+        /* =====================================================
+           CANVAS
+        ===================================================== */
+
+        #gameCanvas {
+
+            display: block;
+
+            width: 100%;
+            height: 100%;
+
+            touch-action: none;
+        }
+
+
+        /* =====================================================
+           LIST NAME
+        ===================================================== */
+
+        #list-name-display {
+
+            position: absolute;
+
+            top: 12px;
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            max-width: 60%;
+
+            padding:
+                7px 16px;
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    0.72
+                );
+
+            border:
+                1px solid
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.25
+                );
+
+            color:
+                #c7d2fe;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+            z-index:
+                8;
+
+            pointer-events:
+                none;
+        }
+
+
+        /* =====================================================
+           SOUND BUTTON
+        ===================================================== */
+
+        #sound-button {
+
+            position: absolute;
+
+            top: 12px;
+            right: 14px;
+
+            width: 42px;
+            height: 42px;
+
+            border: 1px solid
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.35
+                );
+
+            border-radius: 8px;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    0.82
+                );
+
+            color: white;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            z-index: 40;
+
+            transition:
+                transform .12s ease,
+                background .12s ease;
+        }
+
+
+        #sound-button:hover {
+
+            transform:
+                scale(1.06);
+
+            background:
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.16
+                );
+        }
+
+
+        /* =====================================================
+           TARGET / HUD BAR
+        ===================================================== */
+
+        #target-bar {
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            height: 88px;
+
+            background:
+                rgba(
+                    10,
+                    15,
+                    30,
+                    0.97
+                );
+
+            border-top:
+                2px solid #00ffff;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                20px;
+
+            padding:
+                8px 25px;
+
+            z-index:
+                10;
+
+            pointer-events:
+                none;
+        }
+
+
+        #target-area {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            min-width:
+                0;
+        }
+
+
+        .prompt-label {
+
+            font-size:
+                14px;
+
+            color:
+                #8888aa;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .target-word {
+
+            font-size:
+                clamp(
+                    23px,
+                    3vw,
+                    36px
+                );
+
+            font-weight:
+                900;
+
+            color:
+                #00ffff;
+
+            text-shadow:
+                0 0 14px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    0.8
+                );
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+        }
+
+
+        /* =====================================================
+           STATS
+        ===================================================== */
+
+        .stats-container {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                flex-end;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
+        }
+
+
+        .stat {
+
+            min-width:
+                72px;
+
+            text-align:
+                center;
+        }
+
+
+        .stat-label {
+
+            display:
+                block;
+
+            font-size:
+                9px;
+
+            color:
+                #777799;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                .7px;
+        }
+
+
+        .stat-value {
+
+            display:
+                block;
+
+            margin-top:
+                2px;
+
+            font-size:
+                19px;
+
+            font-weight:
+                900;
+        }
+
+
+        #score-display {
+            color:
+                #ff00ff;
+        }
+
+
+        #ammo-display {
+            color:
+                #00ffcc;
+        }
+
+
+        #shields-display {
+            color:
+                #ff6688;
+        }
+
+
+        #wave-display {
+            color:
+                #ffd166;
+        }
+
+
+        #accuracy-display {
+            color:
+                #8be9fd;
+        }
+
+
+        #words-display {
+            color:
+                #a7f3d0;
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        #message-display {
+
+            position:
+                absolute;
+
+            left:
+                50%;
+
+            top:
+                50%;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(.8);
+
+            padding:
+                13px 28px;
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(
+                    0,
+                    255,
+                    255,
+                    .92
+                );
+
+            color:
+                #050510;
+
+            font-size:
+                25px;
+
+            font-weight:
+                900;
+
+            opacity:
+                0;
+
+            pointer-events:
+                none;
+
+            z-index:
+                30;
+
+            transition:
+                opacity .18s ease,
+                transform .18s ease;
+        }
+
+
+        #message-display.show {
+
+            opacity:
+                1;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                )
+                scale(1);
+        }
+
+
+        /* =====================================================
+           LOADING SCREEN
+        ===================================================== */
+
+        #loading-screen {
+
+            position:
+                absolute;
+
+            inset:
+                0;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    .97
+                );
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            justify-content:
+                center;
+
+            align-items:
+                center;
+
+            text-align:
+                center;
+
+            padding:
+                30px;
+
+            gap:
+                15px;
+
+            z-index:
+                100;
+        }
+
+
+        #loading-screen.hidden {
+            display:
+                none;
+        }
+
+
+        #loading-title {
+
+            font-size:
+                36px;
+
+            font-weight:
+                900;
+
+            color:
+                #00ffff;
+        }
+
+
+        #loading-text {
+
+            font-size:
+                18px;
+
+            color:
+                #cbd5e1;
+
+            line-height:
+                1.5;
+        }
+
+
+        #loading-details {
+
+            max-width:
+                750px;
+
+            font-size:
+                15px;
+
+            color:
+                #ff8899;
+
+            line-height:
+                1.5;
+        }
+
+
+        /* =====================================================
+           GAME OVER
+        ===================================================== */
+
+        #game-over-screen {
+
+            position:
+                absolute;
+
+            inset:
+                0;
+
+            background:
+                rgba(
+                    5,
+                    5,
+                    16,
+                    .94
+                );
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            justify-content:
+                center;
+
+            align-items:
+                center;
+
+            text-align:
+                center;
+
+            padding:
+                25px;
+
+            z-index:
+                90;
+        }
+
+
+        #game-over-screen.hidden {
+            display:
+                none;
+        }
+
+
+        #game-over-screen h1 {
+
+            font-size:
+                clamp(
+                    42px,
+                    7vw,
+                    68px
+                );
+
+            color:
+                #ff3366;
+
+            margin-bottom:
+                6px;
+
+            text-shadow:
+                0 0 15px
+                rgba(
+                    255,
+                    51,
+                    102,
+                    .8
+                );
+        }
+
+
+        #game-over-list {
+
+            color:
+                #cbd5e1;
+
+            font-size:
+                18px;
+
+            margin-bottom:
+                25px;
+
+            max-width:
+                80%;
+        }
+
+
+        /* =====================================================
+           RESULTS
+        ===================================================== */
+
+        #results-grid {
+
+            width:
+                min(
+                    700px,
+                    90%
+                );
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    1fr
+                );
+
+            gap:
+                12px;
+
+            margin-bottom:
+                25px;
+        }
+
+
+        .result-box {
+
+            padding:
+                15px 10px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    .06
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    .12
+                );
+
+            border-radius:
+                10px;
+        }
+
+
+        .result-label {
+
+            display:
+                block;
+
+            font-size:
+                10px;
+
+            text-transform:
+                uppercase;
+
+            color:
+                #7d8494;
+
+            letter-spacing:
+                .7px;
+        }
+
+
+        .result-value {
+
+            display:
+                block;
+
+            margin-top:
+                4px;
+
+            font-size:
+                27px;
+
+            font-weight:
+                900;
+        }
+
+
+        #game-over-message {
+
+            max-width:
+                700px;
+
+            margin-bottom:
+                24px;
+
+            color:
+                #e2e8f0;
+
+            font-size:
+                16px;
+
+            line-height:
+                1.5;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        #button-row {
+
+            display:
+                flex;
+
+            justify-content:
+                center;
+
+            gap:
+                12px;
+
+            flex-wrap:
+                wrap;
+        }
+
+
+        .action-button {
+
+            min-width:
+                150px;
+
+            padding:
+                13px 25px;
+
+            border:
+                none;
+
+            border-radius:
+                7px;
+
+            font-size:
+                17px;
+
+            font-weight:
+                800;
+
+            cursor:
+                pointer;
+
+            transition:
+                transform .12s ease,
+                filter .12s ease;
+        }
+
+
+        .action-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            filter:
+                brightness(1.08);
+        }
+
+
+        #restart-btn {
+
+            background:
+                #00ffff;
+
+            color:
+                #050510;
+
+            box-shadow:
+                0 0 15px
+                rgba(
+                    0,
+                    255,
+                    255,
+                    .5
+                );
+        }
+
+
+        #library-btn {
+
+            background:
+                #ffffff;
+
+            color:
+                #111827;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            #target-bar {
+
+                height:
+                    105px;
+
+                padding:
+                    7px 12px;
+
+                flex-direction:
+                    column;
+
+                justify-content:
+                    center;
+
+                gap:
+                    4px;
             }
-        }
 
-        function getAccuracy(data) {
-            const attempts = Number(data.totalAttempts || 0);
-            if (attempts <= 0) return "—";
 
-            let accuracy = Number(data.accuracy);
-            if (!Number.isFinite(accuracy)) {
-                accuracy = (Number(data.correctAnswers || 0) / attempts) * 100;
-            } else if (accuracy > 0 && accuracy <= 1) {
-                accuracy *= 100;
+            #target-area {
+                max-width:
+                    90%;
             }
 
-            accuracy = Math.max(0, Math.min(100, accuracy));
-            return Math.round(accuracy) + "%";
-        }
 
-        function getPlayerStatus(data) {
-            if (data.completed === true) return { label: "Finished", className: "finished" };
-            if (data.participantStatus === "left") return { label: "Left", className: "left" };
-            if (Number(data.totalAttempts || 0) > 0 || Number(data.score || 0) > 0) {
-                return { label: "Playing", className: "playing" };
+            .stats-container {
+
+                width:
+                    100%;
+
+                justify-content:
+                    space-around;
             }
-            return { label: "Joined", className: "" };
-        }
 
-        function appendTableCell(row, text, className = "") {
-            const cell = document.createElement("td");
-            if (className) cell.className = className;
-            cell.textContent = text;
-            row.appendChild(cell);
-            return cell;
-        }
 
-        function renderLiveLeaderboard() {
-            const players = [...latestParticipants].sort((a, b) => {
-                if (b.score !== a.score) return b.score - a.score;
-                const accuracyA = a.totalAttempts > 0 ? a.correctAnswers / a.totalAttempts : -1;
-                const accuracyB = b.totalAttempts > 0 ? b.correctAnswers / b.totalAttempts : -1;
-                if (accuracyB !== accuracyA) return accuracyB - accuracyA;
-                if (a.completed !== b.completed) return Number(b.completed) - Number(a.completed);
-                return a.joinedAt - b.joinedAt || a.name.localeCompare(b.name);
-            });
-
-            leaderboardPlayerCount.textContent = numberFormat.format(players.length);
-            leaderboardFinishedCount.textContent = numberFormat.format(players.filter(player => player.completed).length);
-            leaderboardLeadingScore.textContent = players.length ? numberFormat.format(players[0].score) : "—";
-            leaderboardEmptyState.style.display = players.length ? "none" : "block";
-            leaderboardRows.replaceChildren();
-
-            let previousScore = null;
-            let currentRank = 0;
-            players.forEach((player, index) => {
-                if (previousScore === null || player.score !== previousScore) {
-                    currentRank = index + 1;
-                    previousScore = player.score;
-                }
-
-                const row = document.createElement("tr");
-                appendTableCell(row, String(currentRank), "leaderboard-rank");
-                appendTableCell(row, player.name);
-                appendTableCell(row, numberFormat.format(player.score), "leaderboard-score");
-                appendTableCell(row, getAccuracy(player.raw), "leaderboard-muted");
-
-                const status = getPlayerStatus(player.raw);
-                const statusCell = document.createElement("td");
-                const statusPill = document.createElement("span");
-                statusPill.className = "player-status" + (status.className ? " " + status.className : "");
-                statusPill.textContent = status.label;
-                statusCell.appendChild(statusPill);
-                row.appendChild(statusCell);
-                leaderboardRows.appendChild(row);
-            });
-
-            leaderboardUpdateTime.textContent = "Updated " + new Date().toLocaleTimeString([], {
-                hour: "numeric", minute: "2-digit", second: "2-digit"
-            });
-        }
-
-        function stopParticipantListener() {
-            if (typeof unsubscribeParticipants === "function") unsubscribeParticipants();
-            unsubscribeParticipants = null;
-            latestParticipants = [];
-        }
-
-        function startParticipantListener(sessionId) {
-            stopParticipantListener();
-            leaderboardRows.replaceChildren();
-            leaderboardEmptyState.style.display = "block";
-            leaderboardPlayerCount.textContent = "0";
-            leaderboardFinishedCount.textContent = "0";
-            leaderboardLeadingScore.textContent = "—";
-            leaderboardUpdateTime.textContent = "Waiting for students to join...";
-
-            const participantsRef = collection(db, "gameSessions", sessionId, "participants");
-            unsubscribeParticipants = onSnapshot(participantsRef, snapshot => {
-                latestParticipants = snapshot.docs.map(playerDoc => {
-                    const data = playerDoc.data();
-                    const score = Number(data.score);
-                    const correctAnswers = Number(data.correctAnswers || 0);
-                    const totalAttempts = Number(data.totalAttempts || 0);
-                    return {
-                        id: playerDoc.id,
-                        name: String(data.displayName || "Player").slice(0, 40),
-                        score: Number.isFinite(score) ? score : 0,
-                        correctAnswers: Number.isFinite(correctAnswers) ? correctAnswers : 0,
-                        totalAttempts: Number.isFinite(totalAttempts) ? totalAttempts : 0,
-                        completed: data.completed === true,
-                        joinedAt: data.joinedAt && typeof data.joinedAt.toMillis === "function" ? data.joinedAt.toMillis() : 0,
-                        raw: data
-                    };
-                });
-                hideNotice(leaderboardNotice);
-                renderLiveLeaderboard();
-            }, error => {
-                console.error("Live leaderboard listener error:", error);
-                showNotice(leaderboardNotice, "The live leaderboard could not load. Check Firestore read permissions for the session participants.", "error");
-                leaderboardUpdateTime.textContent = "Live update connection unavailable";
-            });
-        }
-
-        async function changeSessionStatus(newStatus) {
-            if (!currentSessionRef || !currentSession) return;
-            hideNotice(sessionNotice);
-            startSessionButton.disabled = true;
-            endSessionButton.disabled = true;
-
-            try {
-                const updates = { status: newStatus };
-                if (newStatus === "active") updates.startedAt = serverTimestamp();
-                if (newStatus === "finished") updates.finishedAt = serverTimestamp();
-
-                await updateDoc(currentSessionRef, updates);
-                currentSession.status = newStatus;
-                renderSessionStatus(newStatus);
-                showNotice(sessionNotice, newStatus === "active" ? "Session started." : "Session ended.", "success");
-            } catch (error) {
-                console.error("Could not update session status:", error);
-                renderSessionStatus(currentSession.status);
-                showNotice(sessionNotice, "Could not update the session. Check your Firestore rules and try again.", "error");
+            .stat {
+                min-width:
+                    54px;
             }
+
+
+            .stat-value {
+                font-size:
+                    16px;
+            }
+
+
+            .stat-label {
+                font-size:
+                    8px;
+            }
+
+
+            #list-name-display {
+
+                max-width:
+                    65%;
+
+                font-size:
+                    12px;
+            }
+
+
+            #results-grid {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+            }
+
         }
 
-        async function copyJoinCode() {
-            const code = currentSession?.joinCode;
-            if (!code) return;
 
-            try {
-                await navigator.clipboard.writeText(code);
-                showNotice(sessionNotice, "Game code copied: " + code, "success");
-            } catch (error) {
-                // Fallback for browsers where Clipboard API is unavailable.
-                const textarea = document.createElement("textarea");
-                textarea.value = code;
-                textarea.setAttribute("readonly", "");
-                textarea.style.position = "absolute";
-                textarea.style.left = "-9999px";
-                document.body.appendChild(textarea);
-                textarea.select();
-                const copied = document.execCommand("copy");
-                textarea.remove();
+        @media (max-width: 600px) {
 
-                if (copied) {
-                    showNotice(sessionNotice, "Game code copied: " + code, "success");
+            #game-container {
+                border-width:
+                    2px;
+            }
+
+
+            #target-bar {
+                height:
+                    115px;
+            }
+
+
+            .prompt-label {
+                font-size:
+                    11px;
+            }
+
+
+            .target-word {
+                font-size:
+                    22px;
+            }
+
+
+            #sound-button {
+
+                top:
+                    9px;
+
+                right:
+                    9px;
+
+                width:
+                    36px;
+
+                height:
+                    36px;
+
+                font-size:
+                    17px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div id="game-container">
+
+
+    <!-- =====================================================
+         CANVAS
+    ====================================================== -->
+
+    <canvas
+        id="gameCanvas"
+        width="1300"
+        height="800"
+    ></canvas>
+
+
+    <!-- =====================================================
+         LIST NAME
+    ====================================================== -->
+
+    <div id="list-name-display">
+        Loading vocabulary set...
+    </div>
+
+
+    <!-- =====================================================
+         SOUND BUTTON
+    ====================================================== -->
+
+    <button
+        id="sound-button"
+        type="button"
+        aria-label="Mute game sounds"
+        title="Mute game sounds"
+    >
+        🔊
+    </button>
+
+
+    <!-- =====================================================
+         MESSAGE
+    ====================================================== -->
+
+    <div id="message-display"></div>
+
+
+    <!-- =====================================================
+         TARGET / HUD
+    ====================================================== -->
+
+    <div id="target-bar">
+
+        <div id="target-area">
+
+            <span class="prompt-label">
+                Blast:
+            </span>
+
+            <span
+                id="target-word-display"
+                class="target-word"
+            >
+                ---
+            </span>
+
+        </div>
+
+
+        <div class="stats-container">
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Score
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="score-display"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Ammo
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="ammo-display"
+                >
+                    50
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Shields
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="shields-display"
+                >
+                    ♥ ♥ ♥ ♥
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Level
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="wave-display"
+                >
+                    1
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Accuracy
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="accuracy-display"
+                >
+                    100%
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-label">
+                    Words
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="words-display"
+                >
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOADING SCREEN
+    ====================================================== -->
+
+    <div id="loading-screen">
+
+        <div id="loading-title">
+            BlastWord
+        </div>
+
+        <div id="loading-text">
+            Loading Vocabulary Set...
+        </div>
+
+        <div id="loading-details"></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GAME OVER
+    ====================================================== -->
+
+    <div
+        id="game-over-screen"
+        class="hidden"
+    >
+
+        <h1>
+            GAME OVER
+        </h1>
+
+        <div id="game-over-list">
+            Vocabulary Set
+        </div>
+
+
+        <div id="results-grid">
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Score
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-score"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Accuracy
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-accuracy"
+                >
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Words Blasted
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-correct"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span class="result-label">
+                    Best Combo
+                </span>
+
+                <span
+                    class="result-value"
+                    id="final-combo"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div id="game-over-message"></div>
+
+
+        <div id="button-row">
+
+            <button
+                id="restart-btn"
+                class="action-button"
+                type="button"
+            >
+                PLAY AGAIN
+            </button>
+
+
+            <button
+                id="library-btn"
+                class="action-button"
+                type="button"
+            >
+                LIBRARY
+            </button>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     SHARED VOCABULARY ARCADE SOUND SYSTEM
+
+     IMPORTANT:
+     This must load before the game module.
+========================================================= -->
+
+<script src="sounds/sound.js"></script>
+
+
+<script type="module">
+
+
+/* =========================================================
+   FIREBASE IMPORTS
+========================================================= */
+
+import {
+    initializeApp
+}
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+    getFirestore,
+    doc,
+    getDoc
+}
+from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+/* =========================================================
+   FIREBASE CONFIG
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyD-goTprU8NMVqmsAlve6BAfXrPZN-sQdQ",
+
+    authDomain:
+        "bubbleword-30367.firebaseapp.com",
+
+    projectId:
+        "bubbleword-30367",
+
+    storageBucket:
+        "bubbleword-30367.firebasestorage.app",
+
+    messagingSenderId:
+        "1058393039019",
+
+    appId:
+        "1:1058393039019:web:72ffaf6dab677b9a3657ee"
+};
+
+
+const app =
+    initializeApp(
+        firebaseConfig
+    );
+
+
+const db =
+    getFirestore(
+        app
+    );
+
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const CANVAS_WIDTH =
+    1300;
+
+const CANVAS_HEIGHT =
+    800;
+
+const FOOTER_HEIGHT =
+    88;
+
+
+/*
+ * Every level has a 4 x 5 formation.
+ */
+
+const GRID_ROWS =
+    4;
+
+const GRID_COLS =
+    5;
+
+const TOTAL_SHIPS =
+    GRID_ROWS *
+    GRID_COLS;
+
+
+/*
+ * Starting ammunition.
+ */
+
+const MAX_AMMO =
+    50;
+
+
+/*
+ * Correct shots return a small amount
+ * of ammunition.
+ */
+
+const CORRECT_AMMO_BONUS =
+    2;
+
+
+/*
+ * Player now has FOUR shields.
+ */
+
+const MAX_SHIELDS =
+    4;
+
+
+/*
+ * Level mechanics.
+ */
+
+const BASE_HORIZONTAL_SPEED =
+    1.0;
+
+const BASE_DOWNWARD_SPEED =
+    0.04;
+
+
+/*
+ * Diving attacks become faster and
+ * more frequent as levels increase.
+ */
+
+const BASE_DIVE_CHANCE =
+    0.0025;
+
+const DIVE_CHANCE_INCREMENT =
+    0.0015;
+
+const MIN_DIVE_COOLDOWN =
+    1200;
+
+const BASE_DIVE_COOLDOWN =
+    3500;
+
+const DIVE_SPEED =
+    3.5;
+
+
+/*
+ * One board contains 20 ships.
+ */
+
+const SHIPS_PER_LEVEL =
+    TOTAL_SHIPS;
+
+
+/* =========================================================
+   DOM REFERENCES
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        "gameCanvas"
+    );
+
+
+const ctx =
+    canvas.getContext(
+        "2d"
+    );
+
+
+const targetWordDisplay =
+    document.getElementById(
+        "target-word-display"
+    );
+
+
+const scoreDisplay =
+    document.getElementById(
+        "score-display"
+    );
+
+
+const ammoDisplay =
+    document.getElementById(
+        "ammo-display"
+    );
+
+
+const shieldsDisplay =
+    document.getElementById(
+        "shields-display"
+    );
+
+
+const waveDisplay =
+    document.getElementById(
+        "wave-display"
+    );
+
+
+const accuracyDisplay =
+    document.getElementById(
+        "accuracy-display"
+    );
+
+
+const wordsDisplay =
+    document.getElementById(
+        "words-display"
+    );
+
+
+const listNameDisplay =
+    document.getElementById(
+        "list-name-display"
+    );
+
+
+const loadingScreen =
+    document.getElementById(
+        "loading-screen"
+    );
+
+
+const loadingText =
+    document.getElementById(
+        "loading-text"
+    );
+
+
+const loadingDetails =
+    document.getElementById(
+        "loading-details"
+    );
+
+
+const messageDisplay =
+    document.getElementById(
+        "message-display"
+    );
+
+
+const gameOverScreen =
+    document.getElementById(
+        "game-over-screen"
+    );
+
+
+const gameOverList =
+    document.getElementById(
+        "game-over-list"
+    );
+
+
+const finalScore =
+    document.getElementById(
+        "final-score"
+    );
+
+
+const finalAccuracy =
+    document.getElementById(
+        "final-accuracy"
+    );
+
+
+const finalCorrect =
+    document.getElementById(
+        "final-correct"
+    );
+
+
+const finalCombo =
+    document.getElementById(
+        "final-combo"
+    );
+
+
+const gameOverMessage =
+    document.getElementById(
+        "game-over-message"
+    );
+
+
+const restartButton =
+    document.getElementById(
+        "restart-btn"
+    );
+
+
+const libraryButton =
+    document.getElementById(
+        "library-btn"
+    );
+
+
+const soundButton =
+    document.getElementById(
+        "sound-button"
+    );
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+let vocabList =
+    [];
+
+let listTitle =
+    "Vocabulary Set";
+
+let listLanguage =
+    "";
+
+let currentTarget =
+    null;
+
+let currentTargetShip =
+    null;
+
+let score =
+    0;
+
+let ammo =
+    MAX_AMMO;
+
+let shields =
+    MAX_SHIELDS;
+
+let correctAnswers =
+    0;
+
+/*
+ * Isolated shot counters:
+ * targetShots tracks attempts on vocabulary targets.
+ * hazardShots tracks defensive firing at diving ships.
+ */
+let targetShots =
+    0;
+
+let hazardShots =
+    0;
+
+let streak =
+    0;
+
+let bestStreak =
+    0;
+
+let wave =
+    1;
+
+let isGameOver =
+    false;
+
+let gameStarted =
+    false;
+
+let levelTransitioning =
+    false;
+
+let bullets =
+    [];
+
+let ships =
+    [];
+
+let lastDiveTime =
+    0;
+
+let messageTimer =
+    null;
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player = {
+
+    x:
+        CANVAS_WIDTH / 2,
+
+    y:
+        CANVAS_HEIGHT -
+        FOOTER_HEIGHT -
+        55,
+
+    width:
+        70,
+
+    height:
+        45,
+
+    speed:
+        9,
+
+    color:
+        "#00ffff"
+};
+
+
+/* =========================================================
+   KEYS
+========================================================= */
+
+const keys =
+    {};
+
+
+/* =========================================================
+   SHIP COLORS
+========================================================= */
+
+const SHIP_COLORS = [
+
+    "#1E90FF",
+
+    "#32CD32",
+
+    "#9370DB",
+
+    "#FF69B4",
+
+    "#FF8C00"
+];
+
+
+/* =========================================================
+   FORMATION MOVEMENT
+========================================================= */
+
+let horizontalDirection =
+    1;
+
+let horizontalSpeed =
+    BASE_HORIZONTAL_SPEED;
+
+let downwardSpeed =
+    BASE_DOWNWARD_SPEED;
+
+
+/* =========================================================
+   URL
+========================================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const setId =
+    params.get("id") ||
+    params.get("set");
+
+
+/* =========================================================
+   NORMALIZE TEXT
+========================================================= */
+
+function normalizeText(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+        .trim()
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .toLowerCase();
+}
+
+
+/* =========================================================
+   SHUFFLE
+========================================================= */
+
+function shuffle(
+    array
+) {
+
+    const copy =
+        [...array];
+
+
+    for (
+        let i =
+            copy.length - 1;
+
+        i > 0;
+
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            copy[i],
+            copy[j]
+        ] =
+        [
+            copy[j],
+            copy[i]
+        ];
+    }
+
+
+    return copy;
+}
+
+
+/* =========================================================
+   ACCURACY UTILS
+========================================================= */
+
+function getAccuracyPercentage() {
+    if (targetShots === 0) return 100;
+    return Math.round((correctAnswers / targetShots) * 100);
+}
+
+
+function updateAccuracyUI() {
+    const acc = getAccuracyPercentage();
+    accuracyDisplay.textContent = `${acc}%`;
+}
+
+
+/* =========================================================
+   LOAD FIREBASE SET
+========================================================= */
+
+async function loadVocabularySet(
+    id
+) {
+
+    if (!id) {
+
+        throw new Error(
+            "No vocabulary set ID was provided. Open BlastWord from the Vocabulary Arcade Library."
+        );
+    }
+
+
+    const reference =
+        doc(
+            db,
+            "vocabSets",
+            id
+        );
+
+
+    const snapshot =
+        await getDoc(
+            reference
+        );
+
+
+    if (
+        !snapshot.exists()
+    ) {
+
+        throw new Error(
+            "Vocabulary set not found in Firebase."
+        );
+    }
+
+
+    const data =
+        snapshot.data();
+
+
+    let items =
+        [];
+
+
+    if (Array.isArray(data.items)) {
+        items = data.items;
+    } else if (Array.isArray(data.words)) {
+        items = data.words;
+    }
+
+
+    if (!items || items.length === 0) {
+        throw new Error("Vocabulary set contains no items.");
+    }
+
+
+    vocabList = items.map((item) => ({
+        term: item.term || item.word || "",
+        definition: item.definition || item.def || ""
+    })).filter((item) => item.term && item.definition);
+
+
+    if (vocabList.length === 0) {
+        throw new Error("Vocabulary set has invalid items.");
+    }
+
+
+    listTitle = data.title || data.name || "Vocabulary Set";
+    listLanguage = data.language || "";
+
+    listNameDisplay.textContent = listTitle;
+    loadingScreen.classList.add("hidden");
+
+    initGame();
+}
+
+
+/* =========================================================
+   INIT & SPAWN
+========================================================= */
+
+function initGame() {
+    score = 0;
+    ammo = MAX_AMMO;
+    shields = MAX_SHIELDS;
+    correctAnswers = 0;
+
+    targetShots = 0;
+    hazardShots = 0;
+
+    streak = 0;
+    bestStreak = 0;
+    wave = 1;
+    isGameOver = false;
+    gameStarted = true;
+    levelTransitioning = false;
+
+    bullets = [];
+    ships = [];
+
+    scoreDisplay.textContent = "0";
+    ammoDisplay.textContent = String(MAX_AMMO);
+    shieldsDisplay.textContent = "♥ ".repeat(MAX_SHIELDS).trim();
+    waveDisplay.textContent = "1";
+    wordsDisplay.textContent = "0";
+    updateAccuracyUI();
+
+    gameOverScreen.classList.add("hidden");
+
+    spawnFormation();
+    pickNextTarget();
+}
+
+
+function spawnFormation() {
+    ships = [];
+
+    const startX = 150;
+    const startY = 90;
+    const spacingX = 220;
+    const spacingY = 75;
+
+    let availableVocab = shuffle([...vocabList]);
+
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            if (availableVocab.length === 0) {
+                availableVocab = shuffle([...vocabList]);
+            }
+
+            const vocabItem = availableVocab.pop();
+
+            ships.push({
+                x: startX + c * spacingX,
+                y: startY + r * spacingY,
+                originX: startX + c * spacingX,
+                originY: startY + r * spacingY,
+                width: 140,
+                height: 48,
+                term: vocabItem.term,
+                definition: vocabItem.definition,
+                color: SHIP_COLORS[(r + c) % SHIP_COLORS.length],
+                isDiving: false,
+                diveAngle: 0,
+                diveSpeedX: 0,
+                diveSpeedY: 0
+            });
+        }
+    }
+
+    horizontalDirection = 1;
+    horizontalSpeed = BASE_HORIZONTAL_SPEED + (wave - 1) * 0.2;
+    downwardSpeed = BASE_DOWNWARD_SPEED + (wave - 1) * 0.01;
+}
+
+
+function pickNextTarget() {
+    if (ships.length === 0) {
+        advanceWave();
+        return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * ships.length);
+    currentTargetShip = ships[randomIndex];
+    currentTarget = {
+        term: currentTargetShip.term,
+        definition: currentTargetShip.definition
+    };
+
+    targetWordDisplay.textContent = currentTarget.definition;
+}
+
+
+function advanceWave() {
+    levelTransitioning = true;
+    wave++;
+    waveDisplay.textContent = String(wave);
+
+    showMessage(`LEVEL ${wave}!`, 1800);
+
+    setTimeout(() => {
+        spawnFormation();
+        pickNextTarget();
+        levelTransitioning = false;
+    }, 1800);
+}
+
+
+/* =========================================================
+   SHOOTING & BULLETS
+========================================================= */
+
+function fireBullet() {
+    if (ammo <= 0 || isGameOver || levelTransitioning) return;
+
+    ammo--;
+    ammoDisplay.textContent = String(ammo);
+
+    bullets.push({
+        x: player.x,
+        y: player.y - player.height / 2,
+        radius: 5,
+        speed: 12,
+        color: "#00ffff",
+        targetShotCounted: false
+    });
+
+    if (window.soundSystem && typeof window.soundSystem.playLaser === "function") {
+        window.soundSystem.playLaser();
+    }
+}
+
+
+function updateBullets() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.y -= b.speed;
+
+        let hitSomething = false;
+
+        for (let j = ships.length - 1; j >= 0; j--) {
+            const s = ships[j];
+
+            if (
+                b.x >= s.x - s.width / 2 &&
+                b.x <= s.x + s.width / 2 &&
+                b.y >= s.y - s.height / 2 &&
+                b.y <= s.y + s.height / 2
+            ) {
+                hitSomething = true;
+
+                if (s.isDiving) {
+                    // Defensive shot against charging ship: does NOT affect main target accuracy
+                    hazardShots++;
+                    score += 50;
+                    scoreDisplay.textContent = String(score);
+
+                    showMessage("HAZARD DESTROYED!", 700);
+
+                    if (window.soundSystem && typeof window.soundSystem.playExplosion === "function") {
+                        window.soundSystem.playExplosion();
+                    }
+
+                    ships.splice(j, 1);
+
+                    if (s === currentTargetShip) {
+                        pickNextTarget();
+                    }
+                } else if (normalizeText(s.term) === normalizeText(currentTarget.term)) {
+                    // Direct hit on the active vocabulary target
+                    targetShots++;
+                    correctAnswers++;
+                    wordsDisplay.textContent = String(correctAnswers);
+
+                    streak++;
+                    if (streak > bestStreak) bestStreak = streak;
+
+                    ammo = Math.min(MAX_AMMO, ammo + CORRECT_AMMO_BONUS);
+                    ammoDisplay.textContent = String(ammo);
+
+                    score += 100 + streak * 10;
+                    scoreDisplay.textContent = String(score);
+
+                    if (window.soundSystem && typeof window.soundSystem.playCorrect === "function") {
+                        window.soundSystem.playCorrect();
+                    }
+
+                    ships.splice(j, 1);
+                    pickNextTarget();
                 } else {
-                    showNotice(sessionNotice, "Copy was unavailable. Please select and copy the code manually.", "error");
+                    // Hit incorrect non-charging ship
+                    targetShots++;
+                    streak = 0;
+
+                    score = Math.max(0, score - 30);
+                    scoreDisplay.textContent = String(score);
+
+                    if (window.soundSystem && typeof window.soundSystem.playWrong === "function") {
+                        window.soundSystem.playWrong();
+                    }
                 }
+
+                updateAccuracyUI();
+                bullets.splice(i, 1);
+                break;
             }
         }
 
-        function resetForAnotherSession() {
-            stopParticipantListener();
-            currentSessionRef = null;
-            currentSession = null;
-            sessionPanel.classList.remove("show");
-            leaderboardPanel.classList.remove("show");
-            hideNotice(leaderboardNotice);
-            createGameForm.reset();
-            hideNotice(pageNotice);
-            hideNotice(sessionNotice);
-            renderSessionStatus("waiting");
-            document.getElementById("createHeading").scrollIntoView({ behavior: "smooth", block: "center" });
+        if (!hitSomething && b.y < 0) {
+            // Off-screen bullet counts against target accuracy
+            targetShots++;
+            updateAccuracyUI();
+            bullets.splice(i, 1);
         }
+    }
+}
 
-        createGameForm.addEventListener("submit", createGameSession);
-        copyCodeButton.addEventListener("click", copyJoinCode);
-        startSessionButton.addEventListener("click", () => changeSessionStatus("active"));
-        endSessionButton.addEventListener("click", () => changeSessionStatus("finished"));
-        newSessionButton.addEventListener("click", resetForAnotherSession);
 
-        async function initializePage() {
-            createSessionButton.disabled = true;
-            showNotice(pageNotice, "Connecting to Firebase...");
+/* =========================================================
+   DIVING / ATTACKS
+========================================================= */
 
-            try {
-                const credential = await signInAnonymously(auth);
-                currentUser = credential.user;
-                await loadVocabularySets();
-                if (vocabSetSelect.options.length > 1) {
-                    showNotice(pageNotice, "Connected. Choose a vocabulary set and game to create a session.", "success");
+function updateShips() {
+    let touchedEdge = false;
+
+    const diveChance = BASE_DIVE_CHANCE + (wave - 1) * DIVE_CHANCE_INCREMENT;
+    const now = Date.now();
+
+    for (let i = 0; i < ships.length; i++) {
+        const s = ships[i];
+
+        if (s.isDiving) {
+            s.x += s.diveSpeedX;
+            s.y += s.diveSpeedY;
+
+            // Collision with player
+            if (
+                Math.abs(s.x - player.x) < (s.width / 2 + player.width / 2) &&
+                Math.abs(s.y - player.y) < (s.height / 2 + player.height / 2)
+            ) {
+                ships.splice(i, 1);
+                takeDamage("SHIP COLLISION!");
+
+                if (s === currentTargetShip) {
+                    pickNextTarget();
                 }
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                showNotice(pageNotice, "Could not connect to Firebase. Confirm that Anonymous Authentication is enabled and that your Firestore rules allow the required reads and writes. Details: " + (error.message || "Unknown error"), "error");
-                vocabSetSelect.disabled = true;
-                createSessionButton.disabled = true;
+                continue;
+            }
+
+            // Reached bottom
+            if (s.y > CANVAS_HEIGHT - FOOTER_HEIGHT) {
+                s.isDiving = false;
+                s.x = s.originX;
+                s.y = s.originY;
+            }
+        } else {
+            s.x += horizontalSpeed * horizontalDirection;
+            s.y += downwardSpeed;
+
+            if (s.x - s.width / 2 < 20 || s.x + s.width / 2 > CANVAS_WIDTH - 20) {
+                touchedEdge = true;
+            }
+
+            // Random dive trigger
+            if (
+                now - lastDiveTime > Math.max(MIN_DIVE_COOLDOWN, BASE_DIVE_COOLDOWN - wave * 250) &&
+                Math.random() < diveChance
+            ) {
+                s.isDiving = true;
+                lastDiveTime = now;
+
+                const angle = Math.atan2(player.y - s.y, player.x - s.x);
+                s.diveSpeedX = Math.cos(angle) * (DIVE_SPEED + wave * 0.3);
+                s.diveSpeedY = Math.sin(angle) * (DIVE_SPEED + wave * 0.3);
+            }
+
+            // Touched defense line
+            if (s.y + s.height / 2 >= player.y - 10) {
+                triggerGameOver("Formation penetrated defenses!");
+                return;
             }
         }
+    }
 
-        initializePage();
-    </script>
+    if (touchedEdge) {
+        horizontalDirection *= -1;
+    }
+}
+
+
+/* =========================================================
+   HEALTH / GAME OVER / MESSAGES
+========================================================= */
+
+function takeDamage(reason) {
+    shields--;
+    shieldsDisplay.textContent = "♥ ".repeat(Math.max(0, shields)).trim();
+
+    showMessage(reason || "SHIELD HIT!", 1200);
+
+    if (window.soundSystem && typeof window.soundSystem.playExplosion === "function") {
+        window.soundSystem.playExplosion();
+    }
+
+    if (shields <= 0) {
+        triggerGameOver("Shields Destroyed!");
+    }
+}
+
+
+function triggerGameOver(reason) {
+    isGameOver = true;
+    gameStarted = false;
+
+    gameOverList.textContent = listTitle;
+    finalScore.textContent = String(score);
+    finalAccuracy.textContent = `${getAccuracyPercentage()}%`;
+    finalCorrect.textContent = String(correctAnswers);
+    finalCombo.textContent = String(bestStreak);
+
+    gameOverMessage.textContent = reason || "Game Over";
+    gameOverScreen.classList.remove("hidden");
+}
+
+
+function showMessage(text, duration = 1200) {
+    if (messageTimer) clearTimeout(messageTimer);
+
+    messageDisplay.textContent = text;
+    messageDisplay.classList.add("show");
+
+    messageTimer = setTimeout(() => {
+        messageDisplay.classList.remove("show");
+    }, duration);
+}
+
+
+/* =========================================================
+   DRAW LOOP
+========================================================= */
+
+function draw() {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Draw Player
+    ctx.save();
+    ctx.fillStyle = player.color;
+    ctx.shadowColor = "#00ffff";
+    ctx.shadowBlur = 12;
+
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y - player.height / 2);
+    ctx.lineTo(player.x - player.width / 2, player.y + player.height / 2);
+    ctx.lineTo(player.x + player.width / 2, player.y + player.height / 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Draw Bullets
+    ctx.save();
+    ctx.fillStyle = "#00ffff";
+    ctx.shadowColor = "#00ffff";
+    ctx.shadowBlur = 8;
+    for (const b of bullets) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // Draw Ships
+    for (const s of ships) {
+        ctx.save();
+
+        if (s.isDiving) {
+            ctx.fillStyle = "#ff3366";
+            ctx.shadowColor = "#ff3366";
+            ctx.shadowBlur = 15;
+        } else {
+            ctx.fillStyle = s.color;
+            ctx.shadowColor = s.color;
+            ctx.shadowBlur = 6;
+        }
+
+        ctx.fillRect(
+            s.x - s.width / 2,
+            s.y - s.height / 2,
+            s.width,
+            s.height
+        );
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.strokeRect(
+            s.x - s.width / 2,
+            s.y - s.height / 2,
+            s.width,
+            s.height
+        );
+
+        // Term label
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        let label = s.term;
+        if (label.length > 15) {
+            label = label.substring(0, 13) + "..";
+        }
+
+        ctx.fillText(label, s.x, s.y);
+        ctx.restore();
+    }
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop() {
+    if (gameStarted && !isGameOver) {
+        // Player Controls
+        if (keys["ArrowLeft"] || keys["a"] || keys["A"]) {
+            player.x = Math.max(player.width / 2 + 10, player.x - player.speed);
+        }
+        if (keys["ArrowRight"] || keys["d"] || keys["D"]) {
+            player.x = Math.min(CANVAS_WIDTH - player.width / 2 - 10, player.x + player.speed);
+        }
+
+        updateBullets();
+        updateShips();
+        draw();
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================================================
+   LISTENERS
+========================================================= */
+
+window.addEventListener("keydown", (e) => {
+    keys[e.key] = true;
+
+    if (e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        fireBullet();
+    }
+});
+
+
+window.addEventListener("keyup", (e) => {
+    keys[e.key] = false;
+});
+
+
+restartButton.addEventListener("click", () => {
+    initGame();
+});
+
+
+libraryButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+});
+
+
+soundButton.addEventListener("click", () => {
+    if (window.soundSystem && typeof window.soundSystem.toggleMute === "function") {
+        const muted = window.soundSystem.toggleMute();
+        soundButton.textContent = muted ? "🔇" : "🔊";
+    }
+});
+
+
+/* =========================================================
+   STARTUP
+========================================================= */
+
+loadVocabularySet(setId).catch((err) => {
+    loadingText.textContent = "Error Loading Set";
+    loadingDetails.textContent = err.message;
+});
+
+
+requestAnimationFrame(gameLoop);
+
+
+</script>
+
+
 </body>
+
 </html>
