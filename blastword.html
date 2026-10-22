@@ -3522,22 +3522,18 @@ function handleCollisions() {
                  * a shield when shot.
                  */
 
-                if (
-                    ship.diving
-                ) {
+              if (
+    ship.diving
+) {
 
-                    handleDivingShipHit(
-                        ship
-                    );
+    // Hazard hits do not count as accuracy attempts.
+    totalShots = Math.max(0, totalShots - 1);
 
-                }
+    handleDivingShipHit(
+        ship
+    );
 
-                else {
-
-                    handleNormalShipHit(
-                        ship
-                    );
-                }
+}
 
 
                 break;
