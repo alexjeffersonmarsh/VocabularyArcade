@@ -1700,6 +1700,12 @@ let correctAnswers =
 let totalShots =
     0;
 
+let hazardHits =
+    0;
+
+let accuracyCorrect =
+    0;
+
 let streak =
     0;
 
@@ -3522,18 +3528,25 @@ function handleCollisions() {
                  * a shield when shot.
                  */
 
-              if (
-    ship.diving
-) {
+                if (
+                    ship.diving
+                ) {
 
-    // Hazard hits do not count as accuracy attempts.
-    totalShots = Math.max(0, totalShots - 1);
+                    // Exclude hazard hits from accuracy without changing gameplay.
+                    hazardHits++;
 
-    handleDivingShipHit(
-        ship
-    );
+                    handleDivingShipHit(
+                        ship
+                    );
 
-}
+                }
+
+                else {
+
+                    handleNormalShipHit(
+                        ship
+                    );
+                }
 
 
                 break;
@@ -3736,6 +3749,8 @@ function handleCorrectNormalHit(
 ) {
 
     correctAnswers++;
+
+    accuracyCorrect++;
 
 
     streak++;
@@ -4303,12 +4318,12 @@ function updateHUD() {
 
 
     const accuracy =
-        totalShots > 0
+        (totalShots - hazardHits) > 0
 
             ? Math.round(
                 (
-                    correctAnswers /
-                    totalShots
+                    accuracyCorrect /
+                    (totalShots - hazardHits)
                 )
                 *
                 100
@@ -5100,12 +5115,12 @@ function triggerGameOver(
 
 
     const accuracy =
-        totalShots > 0
+        (totalShots - hazardHits) > 0
 
             ? Math.round(
                 (
-                    correctAnswers /
-                    totalShots
+                    accuracyCorrect /
+                    (totalShots - hazardHits)
                 )
                 *
                 100
@@ -5167,6 +5182,12 @@ function resetGame() {
 
 
     totalShots =
+        0;
+
+    hazardHits =
+        0;
+
+    accuracyCorrect =
         0;
 
 
