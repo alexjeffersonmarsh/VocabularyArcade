@@ -635,7 +635,7 @@ function createLevel() {
          */
 
         const speed =
-            (level - 1) * 1;
+            (level * 1) * 1;
 
 
         bubbles.push({
