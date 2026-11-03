@@ -1259,30 +1259,27 @@ function renderLists() {
     Remove List
 </button>
 
+</div>
 
-                <div class="gameButtons">
+<div class="gameButtons">
 
+    <!-- GEMWORDS -->
 
-                    <!-- GEMWORDS -->
+    <a
+        class="playButton gemButton"
+        href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
+    >
+        💎 GemWords
+    </a>
 
-                    <a
-                        class="playButton gemButton"
-                        href="${GEMWORD_URL}?id=${encodeURIComponent(list.id)}"
-                    >
+    <!-- BUBBLEWORD -->
 
-                        💎 GemWords
+    <a
+        class="playButton bubbleButton"
+        href="${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}"
+    >
+        🫧 BubbleWord
 
-                    </a>
-
-
-                    <!-- BUBBLEWORD -->
-
-                    <a
-                        class="playButton bubbleButton"
-                        href="${BUBBLEWORD_URL}?id=${encodeURIComponent(list.id)}"
-                    >
-
-                        🫧 BubbleWord
 
                     </a>
 
