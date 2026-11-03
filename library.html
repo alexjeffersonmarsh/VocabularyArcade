@@ -441,7 +441,8 @@ from
 import {
     getFirestore,
     collection,
-    getDocs
+    getDocs,
+    deleteDoc
 }
 from
     "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
@@ -537,39 +538,62 @@ catch (error) {
 
 }
 
+async function removeList(listId) {
+    const confirmed = confirm(
+        "Are you sure you want to permanently remove this vocabulary list?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+        await deleteDoc(
+            doc(db, "vocabSets", listId)
+        );
+
+        alert("Vocabulary List removed successfully.");
+
+        // Refresh the displayed lists
+        loadLists();
+
+    } catch (error) {
+        console.error(error);
+        alert("Unable to remove list.");
+    }
+}
+
 
 /* =========================================
    GAME URLS
 ========================================= */
 
 const GEMWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/gemword.html";
+    "https://wordpreps.com/gemword.html";
 
 
 const BUBBLEWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/bubbleword.html";
+    "https://wordpreps.com/bubbleword.html";
 
 
 const CHOICEWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/choiceword.html";
+    "https://wordpreps.com/choiceword.html";
 
 
 const MATCHWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/matchword.html";
+    "https://wordpreps.com/matchword.html";
 
 
 const FLASHWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/flashcard.html";
+    "https://wordpreps.com/flashcard.html";
 
 
 const SORTWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/sortword.html";
+    "https://wordpreps.com/sortword.html";
 
 const BLASTWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/blastword.html";
+    "https://wordpreps.com/blastword.html";
 
 const QUIZWORD_URL =
-    "https://alexjeffersonmarsh.github.io/VocabularyArcade/quizword.html";
+    "https://wordpreps.com/quizword.html";
 
 
 /* =========================================
@@ -1195,24 +1219,36 @@ function renderLists() {
 
                     </div>
 
+<div class="meta">
+    ${list.itemCount || 0} words
+    ${
+        createdDate
+            ? " • Added " + createdDate
+            : ""
+    }
+</div>
 
-                    <div class="meta">
+<button
+    class="remove-list-btn"
+    onclick="event.stopPropagation(); removeList('${list.id}')">
+    Remove List
+</button>
 
-                        ${list.itemCount || 0}
-                        words
+.remove-list-btn {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #c62828;
+    color: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
 
-                        ${
-                            createdDate
-                                ? " • Added " +
-                                  createdDate
-                                : ""
-                        }
-
-                    </div>
-
-
-                </div>
-
+.remove-list-btn:hover {
+    background: #b71c1c;
+}
+``
 
                 <div class="gameButtons">
 
