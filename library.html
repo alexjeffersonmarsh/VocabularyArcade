@@ -24,6 +24,23 @@
 
     <style>
 
+     /* =================================================
+           REMOVE LIST
+        ================================================= */
+        .remove-list-btn {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #c62828;
+    color: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.remove-list-btn:hover {
+    background: #b71c1c;
+}
         /* =================================================
            SORTWORD
         ================================================= */
@@ -442,7 +459,8 @@ import {
     getFirestore,
     collection,
     getDocs,
-    deleteDoc
+    deleteDoc,
+    doc
 }
 from
     "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
@@ -539,6 +557,7 @@ catch (error) {
 }
 
 async function removeList(listId) {
+
     const confirmed = confirm(
         "Are you sure you want to permanently remove this vocabulary list?"
     );
@@ -546,20 +565,26 @@ async function removeList(listId) {
     if (!confirmed) return;
 
     try {
+
         await deleteDoc(
             doc(db, "vocabSets", listId)
         );
 
-        alert("Vocabulary List removed successfully.");
+        alert("Vocabulary list removed.");
 
-        // Refresh the displayed lists
-        loadLists();
+        await loadLibrary();
 
-    } catch (error) {
+    }
+    catch(error) {
+
         console.error(error);
+
         alert("Unable to remove list.");
     }
 }
+
+window.removeList = removeList;
+
 
 
 /* =========================================
@@ -1234,21 +1259,6 @@ function renderLists() {
     Remove List
 </button>
 
-.remove-list-btn {
-    margin-top: 8px;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 6px;
-    background: #c62828;
-    color: white;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.remove-list-btn:hover {
-    background: #b71c1c;
-}
-``
 
                 <div class="gameButtons">
 
