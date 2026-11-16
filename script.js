@@ -747,7 +747,9 @@ function update() {
             level === 1
         ) {
 
-            return;
+           b.x +=
+           b.vx;
+
         }
 
 
